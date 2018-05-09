@@ -1,0 +1,1439 @@
+var wade = wade || {};
+wade.role = wade.role || {};
+var config1 = new Object();
+var config2 = new Object();// 批量开卡
+var NodeArray = new Array(5);// 节点
+var personArray = new Array(3);// 存 人员编号，姓名，部门
+
+/*window.onload = function () { 
+    new uploadPreview({ UpBtn: "up_img", DivShow: "imgdiv", ImgShow: "imgShow" });
+}*/
+
+
+
+
+
+
+var ztreeConf = $.extend({}, {
+	id : "tree",
+	url : "/personnel/getptree.do",
+	// 获取所有节点
+	btns : [ "add", "delete", "edit", "cancel" ],
+	DatatableId : "personnelexample",
+	adddiv : "adddept",
+	search : "searchdiv",
+	search_hide : "searchHide",
+	searchurl : "/personnel/searchByDept.do",
+	addurl : "/personnel/adddept.do",
+	add_shown : add_shownTree,
+	deleteurl : "/personnel/deleteTreeNode.do",
+	// delnode: delnode1,
+	// oncancel: cancel,
+	// afterdelete:afterdel,
+	setting : {
+		data : {
+			simpleData : {
+				enable : true
+			// 简单数据
+			}
+		},
+		view : {
+			selectedMulti : false
+		},
+		callback : {
+			onClick : nodeClick
+		}
+	},
+
+});
+
+// $.fn.zTree.init($("#"+ztreeConf.id),ztreeConf.setting, ztreeConf.zNodes);
+wade.libs.tree(ztreeConf);
+
+window.onload = function() {
+	new uploadPreview({
+		UpBtn : "up_img",
+		DivShow : "imgdiv",
+		ImgShow : "imgShow"
+	});
+}
+
+function afterdel() {
+	$("[name=searchValue0_search_hidden]").val("").trigger('keyup.DT');
+}
+
+// 点击节点是触发事件,触发表格
+function nodeClick(event, treeId, treeNode) {
+	var zTree = $.fn.zTree.getZTreeObj(treeId);
+	var node = zTree.getSelectedNodes()[0];
+	if (node.spId != -1) {
+		// 点击的是默认部门节点 显示所有员工信息
+		$("[name=searchValue0_search_hidden]").val(node.id).trigger('keyup.DT');
+	} else {
+		// 点击的不是默认部门节点
+		$("[name=searchValue0_search_hidden]").val('').trigger('keyup.DT');
+	}
+
+}
+// 点击cancel回调函数
+function cancel() {
+
+}
+
+// 弹出部门树节点的信息
+
+function add_shownTree(devClone, treeid, flag) {
+
+	var selnode = wade.tree.selectNode(treeid);
+	if (selnode == undefined) {
+		devClone.modal('hide');
+		wade.libs.alert("请选择需要操作的部门", 2);
+		return false;
+
+	}
+
+	var zTree = $.fn.zTree.getZTreeObj(treeid);
+	var node = zTree.getSelectedNodes()[0];
+	// /console.log(selnode);
+	var id = node.id;// 树的id
+	devClone.find('input[name="bimDeptId"]').val(id);
+	devClone.find('input[name="deptName"]').on('blur', function() {
+		var deptName = devClone.find('input[name="deptName"]').val();
+		$.ajax({
+			url : '/personnel/selectpinyin.do',
+			data : {
+				val : deptName
+			},
+			dataType : 'json',
+			success : function(data) {
+				var result = eval(data);
+				devClone.find('input[name="pinyin"]').val(result.pinyin);
+			}
+
+		});
+
+	});
+	if (flag == 0) {
+		// 添加树节点时上级部门就是当前选中的节点
+		devClone.find('input[name="type"]').val(flag);// 设置为添加
+		devClone.find('input[name="inCode"]').val(node.name);
+
+	} else {
+		// 修改数节点
+		if (selnode.pId == null) {
+			if (selnode.pName == null) {
+				devClone.find('input[name="inCode"]').val("无");
+			} else {
+				devClone.find('input[name="inCode"]').val(selnode.pName);
+			}
+
+		} else {
+			var parentnode = zTree.getNodeByParam("id", selnode.pId, null);
+			devClone.find('input[name="inCode"]').val(parentnode.name);
+		}
+
+		devClone.find('input[name="deptCode"]').val(node.deptCode);
+		devClone.find('input[name="deptName"]').val(node.name);
+		devClone.find('input[name="pinyin"]').val(node.pinyin);
+		devClone.find('input[name="type"]').val(flag);// 设置为修改
+		// 修改树节点
+		devClone.find('input[name="bimDeptId"]').val(id);
+		// $("#" + config.id).DataTable().ajax.reload();
+	}
+
+	devClone.find('#submit').click(register);
+
+	function register(event) {
+		var code = devClone.find('input[name="deptCode"]').val();
+		var name = devClone.find('input[name="deptName"]').val();
+		var pinyin = devClone.find('input[name="pinyin"]').val();
+		var msg = null;
+		if (code == '') {
+			msg = '部门编号不能为空';
+			devClone
+					.find("#deptCodeNotice")
+					.html(
+							'<span class="point-box errorbgTop dropdown"><i class="sprite icon_arrow_up2 pa"></i>'
+									+ msg + '</span>').show();
+			event.stopImmediatePropagation(); // 阻止提交数据
+			return false;
+		} else if (!RegExpObj.isNumber(code)) {
+			msg = '部门编号只能是数字';
+			devClone
+					.find("#deptCodeNotice")
+					.html(
+							'<span class="point-box errorbgTop dropdown"><i class="sprite icon_arrow_up2 pa"></i>'
+									+ msg + '</span>').show();
+			event.stopImmediatePropagation(); // 阻止提交数据
+			return false;
+		} else if (checkAllName(name, '部门名称') != 100) {
+			msg = checkAllName(name, '部门名称');
+			devClone
+					.find("#deptNamerNotice")
+					.html(
+							'<span class="point-box errorbgTop dropdown"><i class="sprite icon_arrow_up2 pa"></i>'
+									+ msg + '</span>').show();
+			event.stopImmediatePropagation(); // 阻止提交数据
+			return false;
+		} else if (checkAllName(pinyin, '拼音') != 100) {
+			msg = checkAllName(pinyin, '拼音');
+			devClone
+					.find("#pinyinNotice")
+					.html(
+							'<span class="point-box errorbgTop dropdown"><i class="sprite icon_arrow_up2 pa"></i>'
+									+ msg + '</span>').show();
+			event.stopImmediatePropagation(); // 阻止提交数据
+			return false;
+		}
+
+	}
+	devClone.find('input').on('focus', function() {
+		devClone.find(".point-out").hide();
+
+	});
+
+}
+
+// 需要显示的按钮
+config1.btns = new Array({
+	'id' : '10001',
+	'name' : '操作',
+	'fun' : showPersonInfo
+}, {
+	'id' : '10002',
+	'name' : '添加',
+	'fun' : addPersonInfo
+},/*
+	 * { 'id' : '10002', 'name' : 'fileadd', 'fun' : null },
+	 */
+{
+	'id' : "10003",
+	'name' : 'del',
+	"fun" : null
+}, {
+	'id' : "10004",
+	'name' : '移至',
+	"fun" : move
+}, {
+	'id' : "10005",
+	'name' : '批量开卡',
+	"fun" : batchcard
+}, {
+	'id' : "10006",
+	'name' : '身份管理',
+	"fun" : identitymanagement
+}, {
+	'id' : "10007",
+	'name' : '导入',
+	"fun" : importInfo
+}, {
+	'id' : "10008",
+	'name' : '导出',
+	"fun" : exportInfo
+});
+
+config1.search = new Array(
+
+{
+	'type' : 'search',
+	'placeholder' : '编号',
+	'url' : null,
+	'index' : 1
+}, {
+	'type' : 'search_hidden',
+	'placeholder' : '',
+	'url' : null,
+	'index' : 0
+});
+
+/*
+ * config2.btns =[]; config2.search = new Array( { 'type' : 'search',
+ * 'placeholder' : '卡号', 'url' : null, 'index' : 2 }, { 'type' :
+ * 'search_hidden', 'placeholder' : null, 'url' : null, 'index' : 1 } );
+ */
+
+function fillFormData(name, value, div) {
+	var form = div.find('#form1');
+	var form2 = div.find('#form2');
+	var input = form.find('input[name=' + name + '][type=text]').val(value);
+	var input = form.find('input[name=' + name + '][type=hidden]').val(value);
+	form.find('textarea[name=' + name + ']').val(value);
+	form.find('select[name=' + name + ']').val(value).trigger("change"); // select2
+	if(name=='sex'){
+		if(value=='男'){
+			form.find('#radio1').attr('checked', 'checked');
+		}else{
+			form.find('#radio2').attr('checked', 'checked');
+		}
+	}
+	form2.find('input[name=' + name + '][type=text]').val(value);
+	if(name=='photo1'){
+		form.find('#imgShow').attr('src',value);
+	}
+	
+	
+	
+};
+
+// 操作
+function showPersonInfo(sel_tr, all_tr, sel_obj_arr, sel_obj) {
+	if (sel_obj_arr.length == 0) {
+		wade.libs.alert("请选择操作的人员!", 2);
+		return;
+	}
+	var devClone = $("#cardModal").clone(true);
+	devClone.modal('show').on('hidden.bs.modal', function(event) {
+		$(this).remove();
+	});
+	console.log(sel_obj);
+	$.each(sel_obj, function(name, value) {
+		wade.libs.datatable_fill_form_data(name, value, devClone);
+	});
+	devClone.find('input[type="text"]').attr('disabled',true);
+	var tablehtml = '';
+	$.ajax({
+		url : "/Card/cardInfo.do",
+		data : {
+			personId : sel_obj.personId
+		},
+		async : false,
+		success : function(data) {
+			result = JSON.parse(data);
+			$.each(result, function(index, value) {
+
+				if (value.cardStatus == 0) {
+					tablehtml +='<tr ><td>'+(index + 1) +'</td><td>'+ value.cardId +'</td><td>正常卡</td><td  style="display:none;">'+value.bimCardId+'</td></tr>'
+				} else {
+					tablehtml +='<tr ><td>'+(index + 1) +'</td><td>'+value.cardId +'</td><td>挂失卡</td><td  style="display:none;">'+value.bimCardId+'</td></tr>'
+				}
+
+			});
+			devClone.find('#tr1').after(tablehtml);
+			
+		}
+	});
+
+	//点击tr
+	devClone.find("tr").bind('click',clickTr);
+	
+   function clickTr(){
+	   $("tr").removeAttr('class');
+		$(this).attr('class', 'active');
+		var val = $(this).children('td').eq(2).html();
+		if (val == '正常卡') {
+			devClone.find('button[name="unnormalcard"]').attr(
+					'disabled', true);
+			devClone.find('button[name="normalcard"]').attr(
+					'disabled', false);
+		} else if(val == '挂失卡'){
+			devClone.find('button[name="normalcard"]').attr(
+					'disabled', true);
+			devClone.find('button[name="unnormalcard"]').attr(
+					'disabled', false);
+		}else{
+			devClone.find('button[name="normalcard"]').attr(
+					'disabled', true);
+			devClone.find('button[name="unnormalcard"]').attr(
+					'disabled', true);
+			devClone.find('#card-bind-btn').attr(
+					'disabled', false);
+		}
+   }
+	
+	
+	
+	
+	//开卡
+	devClone.find('#card-bind-btn').click(function(){
+		//alert(devClone.find('tr').length);
+		//var index=devClone.find('tr.active').children('td').eq(0).html();
+		var index=devClone.find('tr').length;
+		//var bimCardId=devClone.find('tr.active').children('td').eq(3).html();
+		var bindcardClone = $("#bindcardModal").clone(true);
+		bindcardClone.modal('show').on('hidden.bs.modal', function(event) {
+			$(this).remove();
+		});
+		 
+		 //alert();
+		 bindcardClone.find('input[name="personId"]').val(sel_obj.personId);
+		
+		//alert(formdata);
+		 var tablehtml='';
+		 bindcardClone.find('#submit').click(function(){
+			 var  cardId=bindcardClone.find('input[name="cardId"]').val();
+			 var jsoninfo = bindcardClone.find("form").serializeObject();
+			 var formdata = JSON.stringify(jsoninfo);
+			// alert(cardId);
+			 $.ajax({
+					url : "/Card/bindCardInfo.do",
+					data : {
+						formdata : formdata
+					},
+					async : false,
+					success : function(data) {
+						result = JSON.parse(data);
+						//console.log(result);
+						if(result.success){
+							bindcardClone.modal('hide');
+							wade.libs.alert(result.msg,3,devClone);
+							tablehtml +='<tr ><td>'+(index) +'</td><td>'+ cardId +'</td><td>正常卡</td><td  style="display:none;">'+result.object.bimCardId+'</td></tr>'
+						    devClone.find('tr').eq(index-1).after(tablehtml);
+							//devClone.find("tr").removeAttr('active');
+							devClone.find("tr").bind('click',clickTr);
+							//clickTr();
+						}else{
+						
+							bindcardClone.modal('hide');
+							wade.libs.alert(result.msg, 0,devClone);
+								
+						}
+						
+						
+					}
+				});
+		 });
+			
+		});	
+	
+
+	
+
+	
+	//点击换卡
+	devClone.find('#card-swap-btn').click(function(){
+		var card=devClone.find('tr.active').children('td').eq(1).html();
+		var bimCardId=devClone.find('tr.active').children('td').eq(3).html();
+		var index=devClone.find('tr.active').children('td').eq(0).html();
+		
+		var swapcardClone = $("#swapcardModal").clone(true);
+		swapcardClone.modal('show').on('hidden.bs.modal', function(event) {
+			$(this).remove();
+		});
+		
+		swapcardClone.find('input[name="oldcard"]').val(card);
+		swapcardClone.find('#submit').click(function(){
+			var cardId=swapcardClone.find('input[name="newcard"]').val();
+			$.ajax({
+				url : "/Card/updateswapCardInfo.do",
+				data : {
+					cardId : cardId,
+					bimCardId:bimCardId
+				},
+				async : false,
+				success : function(data) {
+					result = JSON.parse(data);
+					
+					if(result.success){
+						wade.libs.alert(result.msg,3,devClone);
+						swapcardClone.modal('hide');
+						devClone.find('tr').eq(index).children('td').eq(1).html(cardId);
+						//devClone.find("tr").removeAttr('active');
+					}else{
+						wade.libs.alert(result.msg, 0,devClone);
+						swapcardClone.modal('hide');	
+					}
+				}
+			});
+		});	
+	});
+	
+	
+	//点击挂失
+	devClone.find('#card-loss-btn').click(function(){
+		var index=devClone.find('tr.active').children('td').eq(0).html();
+		var bimCardId=devClone.find('tr.active').children('td').eq(3).html();
+			$.ajax({
+				url : "/Card/updatelossCardInfo.do",
+				data : {
+					bimCardId:bimCardId
+					
+				},
+				async : false,
+				success : function(data) {
+					result = JSON.parse(data);
+					if(result.success){
+						wade.libs.alert(result.msg,3,devClone);
+						devClone.find('tr').eq(index).children('td').eq(2).html('挂失卡');
+						//clickTr();
+						//devClone.find("tr").removeAttr('active');
+					}else{
+						wade.libs.alert(result.msg, 0,devClone);
+							
+					}
+				}
+			});
+		});	
+	//解挂
+	devClone.find('#card-unloss-btn').click(function(){
+		var index=devClone.find('tr.active').children('td').eq(0).html();
+		var bimCardId=devClone.find('tr.active').children('td').eq(3).html();
+			$.ajax({
+				url : "/Card/updateunlossCardInfo.do",
+				data : {
+					bimCardId:bimCardId
+				},
+				async : false,
+				success : function(data) {
+					result = JSON.parse(data);
+					if(result.success){
+						wade.libs.alert(result.msg,3,devClone);
+						devClone.find('tr').eq(index).children('td').eq(2).html('正常卡');
+						//clickTr();
+						//devClone.find("tr").removeAttr('active');
+					}else{
+						wade.libs.alert(result.msg, 0,devClone);
+							
+					}
+				}
+			});
+		});	
+	
+	//退卡
+	devClone.find('#card-return-btn').click(function(){
+		//var index=devClone.find('tr.active').children('td').eq(0).html();
+		var bimCardId=devClone.find('tr.active').children('td').eq(3).html();
+		var tablehtml='';
+			$.ajax({
+				url : "/Card/returnCardInfo.do",
+				data : {
+					bimCardId:bimCardId,
+					personId:sel_obj.personId
+				},
+				async : false,
+				success : function(data) {
+					result = JSON.parse(data);
+					if(result.success){
+						wade.libs.alert(result.msg,3,devClone);
+						//console.log(result);
+						devClone.find('tr:gt(0)').remove();
+						$.each(result.object, function(index, value) {
+
+							if (value.cardStatus == 0) {
+								tablehtml +='<tr ><td>'+(index + 1) +'</td><td>'+ value.cardId +'</td><td>正常卡</td><td  style="display:none;">'+value.bimCardId+'</td></tr>'
+							} else {
+								tablehtml +='<tr ><td>'+(index + 1) +'</td><td>'+value.cardId +'</td><td>挂失卡</td><td  style="display:none;">'+value.bimCardId+'</td></tr>'
+							}
+
+						});
+						devClone.find('#tr1').after(tablehtml);
+						devClone.find("tr").bind('click',clickTr);
+						
+					}else{
+						wade.libs.alert(result.msg, 0,devClone);
+							
+					}
+				}
+			});
+	});
+	
+	
+	
+	
+	
+	
+	// 点击详细信息
+	devClone.find('#person-info').click(function() {
+		var personClone = $("#personModal").clone(true);
+		personClone.modal('show').on('hidden.bs.modal', function(event) {
+			$(this).remove();
+		});
+		$.ajax({
+			url : '/personnel/selectCateType.do',
+			dataType : 'json',
+			async : false,
+			success : function(data) {
+				var result = eval(data);
+				for(var i in result){
+					if(result[i].id!=undefined){
+						
+						if(result[0].id==-1&&result.length==1){
+							personClone.find("*[name=custom3]").attr("disabled", "disabled");
+							personClone.find("*[name=custom3]").append('<option value="'+result[0].id+'" ">'+result[0].text+'</option>');
+		   	                 	break;
+		   	                 }
+							else{
+								personClone.find("*[name=custom3]").append('<option value="'+result[i].id+'">'+result[i].text+'</option>');
+							}
+						
+					}
+					
+					
+					
+				}
+			}
+
+		});
+		$.each(sel_obj, function(name, value) {
+			fillFormData(name, value, personClone);
+		});
+        console.log(sel_obj	);
+		personClone.find('input').attr('disabled', true);
+		personClone.find('select').attr('disabled', true);
+		personClone.find('.fingerbtn').remove()
+		personClone.find('#submit').remove();
+		function ChangeTab(personClone) {
+			personClone.find('#allInfo').removeClass('active in');
+			personClone.find('#fingerInfo').removeClass('active in');
+			personClone.find('#basicInfo').addClass('active in');
+			personClone.find('li[name="allInfo"]').removeClass('active in');
+			personClone.find('li[name="fingerInfo"]').removeClass('active in');
+			personClone.find('li[name="basicInfo"]').addClass('active in');
+		}
+
+		ChangeTab(personClone);
+
+		personClone.find('#jb').click(function() {
+			personClone.find('#allInfo').removeClass('active in');
+			personClone.find('#fingerInfo').removeClass('active in');
+			personClone.find('#basicInfo').addClass('active in');
+
+		});
+		personClone.find('#xx').click(function() {
+			personClone.find('#basicInfo').removeClass('active in');
+			personClone.find('#fingerInfo').removeClass('active in');
+			personClone.find('#allInfo').addClass('active in');
+
+		});
+		personClone.find('#zw').click(function() {
+			personClone.find('#allInfo').removeClass('active in');
+			personClone.find('#basicInfo').removeClass('active in');
+			personClone.find('#fingerInfo').addClass('active in');
+			
+
+		});
+	});
+
+	
+	
+	
+	
+};
+
+// 移至
+function move(sel_tr, all_tr, sel_obj_arr, sel_obj) {
+	if (sel_obj_arr.length == 0) {
+		wade.libs.alert("请选择需要移至的员工!", 2);
+		return;
+	}
+	var devClone = $("#changedept").clone(true);
+	devClone.modal('show').on('hidden.bs.modal', function(event) {
+		$(this).remove();
+	});
+	// 修改clone后的modal的id
+	var tree = devClone.find("#changetree");
+	// var treeid='clonechangetree';
+	// treeid = new Date().getTime().toString();
+	tree.attr('id', 'clonechangetree');
+	var treeid = tree.attr('id');
+	var ztreeConf = $.extend({}, {
+		id : tree.attr('id'),
+		url : "/personnel/getptree.do",
+		// 获取所有节点
+		btns : [],
+		setting : {
+			data : {
+				simpleData : {
+					enable : true
+				// 简单数据
+				}
+			},
+			view : {
+				selectedMulti : false
+			}
+
+		}
+	});
+
+	wade.libs.tree(ztreeConf);
+
+	var condition = "[";
+	$.each(sel_obj_arr, function(index, obj) {
+		var personId = obj.personId;
+		// var personName = obj.personName;
+		// alert(personCode);
+		if (index == 0)
+
+			condition += personId;
+		else
+			condition += ',' + personId
+
+	});
+	condition += "]";
+	devClone.find(".btn-primary").unbind("click").click(
+			function() {
+				if (!wade.tree.selectNode(treeid)) {
+
+					wade.libs.alert("请选择部门！", 0, devClone.find('div:first'));
+				} else {
+					var deptid = wade.tree.selectNode(treeid).id
+					// alert(deptid);
+					$.ajax({
+						url : "/personnel/changedept.do",
+						data : "condition=" + condition + "&deptid=" + deptid,
+						// 默认获取div下第一个from数据
+						success : function(data) {
+							result = JSON.parse(data);
+							if (result.success) {
+								wade.libs.alert('修改成功');
+								$(".paginate_button.active").click(); // 点击分页获取最新数据
+								devClone.modal('hide');
+							} else {
+								wade.libs.alert(result.msg, 0, devClone
+										.find('div:first'));
+							}
+						}
+					});
+				}
+
+			});
+
+	// alert(cartypeid);
+
+	// console.log(condition);
+
+};
+// 批量开卡
+function batchcard(sel_tr, all_tr, sel_obj_arr, sel_obj) {
+	if (sel_obj_arr.length == 0) {
+		wade.libs.alert("请选择需要移至的员工!", 2);
+		return;
+	}
+	var devClone = $("#batchcard").clone(true);
+
+	devClone.modal({
+		backdrop : 'static',
+		keyboard : false
+	}).on('hidden.bs.modal', function(event) {
+		$(this).remove();
+	});
+	var tablehtml = '';
+	// var cardNumberArray=devClone.find("input[name='cardNumberArray']");
+	$.each(sel_obj_arr,function(index, value) {
+				tablehtml += '<tr ><td>'+ value.personCode+ '</td><td>'+ value.personName+ '</td><td>'+ value.deptName+ '</td><td>'+ value.phone+ '</td><td><input type="text" name="cardNumberArray" ><input type="hidden" name ="personIdArray" value="'+ value.personId + '"></td></tr>'
+					});
+	
+	devClone.find('#tr1').after(tablehtml);
+	/*
+	 * 回车
+	 */
+	var el = devClone.find('input[name="cardNumberArray"]');
+	el.keydown(function() {
+		if (event.keyCode == 13) {// 输入回车键
+       $(this).parent().parent().next().children('td').eq('4').find('input[name="cardNumberArray"]').focus();
+		
+		}
+	});
+
+	devClone.find('#add').click(function() {
+		var jsoninfo = devClone.find("form:first").serializeObject();
+		var formdata = JSON.stringify(jsoninfo);
+		$.ajax({
+			url : "/personnel/batchcard.do",
+			data : {
+				formdata : formdata
+			},
+			// 默认获取div下第一个from数据
+			success : function(data) {
+				result = JSON.parse(data);
+				if (result.success) {
+					devClone.modal("hide");
+					wade.libs.alert('批量开卡成功');
+
+				} else {
+					devClone.modal("hide");
+					wade.libs.alert('批量开卡失败', 0);
+				}
+			}
+		});
+
+	});
+
+};
+
+
+
+// 身份管理
+function identitymanagement(sel_tr, all_tr, sel_obj_arr, sel_obj) {
+
+	var devClone = $("#bimcateModal").clone(true);
+	devClone.modal({
+		backdrop : 'static',keyboard : false})
+		.on('hidden.bs.modal', function(event) {$(this).remove();});
+	//显示身份信息
+	$.ajax({
+		url : "/personnel/bimcate.do",
+		async : false,
+		success : function(data) {
+			result = JSON.parse(data);
+			//console.log(result);
+			//var table='';
+			if (result.length!=0) {
+				$.each(result, function(index, value) {
+					var table='<tr ><td>'+(index+1)+'</td><td><input type="text" name="cateName"></td><td><input  type="text" name="note"></td><td style="text-align:center;"><a class="update">修改</a><a class="delete" style="margin-left: 10px;">删除</a></td><td  style="display:none;" name="bimCateId">'+value.bimCateId+'</td></tr>';
+					devClone.find('tr:last').after(table);
+					var a=devClone.find('tr:last');
+					//console.log(a.children('td').eq(0).html());
+					//alert(value.cateName);
+					a.find('input[name="cateName"]').val(value.cateName);
+					a.find('input[name="note"]').val(value.note);
+					//a.find('input[name="bimCateId"]').html(value.bimCateId);
+				});
+				
+			} 
+			
+		}
+	});
+	
+
+	//点击tr
+	devClone.find("tr").bind('click',clickTr);
+	
+   function clickTr(){
+	   devClone.find("tr").removeAttr('class');
+		$(this).attr('class', 'active');
+   }
+	
+	
+	
+	
+	
+	
+	/*
+	 * 点击修改操作
+	 */
+	devClone.find('.update').bind('click',updateCate);
+	
+	function updateCate(){
+		//alert(0);
+		var bimCateId=$(this).parent().next().html();
+		var noteelem=$(this).parent().prev();
+		var note=noteelem.find('input[name="note"]').val();
+		var cateName=noteelem.prev().find('input[name="cateName"]').val();
+		$.ajax({
+			url : "/personnel/updatecate.do",
+			async : false,
+			data : {
+				bimCateId : bimCateId,
+				cateName:cateName,
+				note:note
+			},
+			success : function(data) {
+				result = JSON.parse(data);
+				//console.log(result);
+				if(result.success){
+					wade.libs.alert(result.msg,3,devClone);
+				}else{
+					wade.libs.alert(result.msg, 0,devClone);
+					//$(this).parent().prev().prev().find('input[name="cateName"]').css('border-color','red')
+				}
+			}
+		});
+		
+	}
+	
+	
+	
+	/*
+	 * 点击添加
+	 */
+	devClone.find('#add').click(function(){
+		
+		$.ajax({
+			url : "/personnel/addcate.do",
+			async : false,
+			success : function(data) {
+				result = JSON.parse(data);
+				console.log(result);
+				if(result.success){
+					var index=devClone.find('tr').length;
+					var lasttr=devClone.find("tr:last");
+					var table='<tr ><td>'+index+'</td><td><input type="text" name="cateName"></td><td><input  type="text"  name="note"></td><td style="text-align:center;"><a class="update">修改</a><a class="delete" style="margin-left: 10px;">删除</a></td><td  style="display:none;" name="bimCateId">'+result.object.bimCateId+'</td></tr>';
+					lasttr.after(table);
+					var addlasttr=devClone.find("tr:last");
+					addlasttr.find('input[name="cateName"]').val(result.object.cateName);
+					addlasttr.find('input[name="note"]').val(result.object.note);
+					devClone.find("tr").bind('click',clickTr);
+					devClone.find('.update').bind('click',updateCate);
+					devClone.find('.delete').bind('click',deleteCate);
+				}else{
+					alert(result.msg);
+				}
+			}
+		});
+		
+		
+		
+		
+		
+		
+	});
+	
+	/*
+	 * 点击删除
+	 */
+	
+	devClone.find('.delete').bind('click',deleteCate);
+	
+	function deleteCate(){
+		var bimCateId=$(this).parent().next().html();
+		$.ajax({
+			url : "/personnel/delcate.do",
+			async : false,
+			data : {
+				bimCateId : bimCateId
+				
+			},
+			success : function(data) {
+				result = JSON.parse(data);
+				//console.log(result);
+				if(result.success){
+					wade.libs.alert(result.msg,3,devClone);
+					if (result.object.length!=0) {
+						devClone.find('tr:gt(0)').remove();
+						$.each(result.object, function(index, value) {
+							var table='<tr ><td>'+(index+1)+'</td><td><input type="text" name="cateName"></td><td><input  type="text" name="note"></td><td style="text-align:center;"><a class="update">修改</a><a class="delete" style="margin-left: 10px;">删除</a></td><td  style="display:none;" name="bimCateId">'+value.bimCateId+'</td></tr>';
+							devClone.find('tr:last').after(table);
+							var a=devClone.find('tr:last');
+							a.find('input[name="cateName"]').val(value.cateName);
+							a.find('input[name="note"]').val(value.note);
+						});
+						
+					}
+					devClone.find("tr").bind('click',clickTr);
+					devClone.find('.update').bind('click',updateCate);
+					devClone.find('.delete').bind('click',deleteCate);
+					$("#personnelexample").DataTable().draw(false);
+					
+				}else{
+					wade.libs.alert(result.msg, 0,devClone);
+					//$(this).parent().prev().prev().find('input[name="cateName"]').css('border-color','red')
+				}
+			}
+		});
+	}	
+};
+// 导入
+function importInfo() {
+	// alert(0);
+	var devClone = $("#uploadModal1").clone(true);
+	// var devClone2 = $("#progressModal").clone(true);
+	devClone.modal({
+		backdrop : 'static',
+		keyboard : false
+	}).on('hidden.bs.modal', function(event) {
+		$(this).remove();
+	});
+
+	devClone.find('input[name="lx"]').change(function() {
+		var type = devClone.find('input:radio[name="lx"]:checked').val();
+
+		if (type == 0) {// 部门
+			devClone.find('#mb').text('下载部门模板');
+		} else {// 员工
+			devClone.find('#mb').text('下载人员模板');
+		}
+	});
+	// 点击下载模板类型
+	devClone.find('#mb').click(function() {
+		var type = devClone.find('input:radio[name="lx"]:checked').val();
+		if (type == 0) {// 部门
+
+			window.open("/personnel/DeptDemodownload.do");
+		} else {// 员工
+
+			window.open("/personnel/PersonDemodownload.do");
+		}
+	});
+
+	devClone.find('#sc').click(function() {
+		// alert(0);
+		if (devClone.find("#file").val() == "") {
+			alert("请选择文件！");
+			return;
+		}
+
+		var type = devClone.find('input:radio[name="lx"]:checked').val();
+		var formData = new FormData(devClone.find('#form1')[0]);
+		formData.append("type", type);
+		$.ajax({
+			type : 'post',
+			url : '/personnel/upload.do',
+			data : formData,
+			mimeType : "multipart/form-data",
+			contentType : false,
+			cache : false,
+			processData : false,
+			success : function(data) {
+				var result = JSON.parse(data);
+				// alert(result.success);
+				if (result.success) {
+					alert("恭喜！上传成功！");
+					devClone.modal('hide');
+					// devClone2.modal('hide');
+				} else {
+					// devClone2.modal('hide');
+					alert(result.msg);
+				}
+
+			},
+			fail : function(jqXHR, textStatus, errorThrown) {
+
+			}
+
+		});
+
+	});
+
+};
+// 导出
+function exportInfo() {
+	var devClone = $("#downloadModal").clone(true);
+
+	devClone.modal({
+		backdrop : 'static',
+		keyboard : false
+	}).on('hidden.bs.modal', function(event) {
+		$(this).remove();
+	});
+
+	devClone.find('#submit').click(function() {
+		var type = devClone.find('input:radio[name="LX"]:checked').val();
+		if (type == 0) {// 部门
+			window.open("/personnel/Deptdownload.do");
+		} else {
+			// 员工
+			window.open("/personnel/Persondownload.do");
+		}
+
+	});
+};
+
+// 添加人员信息
+function addPersonInfo(sel_tr, all_tr, sel_obj_arr, sel_obj) {
+	
+	
+	 
+	
+	
+	
+	var zTree = $.fn.zTree.getZTreeObj("tree");
+	var node = zTree.getSelectedNodes()[0];
+	// console.log(node);
+	if (node == undefined) {
+		wade.libs.alert("请选择需要添加员工的部门!", 2);
+		return;
+	}
+	var devClone = $("#personModal").clone(true);
+	devClone.modal({
+		backdrop : 'static',
+		keyboard : false
+	}).on('hidden.bs.modal', function(event) {
+		$(this).remove();
+	});
+
+	devClone.find('li[name="basicInfo"]').attr('class', 'active');
+
+
+	//devClone.find("#pic").click(function () {
+		//devClone.find("#upload").click(); //隐藏了input:file样式后，点击头像就可以本地上传
+		devClone.find("#up_img").on("change",function(){
+		var objUrl = getObjectURL(this.files[0]) ; //获取图片的路径，该路径不是图片在本地的路径
+		if (objUrl) {
+			devClone.find("#imgShow").attr("src", objUrl) ; //将图片路径存入src中，显示出图片
+		}
+		});
+		//});
+		
+		 
+		//建立一個可存取到該file的url
+		function getObjectURL(file) {
+		var url = null ;
+		if (window.createObjectURL!=undefined) { // basic
+		url = window.createObjectURL(file) ;
+		} else if (window.URL!=undefined) { // mozilla(firefox)
+		url = window.URL.createObjectURL(file) ;
+		} else if (window.webkitURL!=undefined) { // webkit or chrome
+		url = window.webkitURL.createObjectURL(file) ;
+		}
+		return url ;
+		}
+	
+	
+	
+	 //默认显示部门名称 
+	 var zTree = $.fn.zTree.getZTreeObj("tree");
+	 var node=zTree.getSelectedNodes()[0]; 
+
+	 devClone.find('input[name="deptName"]').val(node.name); 
+	 
+	 //初始化select控件
+	$.ajax({
+			url : '/personnel/selectCateType.do',
+			dataType : 'json',
+			success : function(data) {
+				var result = eval(data);
+				for(var i in result){
+					if(result[i].id!=undefined){
+						
+						if(result[0].id==-1&&result.length==1){
+		   	                 devClone.find("*[name=custom3]").attr("disabled", "disabled");
+		   	                 devClone.find("*[name=custom3]").append('<option value="'+result[0].id+'" ">'+result[0].text+'</option>');
+		   	                 	break;
+		   	                 }
+							else{
+								devClone.find("*[name=custom3]").append('<option value="'+result[i].id+'">'+result[i].text+'</option>');
+							}		
+					}			
+				}
+			}
+
+		});
+	 
+	 
+	 
+	 
+	 
+	 
+	// 动态显示拼音
+	devClone.find('input[name="personName"]').on('blur', function() {
+		var personName = devClone.find('input[name="personName"]').val();
+		$.ajax({
+			url : '/personnel/selectpinyin.do',
+			data : {
+				val : personName
+			},
+			dataType : 'json',
+			// async : false,//设置为同步操作就可以给全局变量赋值成功
+			success : function(data) {
+				var result = eval(data);
+				devClone.find('input[name="pinyin"]').val(result.pinyin);
+			}
+
+		});
+	});
+
+	// 用来改变tab样式
+	function ChangeTab(devClone) {
+		devClone.find('#allInfo').removeClass('active in');
+		devClone.find('#fingerInfo').removeClass('active in');
+		devClone.find('#basicInfo').addClass('active in');
+		devClone.find('li[name="allInfo"]').removeClass('active in');
+		devClone.find('li[name="fingerInfo"]').removeClass('active in');
+		devClone.find('li[name="basicInfo"]').addClass('active in');
+	}
+	//改变详细信息Tab
+	function allInfoTab(devClone){
+		devClone.find('#basicInfo').removeClass('active in');
+		devClone.find('#fingerInfo').removeClass('active in');
+		devClone.find('#allInfo').addClass('active in');
+		devClone.find('li[name="basicInfo"]').removeClass('active in');
+		devClone.find('li[name="fingerInfo"]').removeClass('active in');
+		devClone.find('li[name="allInfo"]').addClass('active in');
+	}
+	
+
+	ChangeTab(devClone);
+
+	devClone.find('#jb').click(function() {
+		devClone.find('#allInfo').removeClass('active in');
+		devClone.find('#fingerInfo').removeClass('active in');
+		devClone.find('#basicInfo').addClass('active in');
+
+	});
+	devClone.find('#xx').click(function() {
+		devClone.find('#basicInfo').removeClass('active in');
+		devClone.find('#fingerInfo').removeClass('active in');
+		devClone.find('#allInfo').addClass('active in');
+
+	});
+	devClone.find('#zw').click(function() {
+		devClone.find('#allInfo').removeClass('active in');
+		devClone.find('#basicInfo').removeClass('active in');
+		devClone.find('#fingerInfo').addClass('active in');
+		
+
+	});
+	
+	
+	
+	
+	
+	
+	
+	/** ********************** 校验开始 */
+	devClone.find("#submit").click(register);// 绑定提交事件
+	function register(event) {
+		var personCode = devClone.find('input[name="personCode"]').val();
+		// alert(personCode);
+		var personName = devClone.find('input[name="personName"]').val();
+		var touxiang = devClone.find('#up_img').val();
+		var certId = devClone.find('*[name="certId"]').val();
+		// var birthday=devClone.find('*[name="birthday"]').val();
+		var deptName = devClone.find('input[name="deptName"]').val();
+		var mail = devClone.find('input[name="mail"]').val();
+		var phone = devClone.find('input[name="phone"]').val();
+		// var jobDate=$('input[name="jobDate"]').val();
+		// var resignationDate=$('input[name="resignationDate"]').val();
+		var msg = null;
+		if (!RegExpObj.isNumber(personCode)) {
+			// alert(personCode);
+			msg = '人员编号为数字';
+			devClone
+					.find("#personCodeNotice")
+					.html(
+							'<span class="point-box errorbgTop dropdown"><i class="sprite icon_arrow_up2 pa"></i>'
+									+ msg + '</span>').show();
+			event.stopImmediatePropagation(); // 阻止提交数据
+			ChangeTab(devClone);
+			return false;
+		}
+		if (!RegExpObj.isName(personName)) {
+			// alert(personName);
+			msg = '姓名只能为中文';
+			devClone
+					.find("#personNameNotice")
+					.html(
+							'<span class="point-box errorbgTop dropdown"><i class="sprite icon_arrow_up2 pa"></i>'
+									+ msg + '</span>').show();
+			event.stopImmediatePropagation(); // 阻止提交数据
+			ChangeTab(devClone);
+			return false;
+		}
+
+		if(IDCard(certId)!= 100){
+			var msg = IDCard(certId);
+			devClone.find("#certIdNotice").html('<span class="point-box errorbgTop dropdown"><i class="sprite icon_arrow_up2 pa"></i>'+ msg + '</span>').show();
+			event.stopImmediatePropagation(); // 阻止提交数据
+			ChangeTab(devClone);
+			return false;
+		}
+		
+		
+		if (checkPhone(phone) != 100) {
+			var msg = checkMobile(phone);
+			devClone.find("#phoneNotice").html('<span class="point-box errorbgTop dropdown"><i class="sprite icon_arrow_up2 pa"></i>'+ msg + '</span>').show();
+			event.stopImmediatePropagation(); // 阻止提交数据
+			ChangeTab(devClone);
+			return false;
+		}
+		if (!RegExpObj.email(mail)&&mail!='') {
+			// alert(personName);
+			msg = '邮箱格式不正确';
+			devClone
+					.find("#emailNotice")
+					.html(
+							'<span class="point-box errorbgTop dropdown"><i class="sprite icon_arrow_up2 pa"></i>'
+									+ msg + '</span>').show();
+			event.stopImmediatePropagation(); // 阻止提交数据
+			allInfoTab(devClone);
+			return false;
+		}
+		
+		
+
+	}
+	// 获取焦点
+	devClone.find('input[name="personCode"]').on('focus', function() {
+		devClone.find("#personCodeNotice").hide();
+		devClone.find("#personNameNotice").hide();
+	});
+
+	devClone.find('input[name="personName"]').on('focus', function() {
+		devClone.find("#personCodeNotice").hide();
+		devClone.find("#personNameNotice").hide();
+	});
+	
+	devClone.find('input[name="certId"]').on('focus', function() {
+		devClone.find("#certIdNotice").hide();
+		//devClone.find("#personNameNotice").hide();
+	});
+	
+	devClone.find('input[name="phone"]').on('focus', function() {
+		devClone.find("#phoneNotice").hide();
+		//devClone.find("#personNameNotice").hide();
+	});
+	
+	devClone.find('input[name="mail"]').on('focus', function() {
+		devClone.find("#emailNotice").hide();
+		//devClone.find("#personNameNotice").hide();
+	});
+	
+	/** ******************校验结束 */
+
+	devClone.find(".btn-primary").click(
+			function() { // 保存按钮添加事件
+				/*
+				 * if(devClone.find("#file").val()==""){ alert("请选择上传的头像！");
+				 * return; }
+				 */
+				// var formData= new FormData(devClone.find("#form1")[0]);
+				var formData = new FormData(
+						devClone.find('*[name="formname"]')[0]);
+				var jsonuserinfo = devClone.find('*[name="formname"]')
+						.serializeObject();
+				var condition = JSON.stringify(jsonuserinfo);
+				formData.append('condition', condition);
+				// 提交表单
+				$.ajax({
+					url : '/personnel/savepersonnelInfo.do',
+					type : 'post',
+					data : formData, // 默认获取div下第一个from数据
+					mimeType : "multipart/form-data",
+					contentType : false,
+					cache : false,
+					processData : false,
+					success : function(data) {
+						result = JSON.parse(data);
+						if (result.success) {
+							devClone.modal("hide");
+							wade.libs.alert('添加成功');
+							// var imagesrc='<%=Session["src"]%>';
+							// alert(imagesrc);
+							// devClone.find('#file').attr('src',imagesrc);
+							if ($("#personnelexample_wrapper").find(
+									".paginate_button.active").size() > 0) {
+								$("#personnelexample_wrapper").find(
+										".paginate_button.active").click(); // 点击分页按钮获取新数据
+							} else {
+								$("#personnelexample_wrapper").find(
+										'#personnelexample th:first').click(); // 数据表中没有数据，通过排序列获取数据
+							}
+						} else {
+
+							wade.libs.alert(result.msg,0,devClone);;
+						}
+					}
+				});
+			});
+
+}
+
+// 添加人员
+/*
+ * config1.add_shown=function(devClone, operId,sel_obj){ //用来改变tab样式 function
+ * ChangeTab(devClone){ devClone.find('#allInfo').removeClass('active in');
+ * devClone.find('#basicInfo').addClass('active in');
+ * devClone.find('li[name="allInfo"]').removeClass('active in');
+ * devClone.find('li[name="basicInfo"]').addClass('active in'); }
+ * 
+ * ChangeTab(devClone);
+ * 
+ * devClone.find('#jb').click(function(){
+ * devClone.find('#allInfo').removeClass('active in');
+ * devClone.find('#basicInfo').addClass('active in');
+ * 
+ * 
+ * }); devClone.find('#xx').click(function(){
+ * devClone.find('#basicInfo').removeClass('active in');
+ * devClone.find('#allInfo').addClass('active in');
+ * 
+ * });
+ * 
+ * //出生日期 devClone.find('input[name="birthday"]').datepicker({ autoclose: true,
+ * format: 'yyyy-mm-dd', todayBtn: true, todayHighlight: true, language: 'zh-CN'
+ * 
+ * }).datepicker(); //到职日期 devClone.find('input[name="jobDate"]').datepicker({
+ * autoclose: true, format: 'yyyy-mm-dd', todayBtn: true, todayHighlight: true,
+ * language: 'zh-CN'
+ * 
+ * }).datepicker(); //离职日期
+ * devClone.find('input[name="resignationDate"]').datepicker({ autoclose: true,
+ * format: 'yyyy-mm-dd', todayBtn: true, todayHighlight: true, language: 'zh-CN'
+ * 
+ * }).datepicker();
+ * 
+ * if(operId==0){ var zTree = $.fn.zTree.getZTreeObj("tree"); var
+ * node=zTree.getSelectedNodes()[0]; if(node==undefined){ // alert(0);
+ * devClone.find('input[name="deptName"]').val("默认部门"); } else{ //alert(0);
+ * devClone.find('input[name="deptName"]').val(node.name); }
+ * 
+ * devClone.find('input[name="personName"]').on('blur',function(){ var
+ * personName=devClone.find('input[name="personName"]').val(); $.ajax({
+ * url:'/personnel/selectpinyin.do', data:{val:personName}, dataType:'json',
+ * //async : false,//设置为同步操作就可以给全局变量赋值成功 success:function(data){ var result =
+ * eval(data); //alert(val); //alert(result.val);
+ * devClone.find('input[name="pinyin"]').val(result.pinyin); }
+ * 
+ * }); //getPinyin(deptName,devClone);//获取名称的拼音代码
+ * 
+ * }); }
+ * 
+ * //上传照片 devClone.find('#imagebtn').click(function(){ //alert(0); var formData =
+ * new FormData(devClone.find('#form1')[0]); //var formData = new FormData();
+ * //formData.append("file",$('#file')[0].files[0]); $.ajax({ type:'post', url:
+ * '/personnel/uploadImage.do', data: formData, mimeType: "multipart/form-data",
+ * contentType: false, cache: false, processData: false, success:function(data){
+ * var result = JSON.parse(data); //alert(result.success); if (result.success) {
+ * alert("恭喜！上传成功！"); devClone.modal('hide'); //devClone2.modal('hide'); } else {
+ * //devClone2.modal('hide'); alert(result.msg); }
+ *  },
+ * 
+ * 
+ * }); });
+ * 
+ * //** ********************** 校验
+ *//*
+									 * devClone.find("#submit").click(register);//绑定提交事件
+									 * function register(event){ var
+									 * personCode=devClone.find('input[name="personCode"]').val();
+									 * //alert(personCode); var
+									 * personName=devClone.find('input[name="personName"]').val();
+									 * //var
+									 * deptName=$('input[name="deptName"]').val();
+									 * var msg=null;
+									 * if(!RegExpObj.isNumber(personCode)){
+									 * msg='人员编号为数字';
+									 * devClone.find("#personCodeNotice").html('<span
+									 * class="point-box errorbgTop dropdown"><i
+									 * class="sprite icon_arrow_up2 pa"></i>' +
+									 * msg + '</span>').show();
+									 * event.stopImmediatePropagation();
+									 * //阻止提交数据 ChangeTab(devClone); return
+									 * false; }
+									 * if(!RegExpObj.isCharOrNum(personName)||!RegExpObj.isName(personName)){
+									 * msg='姓名只能为数字,字母,中文';
+									 * devClone.find("#personNameNotice").html('<span
+									 * class="point-box errorbgTop dropdown"><i
+									 * class="sprite icon_arrow_up2 pa"></i>' +
+									 * msg + '</span>').show();
+									 * event.stopImmediatePropagation();
+									 * //阻止提交数据 ChangeTab(devClone); return
+									 * false; }
+									 * 
+									 *  } //获取焦点
+									 * devClone.find('input[name="personCode"]').on('focus',function(){
+									 * devClone.find("#personCodeNotice").hide();
+									 * devClone.find("#personNameNotice").hide();
+									 * });
+									 * 
+									 * devClone.find('input[name="personName"]').on('focus',function(){
+									 * devClone.find("#personCodeNotice").hide();
+									 * devClone.find("#personNameNotice").hide();
+									 * }); };
+									 */
+
+config1.id = "personnelexample"; // table id
+// config1.addDiv = "personModal"; // 新增弹出的层 ID
+config1.getUrl = "/personnel/getpersonnelInfo.do"; // ajax获取数据请求地址
+// config1.saveUrl = "/personnel/savepersonnelInfo.do"; // 保存请求地址
+config1.delUrl = "/personnel/delpersonnelInfo.do";// 删除信息
+// 需要绑定数据的列
+config1.columns = new Array("personId", "bimDeptId", "deptName", "address",
+		"mail", "jobDate", "resignationDate", "birthday", "national", "ethnic",
+		"englishName", "note","educational","custom3","photo1","personCode", "personName", "sex", "certId",
+		"certtype", "pinyin", "phone");
+// 需要隐藏的列
+config1.defs = new Array("personId", "bimDeptId", "deptName", "address",
+		"mail", "jobDate", "resignationDate", "birthday", "national", "ethnic",
+		"englishName", "note","educational","custom3","photo1");
+wade.libs.datatable(config1);
+// 批量开卡
+
+/*
+ * config2.id = "batchcardexample"; // table id //config1.addDiv =
+ * "personModal"; // 新增弹出的层 ID config2.getUrl ="/personnel/getbatchcardInfo.do"; //
+ * ajax获取数据请求地址 //config1.saveUrl = "/personnel/savepersonnelInfo.do"; // 保存请求地址
+ * //需要绑定数据的列 config2.columns = new
+ * Array("personId","personName","deptName","phone","certId" ); //需要隐藏的列
+ * config2.defs = new Array("personId"); wade.libs.datatable(config2);
+ */

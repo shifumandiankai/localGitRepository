@@ -1,0 +1,348 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.wadejerry.scms.modules.device.dao.PfmDeviceScreenMapper" >
+  <resultMap id="BaseResultMap" type="com.wadejerry.scms.modules.device.model.PfmDeviceScreen" >
+    <id column="pfm_device_screen_id" property="pfmDeviceScreenId" jdbcType="INTEGER" />
+    <result column="pfm_device_type" property="pfmDeviceType" jdbcType="INTEGER" />
+    <result column="bim_company_id" property="bimCompanyId" jdbcType="INTEGER" />
+    <result column="device_code" property="deviceCode" jdbcType="VARCHAR" />
+    <result column="device_name" property="deviceName" jdbcType="VARCHAR" />
+    <result column="ip" property="ip" jdbcType="VARCHAR" />
+    <result column="port" property="port" jdbcType="INTEGER" />
+    <result column="login_id" property="loginId" jdbcType="VARCHAR" />
+    <result column="login_password" property="loginPassword" jdbcType="VARCHAR" />
+    <result column="insert_time" property="insertTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="user_name" property="userName" jdbcType="VARCHAR" />
+    <result column="device_id_arr" property="deviceIdArr" jdbcType="VARCHAR" />
+    <result column="custom1" property="custom1" jdbcType="INTEGER" />
+    <result column="custom2" property="custom2" jdbcType="INTEGER" />
+    <result column="custom3" property="custom3" jdbcType="INTEGER" />
+    <result column="custom4" property="custom4" jdbcType="INTEGER" />
+    <result column="custom5" property="custom5" jdbcType="VARCHAR" />
+    <result column="custom6" property="custom6" jdbcType="VARCHAR" />
+    <result column="custom7" property="custom7" jdbcType="VARCHAR" />
+    <result column="custom8" property="custom8" jdbcType="VARCHAR" />
+  </resultMap>
+  <resultMap id="ResultDtoMap" type="com.wadejerry.scms.modules.pfm.dto.ScreenDto" >
+    <id column="pfm_device_screen_id" property="pfmDeviceScreenId" jdbcType="INTEGER" />
+    <result column="pfm_device_type" property="pfmDeviceType" jdbcType="INTEGER" />
+    <result column="bim_company_id" property="bimCompanyId" jdbcType="INTEGER" />
+    <result column="device_code" property="deviceCode" jdbcType="VARCHAR" />
+    <result column="device_name" property="deviceName" jdbcType="VARCHAR" />
+    <result column="ip" property="ip" jdbcType="VARCHAR" />
+    <result column="port" property="port" jdbcType="INTEGER" />
+    <result column="login_id" property="loginId" jdbcType="VARCHAR" />
+    <result column="login_password" property="loginPassword" jdbcType="VARCHAR" />
+    <result column="insert_time" property="insertTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="user_name" property="userName" jdbcType="VARCHAR" />
+   <!--  <result column="device_id_arr" property="arrStr" jdbcType="VARCHAR" /> -->
+     <result column="device_id_arr" property="deviceIdArr" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    pfm_device_screen_id, pfm_device_type, bim_company_id, device_code, device_name, 
+    ip, port, login_id, login_password, insert_time, update_time, user_name, device_id_arr, 
+    custom1, custom2, custom3, custom4, custom5, custom6, custom7, custom8
+  </sql>
+  <!-- 获取记录总数 -->
+  <select id="getRecordTotal" parameterType="com.wadejerry.scms.frame.entity.PageParamsDto"  resultType="java.lang.Integer" >
+  select count(pfm_device_screen_id) from pfm_device_screen where
+  (#{searchValue0,jdbcType=VARCHAR}='' or device_code like CONCAT('%',#{searchValue0,jdbcType=VARCHAR},'%' )) and
+  	<!-- 过滤企业 -->
+  	bim_company_id = #{companyId,jdbcType=INTEGER} 
+  </select>
+  <!-- 分页获取操作员信息 -->
+  <select id="getListByPage" parameterType="com.wadejerry.scms.frame.entity.PageParamsDto" resultMap="ResultDtoMap" >
+   select * from pfm_device_screen where 
+     (#{searchValue0,jdbcType=VARCHAR}='' or device_code like CONCAT('%',#{searchValue0,jdbcType=VARCHAR},'%' )) and
+   (bim_company_id = #{companyId,jdbcType=INTEGER}) ${order} 
+	  	LIMIT  #{length,jdbcType=INTEGER} OFFSET  #{start,jdbcType=INTEGER} 
+  </select>
+  <!-- 名称是否存在 -->
+  <select  id="findByName" resultMap="ResultDtoMap">
+  select * from pfm_device_screen where device_name=#{0} and bim_company_id=#{1}
+  </select>
+  <!-- 编号是否存在 -->
+  <select  id="findByCode" resultMap="ResultDtoMap">
+  select * from pfm_device_screen where device_code=#{0} and bim_company_id=#{1}
+  </select>
+   
+   <!-- 修改-->
+  <select  id="updateInfo" parameterType="com.wadejerry.scms.modules.pfm.dto.ScreenDto">
+  update pfm_device_screen set device_code =#{deviceCode,jdbcType=VARCHAR},device_name = #{deviceName,jdbcType=VARCHAR},login_id = #{loginId,jdbcType=VARCHAR},update_time = #{updateTime,jdbcType=TIMESTAMP},device_id_arr = #{deviceIdArr,jdbcType=VARCHAR}
+   where pfm_device_screen_id = #{pfmDeviceScreenId,jdbcType=INTEGER}
+  </select>
+  
+  <select  id="updateDeviceArr" parameterType="com.wadejerry.scms.modules.device.model.PfmDeviceScreen">
+  update pfm_device_screen set device_id_arr = #{deviceIdArr,jdbcType=VARCHAR}
+   where pfm_device_screen_id = #{pfmDeviceScreenId,jdbcType=INTEGER}
+  </select>
+  <!-- 删除 -->
+  <delete id="deleteInfo">
+  delete from pfm_device_screen where pfm_device_screen_id=#{0}
+  </delete>
+  <insert id="insertInfo" parameterType="com.wadejerry.scms.modules.pfm.dto.ScreenDto" useGeneratedKeys="true" keyProperty="pfmDeviceScreenId">
+   insert into pfm_device_screen (pfm_device_type,bim_company_id, device_code, device_name, ip, port, login_id, insert_time,device_id_arr)
+    values (1, 
+      #{bimCompanyId,jdbcType=INTEGER}, #{deviceCode,jdbcType=VARCHAR}, #{deviceName,jdbcType=VARCHAR}, 
+      #{ip,jdbcType=VARCHAR}, #{port,jdbcType=INTEGER}, #{loginId,jdbcType=VARCHAR}, 
+      #{insertTime,jdbcType=TIMESTAMP},  #{deviceIdArr,jdbcType=VARCHAR})
+  </insert>
+  
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from pfm_device_screen
+    where pfm_device_screen_id = #{pfmDeviceScreenId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from pfm_device_screen
+    where pfm_device_screen_id = #{pfmDeviceScreenId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.wadejerry.scms.modules.device.model.PfmDeviceScreen" >
+    insert into pfm_device_screen (pfm_device_screen_id, pfm_device_type, 
+      bim_company_id, device_code, device_name, 
+      ip, port, login_id, 
+      login_password, insert_time, update_time, 
+      user_name, device_id_arr, custom1, 
+      custom2, custom3, custom4, 
+      custom5, custom6, custom7, 
+      custom8)
+    values (#{pfmDeviceScreenId,jdbcType=INTEGER}, #{pfmDeviceType,jdbcType=INTEGER}, 
+      #{bimCompanyId,jdbcType=INTEGER}, #{deviceCode,jdbcType=VARCHAR}, #{deviceName,jdbcType=VARCHAR}, 
+      #{ip,jdbcType=VARCHAR}, #{port,jdbcType=INTEGER}, #{loginId,jdbcType=VARCHAR}, 
+      #{loginPassword,jdbcType=VARCHAR}, #{insertTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, 
+      #{userName,jdbcType=VARCHAR}, #{deviceIdArr,jdbcType=VARCHAR}, #{custom1,jdbcType=INTEGER}, 
+      #{custom2,jdbcType=INTEGER}, #{custom3,jdbcType=INTEGER}, #{custom4,jdbcType=INTEGER}, 
+      #{custom5,jdbcType=VARCHAR}, #{custom6,jdbcType=VARCHAR}, #{custom7,jdbcType=VARCHAR}, 
+      #{custom8,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.wadejerry.scms.modules.device.model.PfmDeviceScreen" >
+    insert into pfm_device_screen
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="pfmDeviceScreenId != null" >
+        pfm_device_screen_id,
+      </if>
+      <if test="pfmDeviceType != null" >
+        pfm_device_type,
+      </if>
+      <if test="bimCompanyId != null" >
+        bim_company_id,
+      </if>
+      <if test="deviceCode != null" >
+        device_code,
+      </if>
+      <if test="deviceName != null" >
+        device_name,
+      </if>
+      <if test="ip != null" >
+        ip,
+      </if>
+      <if test="port != null" >
+        port,
+      </if>
+      <if test="loginId != null" >
+        login_id,
+      </if>
+      <if test="loginPassword != null" >
+        login_password,
+      </if>
+      <if test="insertTime != null" >
+        insert_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+      <if test="userName != null" >
+        user_name,
+      </if>
+      <if test="deviceIdArr != null" >
+        device_id_arr,
+      </if>
+      <if test="custom1 != null" >
+        custom1,
+      </if>
+      <if test="custom2 != null" >
+        custom2,
+      </if>
+      <if test="custom3 != null" >
+        custom3,
+      </if>
+      <if test="custom4 != null" >
+        custom4,
+      </if>
+      <if test="custom5 != null" >
+        custom5,
+      </if>
+      <if test="custom6 != null" >
+        custom6,
+      </if>
+      <if test="custom7 != null" >
+        custom7,
+      </if>
+      <if test="custom8 != null" >
+        custom8,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="pfmDeviceScreenId != null" >
+        #{pfmDeviceScreenId,jdbcType=INTEGER},
+      </if>
+      <if test="pfmDeviceType != null" >
+        #{pfmDeviceType,jdbcType=INTEGER},
+      </if>
+      <if test="bimCompanyId != null" >
+        #{bimCompanyId,jdbcType=INTEGER},
+      </if>
+      <if test="deviceCode != null" >
+        #{deviceCode,jdbcType=VARCHAR},
+      </if>
+      <if test="deviceName != null" >
+        #{deviceName,jdbcType=VARCHAR},
+      </if>
+      <if test="ip != null" >
+        #{ip,jdbcType=VARCHAR},
+      </if>
+      <if test="port != null" >
+        #{port,jdbcType=INTEGER},
+      </if>
+      <if test="loginId != null" >
+        #{loginId,jdbcType=VARCHAR},
+      </if>
+      <if test="loginPassword != null" >
+        #{loginPassword,jdbcType=VARCHAR},
+      </if>
+      <if test="insertTime != null" >
+        #{insertTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="userName != null" >
+        #{userName,jdbcType=VARCHAR},
+      </if>
+      <if test="deviceIdArr != null" >
+        #{deviceIdArr,jdbcType=VARCHAR},
+      </if>
+      <if test="custom1 != null" >
+        #{custom1,jdbcType=INTEGER},
+      </if>
+      <if test="custom2 != null" >
+        #{custom2,jdbcType=INTEGER},
+      </if>
+      <if test="custom3 != null" >
+        #{custom3,jdbcType=INTEGER},
+      </if>
+      <if test="custom4 != null" >
+        #{custom4,jdbcType=INTEGER},
+      </if>
+      <if test="custom5 != null" >
+        #{custom5,jdbcType=VARCHAR},
+      </if>
+      <if test="custom6 != null" >
+        #{custom6,jdbcType=VARCHAR},
+      </if>
+      <if test="custom7 != null" >
+        #{custom7,jdbcType=VARCHAR},
+      </if>
+      <if test="custom8 != null" >
+        #{custom8,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.wadejerry.scms.modules.device.model.PfmDeviceScreen" >
+    update pfm_device_screen
+    <set >
+      <if test="pfmDeviceType != null" >
+        pfm_device_type = #{pfmDeviceType,jdbcType=INTEGER},
+      </if>
+      <if test="bimCompanyId != null" >
+        bim_company_id = #{bimCompanyId,jdbcType=INTEGER},
+      </if>
+      <if test="deviceCode != null" >
+        device_code = #{deviceCode,jdbcType=VARCHAR},
+      </if>
+      <if test="deviceName != null" >
+        device_name = #{deviceName,jdbcType=VARCHAR},
+      </if>
+      <if test="ip != null" >
+        ip = #{ip,jdbcType=VARCHAR},
+      </if>
+      <if test="port != null" >
+        port = #{port,jdbcType=INTEGER},
+      </if>
+      <if test="loginId != null" >
+        login_id = #{loginId,jdbcType=VARCHAR},
+      </if>
+      <if test="loginPassword != null" >
+        login_password = #{loginPassword,jdbcType=VARCHAR},
+      </if>
+      <if test="insertTime != null" >
+        insert_time = #{insertTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="userName != null" >
+        user_name = #{userName,jdbcType=VARCHAR},
+      </if>
+      <if test="deviceIdArr != null" >
+        device_id_arr = #{deviceIdArr,jdbcType=VARCHAR},
+      </if>
+      <if test="custom1 != null" >
+        custom1 = #{custom1,jdbcType=INTEGER},
+      </if>
+      <if test="custom2 != null" >
+        custom2 = #{custom2,jdbcType=INTEGER},
+      </if>
+      <if test="custom3 != null" >
+        custom3 = #{custom3,jdbcType=INTEGER},
+      </if>
+      <if test="custom4 != null" >
+        custom4 = #{custom4,jdbcType=INTEGER},
+      </if>
+      <if test="custom5 != null" >
+        custom5 = #{custom5,jdbcType=VARCHAR},
+      </if>
+      <if test="custom6 != null" >
+        custom6 = #{custom6,jdbcType=VARCHAR},
+      </if>
+      <if test="custom7 != null" >
+        custom7 = #{custom7,jdbcType=VARCHAR},
+      </if>
+      <if test="custom8 != null" >
+        custom8 = #{custom8,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where pfm_device_screen_id = #{pfmDeviceScreenId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.wadejerry.scms.modules.device.model.PfmDeviceScreen" >
+    update pfm_device_screen
+    set pfm_device_type = #{pfmDeviceType,jdbcType=INTEGER},
+      bim_company_id = #{bimCompanyId,jdbcType=INTEGER},
+      device_code = #{deviceCode,jdbcType=VARCHAR},
+      device_name = #{deviceName,jdbcType=VARCHAR},
+      ip = #{ip,jdbcType=VARCHAR},
+      port = #{port,jdbcType=INTEGER},
+      login_id = #{loginId,jdbcType=VARCHAR},
+      login_password = #{loginPassword,jdbcType=VARCHAR},
+      insert_time = #{insertTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      user_name = #{userName,jdbcType=VARCHAR},
+      device_id_arr = #{deviceIdArr,jdbcType=VARCHAR},
+      custom1 = #{custom1,jdbcType=INTEGER},
+      custom2 = #{custom2,jdbcType=INTEGER},
+      custom3 = #{custom3,jdbcType=INTEGER},
+      custom4 = #{custom4,jdbcType=INTEGER},
+      custom5 = #{custom5,jdbcType=VARCHAR},
+      custom6 = #{custom6,jdbcType=VARCHAR},
+      custom7 = #{custom7,jdbcType=VARCHAR},
+      custom8 = #{custom8,jdbcType=VARCHAR}
+    where pfm_device_screen_id = #{pfmDeviceScreenId,jdbcType=INTEGER}
+  </update>
+  
+  <select id="selectByCompanyId" parameterType="int" resultMap="BaseResultMap">
+  select * from pfm_device_screen where bim_company_id = #{id}
+  </select>
+</mapper>

@@ -1,0 +1,294 @@
+package com.wadejerry.scms.modules.license.service;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import org.dom4j.Document;
+import org.dom4j.DocumentException;
+import org.dom4j.DocumentHelper;
+import org.dom4j.Element;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.wadejerry.scms.frame.constant.user.ConstSystem;
+import com.wadejerry.scms.modules.auth.dao.BimCompanyMapper;
+import com.wadejerry.scms.modules.auth.model.BimCompany;
+import com.wadejerry.scms.utils.RSAHelper;
+import com.wadejerry.scms.utils.date.DateUtil;
+
+@Service
+public class LiscenseService {
+
+	@Autowired
+	private BimCompanyMapper companyMapper;
+	/**
+	 * function: 查询company表中id为1 的公司信息返回提示信息
+	 * return:过期或者当前无liscense
+	 */
+	public String currentLiscenseInfo(){
+		try{
+			BimCompany company = companyMapper.selectByPrimaryKey(1);
+			if(company==null||company.getRegCode()==null){
+				return "当前无Liscense信息，请导入Liscense授权文件！";
+			}
+			String rsa = RSAHelper.DecryptString(company.getRegCode().trim(), RSAHelper.prikey);
+
+			if(!validateLiscense(rsa)){//验证xml格式是否正确
+				throw new Exception("Liscense格式错误");
+			}
+			
+			Document document = DocumentHelper.parseText(rsa); 
+			Element root = document.getRootElement();
+			Date disabletime = DateUtil.YMDsdf.parse(root.element("Day").getTextTrim());
+			Calendar discalendar = Calendar.getInstance();
+			discalendar.setTime(disabletime);
+			discalendar.add(Calendar.DATE, 1);
+			if(discalendar.before(Calendar.getInstance())){
+				return "当前liscense已过期，请重新导入Liscense授权文件！";
+			}
+		}
+		catch(Exception e){
+			return "当前Liscence存在错误，请重新导入Liscense授权文件！";
+		}
+
+		return "当前授权可用，您将更新Liscense授权文件！";
+
+	}
+	/**
+	 * function: 查询company表中id为1 的公司信息返回提示信息
+	 * return:过期或者当前无liscense返回false
+	 */
+	public boolean currentLiscenseInfocan(){
+		try{
+			BimCompany company = companyMapper.selectByPrimaryKey(1);
+
+			if(company==null||company.getRegCode()==null){
+				return false;
+			}
+			String rsa = RSAHelper.DecryptString(company.getRegCode().trim(), RSAHelper.prikey);
+
+			if(!validateLiscense(rsa)){//验证xml格式是否正确
+				throw new Exception("Liscense格式错误");
+			}
+			
+			Document document = DocumentHelper.parseText(rsa); 
+			Element root = document.getRootElement();
+			Date disabletime = DateUtil.YMDsdf.parse(root.element("Day").getTextTrim());
+			Calendar discalendar = Calendar.getInstance();
+			discalendar.setTime(disabletime);
+			discalendar.add(Calendar.DATE, 1);
+			if(discalendar.before(Calendar.getInstance())){
+				return false;
+			}
+		}
+		catch(Exception e){
+			return false;
+
+		}
+		return true;
+
+	}
+
+	/**
+	 * function: 导入liscense信息
+	 * para:要解析的密文
+	 * return:
+	 * <!--RTM 录像回放 RPM 实时预览 VMM 视频监控 BIM 一卡通  ECM 梯控 VRM 访客 WAM 考勤 CCM 消费 MCM 会议预约 IDM 信息发布 EMM 电子地图  VDM 派车 PFM 停车 ACM 门禁 -->
+	 * @throws Exception 
+	 */
+	public void importLiscense(String regCode) throws Exception {
+
+		try{
+			//liscense解析
+			String rsa = RSAHelper.DecryptString(regCode.trim(), RSAHelper.prikey);
+
+			if(!validateLiscense(rsa)){//验证xml格式是否正确
+				throw new Exception("Liscense格式错误");
+			}
+			//格式正确，可以导入liscense
+			Document document = DocumentHelper.parseText(rsa); 
+			BimCompany newComp = new BimCompany();
+			Element root = document.getRootElement();
+			newComp.setBimCompanyId(1);
+			newComp.setCompanyName(root.element("corpName").getTextTrim());
+			newComp.setRegCode(regCode);
+			//newComp.setDisableTime(DateUtil.YMDsdf.parse(root.element("Day").getTextTrim()));
+			//newComp.setUseSystem(root.element("Module").getTextTrim());
+			newComp.setStatus((short)0);
+
+
+			//更新company 
+			BimCompany company = companyMapper.selectByPrimaryKey(1);
+
+			if(company!=null){//update
+
+				newComp.setUpdateTime(new Date());
+				companyMapper.updateByPrimaryKeySelective(newComp);
+			}
+			else//insert
+			{
+				newComp.setCreateTime(new Date());
+				newComp.setCompanyCode(1);
+				companyMapper.insert(newComp);
+			}
+
+
+		}
+
+		catch(Exception e){
+			throw e;
+		}
+
+
+
+	}	
+	/**
+	 * liscense格式验证
+	 * 
+	 * @param xml
+	 * @return
+	 */
+
+	private boolean validateLiscense(String xml){
+
+		try{
+			Document document = DocumentHelper.parseText(xml); 
+			Element rootEle = document.getRootElement();
+			if(rootEle.getName().equals("License")){
+				for(Iterator it=rootEle.elementIterator();it.hasNext();){
+					Element element = (Element) it.next();
+					if(element.getName().equals("corpName")
+							||element.getName().equals("Day")
+							||element.getName().equals("Module")
+							||element.getName().equals("IdmDeviceCount")
+							||element.getName().equals("EcmDeviceCount")
+							||element.getName().equals("CcmDeviceCount")
+							||element.getName().equals("AcmPoints")
+							||element.getName().equals("AcmDeviceCount")
+							||element.getName().equals("VideoPoints")
+							||element.getName().equals("VideoDeviceCount")
+							||element.getName().equals("LoginName")){
+						continue;
+
+					}
+					else{
+						return false;
+					}
+				}
+				return true;
+			}
+			else{
+				return false;
+			}
+
+		}
+		catch(DocumentException e){
+
+			return false;
+		}
+
+
+	}
+
+	public List<Integer> subSystems(){
+		List<Integer> list = new ArrayList();
+		BimCompany company = companyMapper.selectByPrimaryKey(1);
+		if(company==null||company.getRegCode()==null){
+
+		}
+		else{
+			//liscense解析
+			String rsa = RSAHelper.DecryptString(company.getRegCode().trim(), RSAHelper.prikey);
+
+			if(!validateLiscense(rsa)){//验证xml格式是否正确
+				return list;
+			}
+			//格式正确，可以导入liscense
+			Document document;
+			try {
+				document = DocumentHelper.parseText(rsa);
+			} catch (DocumentException e) {
+				
+				return list;
+			} 
+			
+			Element root = document.getRootElement();
+			String useSystem = root.element("Module").getTextTrim();
+			if(useSystem.contains("RTM")){
+				list.add(ConstSystem.SUB_SYSTEM_CPDE_RTM);
+			}
+			if(useSystem.contains("RPM")){
+				list.add(ConstSystem.SUB_SYSTEM_CPDE_RPM);
+			}
+			if(useSystem.contains("VMM")){
+				list.add(ConstSystem.SUB_SYSTEM_CPDE_VMM);
+			}
+			if(useSystem.contains("BIM")){
+				list.add(ConstSystem.SUB_SYSTEM_CPDE_BIM);
+			}
+			if(useSystem.contains("ECM")){
+				list.add(ConstSystem.SUB_SYSTEM_CPDE_ECM);
+			}
+			if(useSystem.contains("VRM")){
+				list.add(ConstSystem.SUB_SYSTEM_CODE_VRM);
+			}
+			if(useSystem.contains("WAM")){
+				list.add(ConstSystem.SUB_SYSTEM_CODE_WAM);
+			}
+			if(useSystem.contains("CCM")){
+				list.add(ConstSystem.SUB_SYSTEM_CODE_CCM);
+			}
+			if(useSystem.contains("MCM")){
+				list.add(ConstSystem.SUB_SYSTEM_CPDE_MCM);
+			}
+			if(useSystem.contains("EMM")){
+				list.add(ConstSystem.SUB_SYSTEM_CPDE_EMM);
+			}
+			if(useSystem.contains("VDM")){
+				list.add(ConstSystem.SUB_SYSTEM_CPDE_VDM);
+			}
+			if(useSystem.contains("PFM")){
+				list.add(ConstSystem.SUB_SYSTEM_CODE_PFM);
+			}
+			if(useSystem.contains("IDM")){
+				list.add(ConstSystem.SUB_SYSTEM_CPDE_IDM);
+			}
+			if(useSystem.contains("ACM")){
+				list.add(ConstSystem.SUB_SYSTEM_CODE_ACM);
+			}
+
+
+		}
+
+		return list;
+
+	}
+
+	public Map<String,String> getLicenseInfo() throws DocumentException{
+
+		BimCompany company = companyMapper.selectByPrimaryKey(1);
+		String regCode=company.getRegCode();//从中获取熟练信息
+		
+		Map<String,String> map = new HashMap();
+		
+		Document document = DocumentHelper.parseText(RSAHelper.DecryptString(regCode.trim(), RSAHelper.prikey));
+		Element root = document.getRootElement();
+		map.put("s1", root.element("IdmDeviceCount").getTextTrim());
+		map.put("s2", root.element("EcmDeviceCount").getTextTrim());
+		map.put("s3", root.element("CcmDeviceCount").getTextTrim());
+		map.put("s4", root.element("AcmPoints").getTextTrim());
+		map.put("s5", root.element("AcmDeviceCount").getTextTrim());
+		map.put("s6", root.element("VideoPoints").getTextTrim());
+		map.put("s7", root.element("VideoDeviceCount").getTextTrim());
+		map.put("s8", root.element("Day").getTextTrim());
+
+		return map;
+
+	}
+}

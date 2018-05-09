@@ -1,0 +1,263 @@
+package com.wadejerry.scms.modules.auth.controller;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.shiro.SecurityUtils;
+import org.codehaus.jettison.json.JSONArray;
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.wadejerry.scms.frame.constant.user.ConstUser;
+import com.wadejerry.scms.frame.entity.DataTableDto;
+import com.wadejerry.scms.frame.entity.LoginInfo;
+import com.wadejerry.scms.frame.entity.PageParamsDto;
+import com.wadejerry.scms.modules.auth.dto.RoleDto;
+import com.wadejerry.scms.modules.auth.dto.UserDto;
+import com.wadejerry.scms.modules.auth.model.BimUser;
+import com.wadejerry.scms.modules.auth.model.BimUserRole;
+import com.wadejerry.scms.modules.auth.service.BimUserRoleRelService;
+import com.wadejerry.scms.modules.auth.service.BimUserService;
+import com.wadejerry.scms.utils.AjaxUtil;
+import com.wadejerry.scms.utils.Log.LogManager;
+import com.wadejerry.scms.utils.json.JacksonUtil;
+
+@Controller
+public class BimUserControler {
+
+	@Autowired
+	private HttpServletResponse response;
+	@Autowired
+	private HttpServletRequest request;
+	@Autowired
+	private BimUserService bimUserService; // 用户Service
+	@Autowired
+	private BimUserRoleRelService bimUserRoleRelService; //角色与用户关联Service
+	
+	/**
+	* 分页获取用户 信息 
+	* @author zhanying 2016年9月22日 下午7:33:48
+	* @param   
+	* @modificationHistory=========================逻辑或功能性重大变更记录
+	* @modify by user: 
+	* @modify by reason:
+	 */
+	@RequestMapping("/user/getUserInfo.do")
+	@ResponseBody
+	private void GetUserInfoByPage() {
+		PageParamsDto paramsDto = new PageParamsDto(request); //获取分页参数
+		paramsDto.setIntValue1(ConstUser.CONST_USER_TYPE); // 角色类型
+		int iTotal =0;
+		List<UserDto> dtoList = null;
+		
+		if(!SecurityUtils.getSubject().isPermitted("UserSee")){
+		}else{
+			 iTotal = bimUserService.getRecordTotal(paramsDto); //获取记录总数
+		if (iTotal > 0) {
+			if(paramsDto.getLength() == -1){ //查询所有记录
+				paramsDto.setLength(iTotal);
+			}
+			dtoList= bimUserService.getBimUserListByPage(paramsDto); //获取分页记录
+		}
+		}
+		DataTableDto data = new DataTableDto();  //返回数据封装 
+		data.setDataList(dtoList);
+		data.setDraw(paramsDto.getDraw());
+		data.setRecordsFiltered(iTotal);
+		data.setRecordsTotal(iTotal);
+		AjaxUtil.ajaxWriteDataTable(data, response);
+	}
+	
+	/**
+	*  保存用户信息
+	* @author zhanying 2016年9月22日 下午7:34:31
+	* @param   
+	* @modificationHistory=========================逻辑或功能性重大变更记录
+	* @modify by user: 
+	* @modify by reason:
+	 */
+	@RequestMapping("/user/saveUser.do")
+	@ResponseBody
+	private void SaveUserInfo() {
+		String formData = request.getParameter("condition");	// 获取表单数据 	
+		try {
+			JSONObject jsonObject = new JSONObject(formData); 
+			if(jsonObject.has("disableTime")){
+				String str = jsonObject.get("disableTime").toString();
+				if(!str.equals("")){
+					jsonObject.put("disableTime", str+" 00:00:00");  //日期格式处理 
+				}
+			}
+			if(jsonObject.has("selRoleIds")){
+			Object obj = jsonObject.get("selRoleIds");
+				if(obj.getClass() != JSONArray.class && obj.toString()!= ""){	//多选角色处理，如果只选择了一个角色，传输过来是一个字符串
+					List<String> list = new ArrayList<String>();
+					list.add(obj.toString());
+					jsonObject.put("selRoleIds",list);  //日期格式处理 	
+				}
+			}
+			formData = jsonObject.toString();
+		} catch (JSONException e) {
+			LogManager.logException(e);
+			return;
+		}	
+		
+		UserDto userDto  = JacksonUtil.toObject(formData, UserDto.class);  //JSON转为DTO对象
+		if(userDto == null){
+			return;
+		}
+		BimUser user=null;
+	    if(userDto.getBimUserId() == null){
+	    	user= bimUserService.findUserByLoginName(userDto.getUserName(), ConstUser.CONST_USER_TYPE);
+	    	if(user != null) {
+	    		AjaxUtil.ajaxWrite(false,"用户名称已使用", response);
+	    		return;
+	    	}
+	    	user = new BimUser();
+	    	user.setUserType(ConstUser.CONST_USER_TYPE);
+	    	user.setUserName(userDto.getUserName());
+	    	user.setEealName(userDto.getEealName());
+	    	user.setPassword(userDto.getPassword());
+	    	user.setPhone(userDto.getPhone());
+	    	user.setEmail(userDto.getEmail());
+	    	user.setDisableTime(userDto.getDisableTime());
+	    	user.setStatus(userDto.getStatus());
+	    	user.setNote(userDto.getNote());
+	    	user.setBimCompanyId(LoginInfo.getCompanyId());
+	    	user.setInId(LoginInfo.getLoginId());  
+	    	user.setsLevel(ConstUser.GENERAL_MANAGER);	//管理员级别为普通管理员 
+	    	user.setCreateTime(new Date());
+	    	user.setUpdateTime(new Date());
+	    	bimUserService.insertUser(user); //添加用户信息 
+	    	BimUserRole userRoleRel =null;	
+	    	if(userDto.getSelRoleIds() != null) {
+		    	for(String roleId : userDto.getSelRoleIds()){	
+		    		userRoleRel = new BimUserRole();
+		    		userRoleRel.setBimRoleId(Integer.parseInt(roleId));
+		    		userRoleRel.setUserId(user.getBimUserId());
+		    		userRoleRel.setCreateTime(new Date());
+		    		bimUserRoleRelService.insertUserRoleRel(userRoleRel); //添加角色与操作员绑定信息 
+		    	}
+	    	}
+	    } else {	//修改用户信息
+	    	user =bimUserService.getUserById(userDto.getBimUserId()); //获取用户信
+	    	if(user != null)
+	    	{
+		    	user.setEealName(userDto.getEealName());
+		    	user.setPhone(userDto.getPhone());
+		    	user.setEmail(userDto.getEmail());
+		    	user.setDisableTime(userDto.getDisableTime());
+		    	user.setStatus(userDto.getStatus());
+		    	user.setNote(userDto.getNote());
+		    	user.setUpdateTime(new Date());
+	    		bimUserService.updateUser(user); //更新角色信息
+	    		bimUserRoleRelService.deleteByUserId(user.getBimUserId());
+	    		BimUserRole userRoleRel =null;	
+	    		if(userDto.getSelRoleIds()!=null){
+	    			for(String roleId : userDto.getSelRoleIds()){	
+			    		userRoleRel = new BimUserRole();
+			    		userRoleRel.setBimRoleId(Integer.parseInt(roleId));
+			    		userRoleRel.setUserId(user.getBimUserId());
+			    		userRoleRel.setCreateTime(new Date());
+			    		bimUserRoleRelService.insertUserRoleRel(userRoleRel); //添加角色与操作员绑定信息 
+			    	}
+	    		}
+	    		
+	    	}
+	    }    
+		AjaxUtil.ajaxWrite(true,"", response);
+	}
+	
+	/**
+	* 删除用户信息
+	* @author zhanying 2016年9月22日 下午7:34:10
+	* @param   
+	* @modificationHistory=========================逻辑或功能性重大变更记录
+	* @modify by user: 
+	* @modify by reason:
+	 */
+	@RequestMapping("/user/delUser.do")
+	@ResponseBody
+	private void DelUserInfo(){
+		String jsonArrayStr = request.getParameter("condition");
+		try {
+			List<RoleDto> delDtoList = JacksonUtil.json2list(jsonArrayStr, RoleDto.class);
+			BimUser user = null;
+			for(RoleDto roleDto : delDtoList){
+				user = bimUserService.getUserById(roleDto.getBimUserId());
+				if(user != null && user.getsLevel() == ConstUser.ENTERPRISE_ADMINISTRATOR) {
+					if(delDtoList.size() == 1){	//如果删除的数量是1 并且是企业管理员，返回失败 
+						AjaxUtil.ajaxWrite(false,"系统管理员不能删除", response);
+						return;
+					}
+					continue;			
+				}
+				bimUserService.deleteUserById(roleDto.getBimUserId());	// 删除用户 
+				bimUserRoleRelService.deleteByUserId(roleDto.getBimUserId()); //删除用户关联角色信息
+			}
+		} catch (Exception e) {
+			LogManager.logException(e);
+			AjaxUtil.ajaxWrite(false,e.getMessage(), response);	//返回失败
+			return;
+		}
+		AjaxUtil.ajaxWrite(true,"", response);	//返回成功
+	}
+	
+	/**
+	* 修改用户密码
+	* @author zhanying 2016年10月18日 下午3:27:27
+	* @param   
+	* @modificationHistory=========================逻辑或功能性重大变更记录
+	* @modify by user: 
+	* @modify by reason:
+	 */
+	@RequestMapping("/user/changePassword.do")
+	@ResponseBody
+	private void ChangePassword(){
+		int userId = Integer.parseInt(request.getParameter("userid"));
+		String newPassword = request.getParameter("newPassword");
+		BimUser user =  bimUserService.getUserById(userId);
+		if(user == null){
+			AjaxUtil.ajaxWrite(false,"用户不存在", response);
+		} else {
+			user.setPassword(newPassword);
+			bimUserService.updateUser(user);
+			AjaxUtil.ajaxWrite(true,"密码修改成功", response);		
+		}
+	}
+	/**
+	* 修改用户密码
+	* @author zhanying 2016年10月18日 下午3:27:27
+	* @param   
+	* @modificationHistory=========================逻辑或功能性重大变更记录
+	* @modify by user: 
+	* @modify by reason:
+	 */
+	@RequestMapping("/user/changePassword2.do")
+	@ResponseBody
+	private void ChangePassword2(){
+		int userId = Integer.parseInt(request.getParameter("userid"));
+		String newPassword = request.getParameter("newPassword");
+		BimUser user =  bimUserService.getUserById(userId);
+		
+		if(user == null){
+			AjaxUtil.ajaxWrite(false,"用户不存在", response);
+		} else if(!user.getPassword().equals(request.getParameter("lastPassword"))){
+			AjaxUtil.ajaxWrite(false,"原密码错误，更改失败", response);
+		}
+		else{
+			user.setPassword(newPassword);
+			bimUserService.updateUser(user);
+			AjaxUtil.ajaxWrite(true,"密码修改成功", response);		
+		}
+	}
+	
+}

@@ -1,0 +1,84 @@
+package com.wadejerry.scms.modules.weixin.controller;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.codec.digest.DigestUtils;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.wadejerry.scms.utils.AjaxUtil;
+import com.wadejerry.scms.weixin.util.ResolveXml;
+import com.wadejerry.scms.weixin.util.message.Image;
+import com.wadejerry.scms.weixin.util.message.ImageMessage;
+
+@Controller
+public class WeixinController {
+	private final String token = "wxe2fa27668d16ed28";
+	@RequestMapping("/weixinsign")
+	@ResponseBody
+	public void signatureWeixin(HttpServletRequest request,HttpServletResponse response,@RequestParam(value="signature",required = false)String signature,@RequestParam(value="timestamp",required=false)String timestamp,@RequestParam(value="nonce",required =false)String nonce,@RequestParam(value="echostr",required=false)String echostr){
+		
+		if(request.getMethod().toLowerCase().equals("get")){//验证
+		ArrayList<String> list=new ArrayList<String>();
+		list.add(nonce);
+		list.add(timestamp);
+		list.add(token);
+		Collections.sort(list);
+		String result = DigestUtils.shaHex(list.get(0)+list.get(1)+list.get(2));
+		if(result.equals(signature)){
+			AjaxUtil.ajaxWrite(echostr, response);
+		}
+		else{
+			AjaxUtil.ajaxWrite("你想干什么，兄弟！", response);
+		}
+		}
+		else{//响应聊天
+			Chat(request,response);
+		}
+		
+	}
+	
+	public void Chat(HttpServletRequest request,HttpServletResponse response){
+		Map<String,String> message = null;
+		try {
+			message = ResolveXml.parseXML(request);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			AjaxUtil.ajaxWrite("", response);
+			return;
+		}
+		
+		if(message!=null){
+			switch(message.get("MsgType")){
+			case ResolveXml.REQ_MESSAGE_TYPE_TEXT:
+				ImageMessage respMessage = new ImageMessage(message.get("FromUserName"),message.get("ToUserName"),
+						 						new Date().getTime(),ResolveXml.RESP_MESSAGE_TYPE_IMAGE,new Image("rV3MtEO7e-Sy_JFZs_QVkDzPntTDi-fDWYOTeZ_Ej2hclvrlvICABfYBybi9I-yR"));
+				AjaxUtil.ajaxWrite(ResolveXml.messageToXML(respMessage), response);
+				break;
+			}
+		
+		}
+	}
+	
+	/**
+	* 跳转微信扫码支付页面
+	* @author zhanying 2017年6月14日 下午3:08:35
+	* @param  @return 
+	* @modificationHistory=========================逻辑或功能性重大变更记录
+	* @modify by user: 
+	* @modify by reason:
+	 */
+	@RequestMapping("/scanpay.do")
+	public String ScanPay(){	
+		return "pages/weixin/scan_pay";
+	}	 
+}

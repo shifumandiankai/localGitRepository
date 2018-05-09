@@ -1,0 +1,141 @@
+<%@ page contentType="text/html; charset=UTF-8"%>
+<%@taglib prefix="shiro" uri="http://shiro.apache.org/tags"%>
+<!-- Left side column. contains the logo and sidebar -->
+<aside class="main-sidebar">
+	<!-- sidebar: style can be found in sidebar.less -->
+	<section class="sidebar">
+		<!-- Sidebar user panel -->
+		<!--       <div class="user-panel">
+        <div class="pull-left image">
+          <img src="/dist/img/user2-160x160.jpg" class="img-circle" alt="User Image">
+        </div>
+        <div class="pull-left info">
+          <p>Admin</p>
+          <a href="#"><i class="fa fa-circle text-success"></i> 在线</a>
+        </div>
+      </div> -->
+		<!-- search form -->
+		<!--       <form action="#" method="get" class="sidebar-form">
+        <div class="input-group">
+          <input type="text" name="q" class="form-control" placeholder="搜索...">
+              <span class="input-group-btn">
+                <button type="submit" name="search" id="search-btn" class="btn btn-flat"><i class="fa fa-search"></i>
+                </button>
+              </span>
+        </div>
+      </form> -->
+		<!-- /.search form -->
+		<!-- sidebar menu: : style can be found in sidebar.less -->
+
+		<ul class="sidebar-menu">
+
+
+			<li class="leftJichu"><span>停车场应用</span></li>
+
+			<!--         <li id="dashboard" class="treeview">
+          <a href="/pfm_index.do">
+            <i class="fa fa-home"></i> <span>主页</span>    
+          </a>
+        </li> -->
+			<shiro:hasPermission name="CarManages">
+				<li id="carmanagemenu" class="treeview"><a
+					href="/pages/pfm/carmanage/car_manage.jsp"> <i
+						class="fa fa-car"></i><span>车辆管理</span> <!--   <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span> -->
+				</a> <!--             <ul class="treeview-menu">
+            <li id="carmanage"><a href="/pages/pfm/carmanage/car_manage.jsp"><i class="fa fa-circle-o"></i>车辆管理</a></li>
+				<li id="cartype"><a href="index.html"><i class="fa fa-circle-o"></i>车辆类别</a></li>
+				<li id="ruleconfig"><a href="index.html"><i class="fa fa-circle-o"></i>规则配置</a></li>
+				<li id="preferencemanage"><a href="index.html"><i class="fa fa-circle-o"></i>商户管理</a></li>
+            </ul> --></li>
+			</shiro:hasPermission>
+			<shiro:hasPermission name="AccountManage">
+				<li id="feemanage" class="treeview"><a
+					href="/pages/pfm/account/account.jsp"> <i class="fa fa-jpy"></i><span>账户管理</span>
+						<!--          <span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i>
+            </span> -->
+				</a> <!--<ul class="treeview-menu">
+            <li id="pay" ><a href="/pages/pfm/account/account.jsp"><i class="fa fa-circle-o"></i>充值</a></li>
+            <li id="backfee"><a href="/pages/pfm/account/account.jsp"><i class="fa fa-circle-o"></i>退款</a></li>
+          </ul> --></li>
+			</shiro:hasPermission>
+			<shiro:hasPermission name="InOutMonitor">
+				<li id="chargemonitor" class="treeview"><a
+					href="/pages/pfm/jiankong/jiankong.jsp"> <i
+						class="fa fa-desktop"></i><span>出入监控</span> <!--        <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span> -->
+				</a> <!--       <ul class="treeview-menu">
+            <li id="startmonitor"><a href="index.html"><i class="fa fa-circle-o"></i>开始监控</a></li>
+          </ul> --></li>
+			</shiro:hasPermission>
+			<shiro:hasPermission name="ParkingSetting">
+				<li id="parkpotsetting" class="treeview"><a href="#"> <i
+						class="fa fa-cog"></i><span>车场设置</span> <span
+						class="pull-right-container"> <i
+							class="fa fa-angle-left pull-right"></i>
+					</span>
+				</a>
+					<ul class="treeview-menu">
+						<shiro:hasPermission name="ParkingManage">
+							<li><a href="/pages/pfm/parkinglot/park.jsp"><i
+									class="fa fa-circle-o"></i>车场管理</a></li>
+						</shiro:hasPermission>
+						<shiro:hasPermission name="CrossPeriod">
+							<li><a href="/pages/pfm/time/time.jsp"><i
+									class="fa fa-circle-o"></i>通行时段</a></li>
+						</shiro:hasPermission>
+						<shiro:hasPermission name="InOutManage">
+							<li><a href="/pages/pfm/entrance/entrance.jsp"><i
+									class="fa fa-circle-o"></i>出入口管理</a></li>
+						</shiro:hasPermission>
+						<shiro:hasPermission name="StaffManage">
+							<li><a href="/pages/pfm/booth/booth.jsp"><i
+									class="fa fa-circle-o"></i>岗亭管理</a></li>
+						</shiro:hasPermission>
+						<shiro:hasPermission name="SpecialNumber">
+							<li><a href="/pages/pfm/specialcarnum/specialcarnum.jsp"><i
+									class="fa fa-circle-o"></i>特殊车牌</a></li>
+						</shiro:hasPermission>
+						<!--  <li id="binding"><a href="index.html"><i class="fa fa-circle-o"></i>车位绑定</a></li> -->
+						<!--  <li id="allowsection"><a href="index.html"><i class="fa fa-circle-o"></i>通行时段</a></li> -->
+						<!--  <li id="special"><a href="index.html"><i class="fa fa-circle-o"></i>特殊车牌</a></li> -->
+					</ul></li>
+			</shiro:hasPermission>
+			<shiro:hasPermission name="ReportQuery">
+				<li id="datareport" class="treeview"><a href="#"> <i
+						class="fa fa-pie-chart"></i><span>报表查询</span> <span
+						class="pull-right-container"> <i
+							class="fa fa-angle-left pull-right"></i>
+					</span>
+				</a>
+					<ul class="treeview-menu">
+						<shiro:hasPermission name="MingxiRecord">
+							<li id="carrecord"><a
+								href="/pages/pfm/report/ChargeRecord.jsp"><i
+									class="fa fa-circle-o"></i>明细报表</a></li>
+						</shiro:hasPermission>
+						<shiro:hasPermission name="TongjiRecord">
+							<li id="feerecord"><a
+								href="/pages/pfm/report/Czreport/czreport.jsp"><i
+									class="fa fa-circle-o"></i>统计报表</a></li>
+						</shiro:hasPermission>
+			<%-- 			<!--           <li id="carrecord2"><a href="index.html"><i class="fa fa-circle-o"></i>退款记录</a></li> -->
+						<shiro:hasPermission name="SummaryStatistics">
+							<li id="carrecord2"><a href="index.html"><i
+									class="fa fa-circle-o"></i>综合统计</a></li>
+						</shiro:hasPermission>
+						<shiro:hasPermission name="AbnormalGate">
+							<li id="carrecord2"><a href="index.html"><i
+									class="fa fa-circle-o"></i>异常开闸</a></li>
+						</shiro:hasPermission>
+						<!-- <li ><a href="/pages/pfm/report/parkreport/parkreport.jsp"><i class="fa fa-circle-o"></i>场内车辆</a></li> -->
+						<li><a href="/pages/pfm/report/carreport/report.jsp"><i
+								class="fa fa-circle-o"></i>报表</a></li> --%>
+					</ul></li>
+			</shiro:hasPermission>
+
+		</ul>
+	</section>
+</aside>

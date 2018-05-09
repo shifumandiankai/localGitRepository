@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.wadejerry.scms.modules.pfm.dao.PfmUnitPeriodMapper" >
+  <resultMap id="BaseResultMap" type="com.wadejerry.scms.modules.pfm.model.PfmUnitPeriod" >
+    <id column="unit_period_id" property="unitPeriodId" jdbcType="INTEGER" />
+    <result column="free_time" property="freeTime" jdbcType="SMALLINT" />
+    <result column="use_top_money" property="useTopMoney" jdbcType="SMALLINT" />
+    <result column="include_free_time" property="includeFreeTime" jdbcType="SMALLINT" />
+    <result column="custom1" property="custom1" jdbcType="INTEGER" />
+    <result column="custom2" property="custom2" jdbcType="INTEGER" />
+    <result column="custom3" property="custom3" jdbcType="VARCHAR" />
+    <result column="custom4" property="custom4" jdbcType="VARCHAR" />
+    <result column="rule_id" property="ruleId" jdbcType="INTEGER" />
+     <result column="top_money" property="topMoney" jdbcType="NUMERIC" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    unit_period_id, free_time, use_top_money, include_free_time, custom1, custom2, custom3, 
+    custom4, rule_id , top_money
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from pfm_unit_period
+    where unit_period_id = #{unitPeriodId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from pfm_unit_period
+    where unit_period_id = #{unitPeriodId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.wadejerry.scms.modules.pfm.model.PfmUnitPeriod" >
+    insert into pfm_unit_period (unit_period_id, free_time, use_top_money, 
+      include_free_time, custom1, custom2, 
+      custom3, custom4, rule_id , top_money
+      )
+    values (#{unitPeriodId,jdbcType=INTEGER}, #{freeTime,jdbcType=SMALLINT}, #{useTopMoney,jdbcType=SMALLINT}, 
+      #{includeFreeTime,jdbcType=SMALLINT}, #{custom1,jdbcType=INTEGER}, #{custom2,jdbcType=INTEGER}, 
+      #{custom3,jdbcType=VARCHAR}, #{custom4,jdbcType=VARCHAR},#{topMoney,jdbcType=NUMERIC})
+  </insert>
+  <insert id="insertSelective" parameterType="com.wadejerry.scms.modules.pfm.model.PfmUnitPeriod"  useGeneratedKeys="true" keyProperty="unitPeriodId" >
+    insert into pfm_unit_period
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="unitPeriodId != null" >
+        unit_period_id,
+      </if>
+      <if test="freeTime != null" >
+        free_time,
+      </if>
+      <if test="useTopMoney != null" >
+        use_top_money,
+      </if>
+      <if test="includeFreeTime != null" >
+        include_free_time,
+      </if>
+      <if test="custom1 != null" >
+        custom1,
+      </if>
+      <if test="custom2 != null" >
+        custom2,
+      </if>
+      <if test="custom3 != null" >
+        custom3,
+      </if>
+      <if test="custom4 != null" >
+        custom4,
+      </if>
+      <if test="ruleId != null" >
+        rule_id,
+      </if>
+      <if test="topMoney != null" >
+        top_money,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="unitPeriodId != null" >
+        #{unitPeriodId,jdbcType=INTEGER},
+      </if>
+      <if test="freeTime != null" >
+        #{freeTime,jdbcType=SMALLINT},
+      </if>
+      <if test="useTopMoney != null" >
+        #{useTopMoney,jdbcType=SMALLINT},
+      </if>
+      <if test="includeFreeTime != null" >
+        #{includeFreeTime,jdbcType=SMALLINT},
+      </if>
+      <if test="custom1 != null" >
+        #{custom1,jdbcType=INTEGER},
+      </if>
+      <if test="custom2 != null" >
+        #{custom2,jdbcType=INTEGER},
+      </if>
+      <if test="custom3 != null" >
+        #{custom3,jdbcType=VARCHAR},
+      </if>
+      <if test="custom4 != null" >
+        #{custom4,jdbcType=VARCHAR},
+      </if>
+      <if test="ruleId != null" >
+        #{ruleId,jdbcType=INTEGER},
+      </if>
+        <if test="topMoney != null" >
+        #{topMoney,jdbcType=NUMERIC},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.wadejerry.scms.modules.pfm.model.PfmUnitPeriod" >
+    update pfm_unit_period
+    <set >
+      <if test="freeTime != null" >
+        free_time = #{freeTime,jdbcType=SMALLINT},
+      </if>
+      <if test="useTopMoney != null" >
+        use_top_money = #{useTopMoney,jdbcType=SMALLINT},
+      </if>
+      <if test="includeFreeTime != null" >
+        include_free_time = #{includeFreeTime,jdbcType=SMALLINT},
+      </if>
+      <if test="custom1 != null" >
+        custom1 = #{custom1,jdbcType=INTEGER},
+      </if>
+      <if test="custom2 != null" >
+        custom2 = #{custom2,jdbcType=INTEGER},
+      </if>
+      <if test="custom3 != null" >
+        custom3 = #{custom3,jdbcType=VARCHAR},
+      </if>
+      <if test="custom4 != null" >
+        custom4 = #{custom4,jdbcType=VARCHAR},
+      </if>
+      <if test="ruleId != null" >
+        rule_id = #{ruleId,jdbcType=INTEGER},
+      </if>
+      <if test="topMoney != null" >
+        top_money,
+      </if>
+       <if test="topMoney != null" >
+        top_money = #{topMoney,jdbcType=NUMERIC},
+      </if>
+    </set>
+    where unit_period_id = #{unitPeriodId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.wadejerry.scms.modules.pfm.model.PfmUnitPeriod" >
+    update pfm_unit_period
+    set free_time = #{freeTime,jdbcType=SMALLINT},
+      use_top_money = #{useTopMoney,jdbcType=SMALLINT},
+      include_free_time = #{includeFreeTime,jdbcType=SMALLINT},
+      custom1 = #{custom1,jdbcType=INTEGER},
+      custom2 = #{custom2,jdbcType=INTEGER},
+      custom3 = #{custom3,jdbcType=VARCHAR},
+      custom4 = #{custom4,jdbcType=VARCHAR},
+      rule_id = #{ruleId,jdbcType=INTEGER},
+        top_money = #{topMoney,jdbcType=NUMERIC}
+    where unit_period_id = #{unitPeriodId,jdbcType=INTEGER}
+  </update>
+   <select id="selectByRuleId" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from pfm_unit_period
+    where rule_id = #{ruleId,jdbcType=INTEGER}
+  </select>
+</mapper>

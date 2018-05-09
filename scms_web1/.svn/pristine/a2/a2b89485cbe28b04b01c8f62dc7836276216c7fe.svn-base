@@ -1,0 +1,153 @@
+<%@ page contentType="text/html; charset=UTF-8"%>
+<%@taglib prefix="shiro" uri="http://shiro.apache.org/tags"%>
+
+<style type="text/css">
+.ztree li span.button[treenode_ico] {
+	background-position: -292px -68px !important;
+	background-image: url("/pages/pfm/carmanage/css/icon1.png") !important;
+}
+label{
+margin:0px;
+}
+#tongxingitems li{
+display:block;
+height:50px;
+}
+#tongxingitems .cardata:hover{
+background-color:rgb(217, 237, 247);
+}
+
+#tongxingitems li.active{
+background-color:#289B93;
+}
+#tongxingitems th{
+width:15%;
+height:40px;
+text-align:center;
+}
+#tongxingitems td{
+width:15%;
+height:40px;
+text-align:center;
+}
+</style>
+	<div class="content-wrapper">
+		<!-- Content Header (Page header) -->
+		<section class="content-header">
+
+			<h1>出入监控界面</h1>
+			<ol class="breadcrumb">
+				<li><a href="/index.do"><i class="fa fa-dashboard"></i>主页</a></li>
+				<li class="active">出入监控</li>
+			</ol>
+		</section>
+		<!-- Main content -->
+		<section class="content">
+			<div class="box">
+				<div>
+					<div id="left" style="float: left; width: 17%;">
+
+						<ul id="tree" class="ztree" style="margin-left: 10px;"></ul>
+
+					</div>
+
+					<div id="right" style="float: right; width: 83%;">
+
+						<div id="rukou" align="center"
+							style="float: left; width: 49%; height: 530px; border: 2px solid rgba(58, 148, 142, 0.42); margin-right: 2%;">
+							<div style="background-color: black;">
+								<label style="color: green; float: left">入场</label> <label
+									id="churukou"
+									style="color: white; float: left; margin-left: 40px;"></label>
+								<label id="chedao"
+									style="color: white; float: left; margin-left: 40px;"></label>
+								<label id="shijian"
+									style="color: white; float: right;"></label>
+								<div style="clear: both"></div>
+							</div>
+							<div id="rukouimgdiv"
+								style="width: 95%; border: 1px solid rgb(235, 235, 228); height: 300px; margin-top: 10px;margin-bottom:20px;">
+								<img id="img" style="display: inline-block" src="" width="100%"
+									height="85%" alt="进场车辆拍照" /> <label id="carNum"
+									style="display: inline-block; height: 15%; width: 150px; background-color: rgb(235, 235, 228); font-size: 30px; float: left;"
+									id="rukoucarNum"></label> <label id="status"
+									style="display: inline-block; height: 15%; background-color: rgb(235, 235, 228); font-size: 30px; float: right;"
+									id="rukouxinxixianshi"></label>
+							</div>
+
+							<div style="width: 50%; float: left;padding-left:20px;" align="left">
+								<label>入场岗亭：</label><i id="gangting">无 </i><br>
+								<label>车辆类型：</label><i id="cartype">无 </i><br>
+								 <label>车辆性质：</label><i id="carxingzhi">无 </i><br>
+							</div>
+							<div style="width: 50%; float: left;padding-left:20px;" align="left">
+								<label>账户余额：</label><i id="yue">无</i><br> 
+								<label>到期时间：</label><i id="daoqishijian">无 </i><br> 
+								<label>操作员：</label><i id="caozuoyuan">无</i><br>
+							</div>
+						</div>
+
+						<div id="chukou" align="center"
+							style="float: right; width: 49%; height: 530px; border: 2px solid rgba(58, 148, 142, 0.42);">
+							<div style="background-color: black;">
+								<label style="color: red; float: left">出场</label> <label
+									id="churukou"
+									style="color: white; float: left; margin-left: 40px;"></label>
+								<label id="chedao"
+									style="color: white; float: left; margin-left: 40px;"></label>
+								<label id="shijian"
+									style="color: white; float: right; "></label>
+								<div style="clear: both"></div>
+							</div>
+							<div id="chukouimgdiv"
+								style="width: 95%; border: 1px solid rgb(235, 235, 228); height: 300px; margin-top: 10px;margin-bottom:20px;">
+								<img id="img" style="display: inline-block" src="" width="100%"
+									height="85%" alt="出场车辆拍照" /> <label id="carNum"
+									style="display: inline-block; height: 15%; width: 150px; background-color: rgb(235, 235, 228); font-size: 30px; float: left;"
+									id="chukoucarNum"></label> <label id="status"
+									style="display: inline-block; height: 15%; background-color: rgb(235, 235, 228); font-size: 30px; float: right;"
+									id="rukouxinxixianshi"></label>
+
+							</div>
+							
+							<div style="width: 50%; float: left;padding-left:20px;" align="left">
+
+								<label>出场岗亭：</label><i id="gangting">无 </i><br> 
+								<label>车辆类型：</label><i id="cartype">无 </i><br> 
+								<label>车辆性质：</label><i id="carxingzhi">无 </i><br> 
+								<label>入场时间：</label><i id="ruchangshijian">无 </i><br> 
+								<label>停车时长：</label><i id="tingcheshichang">无 </i><br>
+							</div>
+							<div style="width: 50%; float: left;padding-left:20px;" align="left">
+								<label>收费规则：</label><i id="shoufeiguize">无 </i><br> 
+								<label>减免规则：</label><i id="jianmianguize">无 </i><br> 
+								<label>收费金额：</label><i id="shoufeijine">无 </i><br> 
+								<label>账户余额：</label><i id="yue">无 </i><br>
+								 <label>到期时间：</label><i id="daoqishijian">无 </i><br> 
+								 <label>操作员：</label><i id="caozuoyuan">无</i><br>
+							</div>
+							
+						</div>
+						<div style="clear: both;"></div>
+						<div
+							style="clear: both; border: 2px solid rgba(58, 148, 142, 0.42);">
+							<h4>最近10条通行记录</h4>
+							<div style="height:400px;over-flow:auto">
+							<table id="tongxingitems" style="width:100%" >
+							<tr><th>车牌号</th><th>车辆类型</th><th>状态</th><th>进出口</th><th>车道</th><th>时间</th><th>操作员</th></tr>
+							</table>
+							</div>
+						</div>
+
+					</div>
+					<!-- /.right -->
+
+					<div style="clear: both"></div>
+				</div>
+			</div>
+			<!-- /.box -->
+		</section>
+	</div>
+<script src="/pages/pfm/jiankong/amq_jquery_adapter.js" type="text/javascript"></script>
+<script src="/pages/pfm/jiankong/amq.js" type="text/javascript"></script>
+<script src="/pages/pfm/jiankong/jiankong.js" type="text/javascript"></script>

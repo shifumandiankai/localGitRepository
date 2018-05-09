@@ -1,0 +1,178 @@
+.fingerprint-bg-div{
+	position:relative;
+}
+.fingerprint-bt{
+	margin:15px;
+}
+
+.fingerprint-tip{
+	color:#8e8e8e;
+	margin: 35px 0 5px 5px;
+	padding:3px; 
+}
+.fingerprint-bg-div{
+	margin:30px 0 20px 15px;
+}
+
+.fingerprint-bg{
+    background:url(../personnel/image/hand.png) 0 0 no-repeat !important; 
+	width:400px; 
+	height:210px;
+}
+
+.fingerprint-finger-undo{
+	background:url("") 0 0 no-repeat;  
+	width:26px; height:33px;  
+	position:absolute;
+
+}
+.fingerprint-finger-undo:hover{
+	background:url(../personnel/image/select.png) 0 0 no-repeat !important;  
+	width:26px; 
+	height:33px; 
+	position:absolute;
+
+}
+.fingerprint-finger-undo.do{
+	background:url(../personnel/image/select.png) 0 0 no-repeat !important;  
+	width:26px; 
+	height:33px; 
+	position:absolute;
+
+}
+.fingerprint-finger-select{
+	
+	width:26px; 
+	height:33px; 
+	position:absolute;
+}
+
+.fingerprint-finger-do{
+	
+	width:26px; 
+	height:33px; 
+	position:absolute;
+}
+
+.fingerprint-finger-leftOne{
+	top:60px; 
+	left:-5px;
+}
+.fingerprint-finger-leftTwo{
+	top:12px; 
+	left:30px;
+}
+
+.fingerprint-finger-leftThree{
+	top:-5px; 
+	left:68px;
+}
+.fingerprint-finger-leftFour{
+	top:7px; 
+	left:118px;
+}
+
+.fingerprint-finger-leftFive{
+	top:97px; 
+	left:165px;
+}
+
+.fingerprint-finger-rightOne{
+	top:97px; 
+	left:212px;
+}
+
+.fingerprint-finger-rightTwo{
+	top:7px; 
+	left:258px;
+}
+
+.fingerprint-finger-rightThree{
+	top:-5px; 
+	left:308px;
+}
+
+.fingerprint-finger-rightFour{
+	top:12px; 
+	left:345px;
+}
+
+.fingerprint-finger-rightFive{
+	top:60px; 
+	left:380px;
+}
+
+.fingerprint-ck {
+	position:absolute;
+	z-index:10000;
+}
+.fingerpring-ck input[type="checkbox"]{
+	margin:-2px 2px 0 0 !important;
+}
+.fingerprint-ck-leftOne{
+	top:37px; 
+	left:-5px;
+}
+.fingerprint-ck-leftTwo{
+	top:-11px; 
+	left:36px;
+}
+.fingerprint-ck-leftThree{
+	top:-28px; 
+	left:74px;
+}
+.fingerprint-ck-leftFour{
+	top:-16px; 
+	left:124px;
+}
+.fingerprint-ck-leftFive{
+	top:74px; 
+	left:171px;
+}
+.fingerprint-ck-rightOne{
+	top:74px; 
+	left:218px;
+}
+.fingerprint-ck-rightTwo{
+	top:-16px; 
+	left:266px;
+}
+.fingerprint-ck-rightThree{
+	top:-28px; 
+	left:316px;
+}
+.fingerprint-ck-rightFour{
+	top:-11px;
+	left:353px;
+}
+.fingerprint-ck-rightFive{
+	top:37px; 
+	left:380px;
+}
+.fingerprint-bt ul>li>a{
+	border:1px solid #CCCCCC;
+	 margin: 0 5px ;
+}
+.fingerprint-bt ul>li>a:hover{
+}
+
+.fingerprint-bt-select{
+	 background-color: #E6EDF5;
+}
+.fingerprint-bt-disabled{
+	background-color: #CCCCCC!important;
+	color:white!important;
+}
+.fingerprint-bt-disabled-unused{
+	background-color: #CCCCCC!important;
+	color:white!important;
+}
+.fingerprint-deviceError-tip{
+	top:100px;
+	left:100px;
+	position:absolute;
+}
+.fingerprint-all{
+	position: relative;
+}
+

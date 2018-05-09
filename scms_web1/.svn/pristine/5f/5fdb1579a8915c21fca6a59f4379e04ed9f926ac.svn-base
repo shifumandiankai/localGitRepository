@@ -1,0 +1,53 @@
+package com.wadejerry.scms.modules.onecard.serviceImpl;
+
+import java.util.Date;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.wadejerry.scms.modules.onecard.dao.BimCateMapper;
+import com.wadejerry.scms.modules.onecard.model.BimCate;
+import com.wadejerry.scms.modules.onecard.service.BimCateService;
+@Service("bimCateService")
+public class BimCateServiceImpl implements BimCateService{
+	 @Autowired
+	 private BimCateMapper bimCateMapper;
+	 
+	@Override
+	public List<BimCate> selectAllInfo(int i) {
+		// TODO Auto-generated method stub
+		return bimCateMapper.selectAllInfo(i);
+	}
+
+	@Override
+	public int selectRandom() {
+		// TODO Auto-generated method stub
+		return bimCateMapper.selectRandom();
+	}
+
+	@Override
+	public void insertCateInfo(BimCate bimCate) {
+		// TODO Auto-generated method stub
+		bimCateMapper.insertCateInfo(bimCate);
+	}
+
+	@Override
+	public void updateCateInfo(Integer bimCateId, String cateName, String note,Date date) {
+		// TODO Auto-generated method stub
+		bimCateMapper.updateCateInfo(bimCateId,cateName,note,date);
+	}
+
+	@Override
+	public BimCate selectByCateName(String cateName) {
+		// TODO Auto-generated method stub
+		return bimCateMapper.selectByCateName(cateName);
+	}
+
+	@Override
+	public void deleteInfo(Integer bimCateId) {
+		// TODO Auto-generated method stub
+		bimCateMapper.deleteInfo(bimCateId);
+	}
+
+}

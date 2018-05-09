@@ -1,0 +1,177 @@
+
+
+/**
+ * PfmWebService.java
+ *
+ * This file was auto-generated from WSDL
+ * by the Apache Axis2 version: 1.6.2  Built on : Apr 17, 2012 (05:33:49 IST)
+ */
+
+    package com.wadejerry.scms.webservice.client;
+
+    /*
+     *  PfmWebService java interface
+     */
+
+    public interface PfmWebService {
+          
+
+        /**
+          * Auto generated method signature
+          * 
+                    * @param remoteConfiguration0
+                
+         */
+
+         
+                     public org.tempuri.RemoteConfigurationResponse remoteConfiguration(
+
+                        org.tempuri.RemoteConfiguration remoteConfiguration0)
+                        throws java.rmi.RemoteException
+             ;
+
+        
+         /**
+            * Auto generated method signature for Asynchronous Invocations
+            * 
+                * @param remoteConfiguration0
+            
+          */
+        public void startremoteConfiguration(
+
+            org.tempuri.RemoteConfiguration remoteConfiguration0,
+
+            final com.wadejerry.scms.webservice.client.PfmWebServiceCallbackHandler callback)
+
+            throws java.rmi.RemoteException;
+
+     
+
+        /**
+          * Auto generated method signature
+          * 
+                    * @param calibratingTime2
+                
+         */
+
+         
+                     public org.tempuri.CalibratingTimeResponse calibratingTime(
+
+                        org.tempuri.CalibratingTime calibratingTime2)
+                        throws java.rmi.RemoteException
+             ;
+
+        
+         /**
+            * Auto generated method signature for Asynchronous Invocations
+            * 
+                * @param calibratingTime2
+            
+          */
+        public void startcalibratingTime(
+
+            org.tempuri.CalibratingTime calibratingTime2,
+
+            final com.wadejerry.scms.webservice.client.PfmWebServiceCallbackHandler callback)
+
+            throws java.rmi.RemoteException;
+
+     
+
+        /**
+          * Auto generated method signature
+          * 
+                    * @param remoteRestart4
+                
+         */
+
+         
+                     public org.tempuri.RemoteRestartResponse remoteRestart(
+
+                        org.tempuri.RemoteRestart remoteRestart4)
+                        throws java.rmi.RemoteException
+             ;
+
+        
+         /**
+            * Auto generated method signature for Asynchronous Invocations
+            * 
+                * @param remoteRestart4
+            
+          */
+        public void startremoteRestart(
+
+            org.tempuri.RemoteRestart remoteRestart4,
+
+            final com.wadejerry.scms.webservice.client.PfmWebServiceCallbackHandler callback)
+
+            throws java.rmi.RemoteException;
+
+     
+
+        /**
+          * Auto generated method signature
+          * 
+                    * @param registerDevice6
+                
+         */
+
+         
+                     public org.tempuri.RegisterDeviceResponse registerDevice(
+
+                        org.tempuri.RegisterDevice registerDevice6)
+                        throws java.rmi.RemoteException
+             ;
+
+        
+         /**
+            * Auto generated method signature for Asynchronous Invocations
+            * 
+                * @param registerDevice6
+            
+          */
+        public void startregisterDevice(
+
+            org.tempuri.RegisterDevice registerDevice6,
+
+            final com.wadejerry.scms.webservice.client.PfmWebServiceCallbackHandler callback)
+
+            throws java.rmi.RemoteException;
+
+     
+
+        /**
+          * Auto generated method signature
+          * 
+                    * @param grtDeviceParamsById8
+                
+         */
+
+         
+                     public org.tempuri.GrtDeviceParamsByIdResponse grtDeviceParamsById(
+
+                        org.tempuri.GrtDeviceParamsById grtDeviceParamsById8)
+                        throws java.rmi.RemoteException
+             ;
+
+        
+         /**
+            * Auto generated method signature for Asynchronous Invocations
+            * 
+                * @param grtDeviceParamsById8
+            
+          */
+        public void startgrtDeviceParamsById(
+
+            org.tempuri.GrtDeviceParamsById grtDeviceParamsById8,
+
+            final com.wadejerry.scms.webservice.client.PfmWebServiceCallbackHandler callback)
+
+            throws java.rmi.RemoteException;
+
+     
+
+        
+       //
+       }
+    

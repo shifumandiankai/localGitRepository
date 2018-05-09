@@ -1,0 +1,13 @@
+package com.wadejerry.scms.weixin.util;
+
+public class WeixinParam {
+
+	public static String APP_ID="wxe2fa27668d16ed28";
+	
+	public static String TOKEN="wxe2fa27668d16ed28";
+	
+	public static String API_KEY="gwAy7X5iQOLUB77PJgcDrGARx6Sa1yY4";
+		
+	public static String MCH_ID="1471551802";
+	
+}

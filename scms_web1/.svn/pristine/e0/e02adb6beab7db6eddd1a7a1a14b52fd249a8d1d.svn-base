@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.wadejerry.scms.modules.basic.dao.CardAppMapper">
+<resultMap type="com.wadejerry.scms.modules.basic.dto.CardAppDto" id="DtoResultMap">
+<id column="bim_card_app_id" property="bimCardAppId" jdbcType="INTEGER"/>
+<result column="app_id" property="appId" jdbcType="INTEGER" />
+<result column="app_code" property="appCode" jdbcType="VARCHAR" />
+<result column="value1" property="bdvalue1" jdbcType="NUMERIC"  />
+<result column="trade_id" property="tradeId" jdbcType="INTEGER" />
+<result column="las_deposit_time" property="lastDepositTime" jdbcType="TIMESTAMP" /> 
+<result column="total_deposit" property="bdtotalDeposit" jdbcType="NUMERIC" />
+<result column="total_dec_fee" property="totalDecFee" jdbcType="VARCHAR" />
+<result column="car_id" property="carId" jdbcType="INTEGER" />
+<result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+<result column="disable_time" property="disableTime" jdbcType="TIMESTAMP" />  
+</resultMap>
+<!-- 查询钱包信息 -->
+<select id="SelectCardAppInfo" parameterType="int" resultMap="DtoResultMap" >
+select * from bim_card_app where car_id=#{0} 
+</select>
+<!-- 更新钱包信息 -->
+<update id="updateInfo" parameterType="com.wadejerry.scms.modules.basic.dto.CardAppDto">
+update bim_card_app set value1=#{appDto.bdvalue1},trade_id=#{appDto.tradeId},las_deposit_time=#{appDto.lastDepositTime},total_deposit=#{appDto.bdtotalDeposit},update_time=#{appDto.updateTime},disable_time=#{appDto.disableTime} where car_id=#{carId}
+<!-- update bim_card_app <set><if test="bdvalue1!=null"> value1=#{bdvalue1,jdbcType=DECIMAL},</if><if test="tradeId!=null">trade_id=#{tradeId,jdbcType=INTEGER},</if><if test="lastDepositTime!=null">las_deposit_time=#{lastDepositTime,jdbcType=TIMESTAMP},</if><if test="bdtotalDeposit!=null">total_deposit=#{bdtotalDeposit,jdbcType=DECIMAL}</if> </set>where car_id=#{carId} -->
+</update>
+<!-- 查询card_app中最大的流水号 -->
+<select id="selectMaxTradeId"  parameterType="java.lang.Integer" resultType="java.lang.Integer">
+select max(trade_id) from bim_card_app where car_id=#{0}
+</select>
+<!-- 查询 card_app中最大的流水号  返回对象类型-->
+<select id="selectMaxTradeIdByDto"  parameterType="java.lang.Integer" resultMap="DtoResultMap">
+select max(trade_id) from bim_card_app where car_id=#{0}
+</select>
+<!-- 退款信息 -->
+<update id="updateTKInfo" parameterType="com.wadejerry.scms.modules.basic.dto.CardAppDto">
+update bim_card_app set value1=#{appDto.bdvalue1},trade_id=#{appDto.tradeId},update_time=#{appDto.updateTime},total_dec_fee=#{appDto.bdtotalDecFee} where car_id=#{carId}
+<!-- update bim_card_app <set><if test="bdvalue1!=null"> value1=#{bdvalue1,jdbcType=DECIMAL},</if><if test="tradeId!=null">trade_id=#{tradeId,jdbcType=INTEGER},</if><if test="lastDepositTime!=null">las_deposit_time=#{lastDepositTime,jdbcType=TIMESTAMP},</if><if test="bdtotalDeposit!=null">total_deposit=#{bdtotalDeposit,jdbcType=DECIMAL}</if> </set>where car_id=#{carId} -->
+</update>
+
+</mapper>

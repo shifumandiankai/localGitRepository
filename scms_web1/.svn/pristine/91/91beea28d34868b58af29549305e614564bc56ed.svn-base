@@ -1,0 +1,27 @@
+package com.wadejerry.scms.utils.quartz;
+
+import com.wadejerry.scms.frame.AppContext;
+import com.wadejerry.scms.task.QuartzSchedulerTask;
+
+/**
+ * Quartz定时任务初始化线程
+ * @author jinbenbin 2013-11-20 下午07:54:56
+ * @version V1.0
+ * @modificationHistory=========================逻辑或功能性重大变更记录
+ * @modify by user: {修改人} 2013-11-20
+ * @modify by reason:{方法名}:{原因}
+ */
+public class QuartzInitThread extends Thread {
+	
+	public void run() {
+		QuartzSchedulerTask quartzSchedulerTask = (QuartzSchedulerTask)AppContext.getBean("quartzSchedulerTask");
+		// 初始化数据库自动备份任务
+		try {
+			quartzSchedulerTask.enableDatabaseBackUpTask();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+}

@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper  namespace="com.wadejerry.scms.modules.onecard.dao.BimDeptMapper">
+<resultMap id="BaseResultMap" type="com.wadejerry.scms.modules.onecard.dto.BimDeptDto" >
+    <id column="bim_dept_id" property="bimDeptId" jdbcType="INTEGER" />
+    <result column="bim_company_id" property="bimCompanyId" jdbcType="INTEGER" />
+    <result column="dept_code" property="deptCode" jdbcType="INTEGER" />
+    <result column="pinyin" property="pinyin" jdbcType="VARCHAR" />
+    <result column="dept_name" property="deptName" jdbcType="VARCHAR" />
+    <result column="in_code" property="inCode" jdbcType="INTEGER" />
+    <result column="use_system" property="useSystem" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+    <result column="note" property="note" jdbcType="VARCHAR" />
+    <result column="dept_level" property="deptLevel" jdbcType="INTEGER" />
+    <result column="custom1" property="custom1" jdbcType="INTEGER" />
+    <result column="custom2" property="custom2" jdbcType="INTEGER" />
+    <result column="custom3" property="custom3" jdbcType="VARCHAR" />
+    <result column="custom4" property="custom4" jdbcType="VARCHAR" />
+    <result column="isDel" property="isDel" jdbcType="SMALLINT" />
+  </resultMap>
+  <!-- 根据treeId查询dept信息 -->
+  <select id="selectInfoByTreeId" parameterType="int" resultMap="BaseResultMap">
+  select * from bim_dept where bim_dept_id=#{0} and bim_company_id=#{1}
+  </select>
+  <!-- 查询部门编号或名称是否存在 -->
+  <select id="selectInfoByCodeOrName" resultMap="BaseResultMap">
+  select * from bim_dept where (dept_code=#{0} or dept_name=#{1}) and bim_company_id=#{2}
+  </select>
+  <!-- 添加tree节点 -->
+  <insert id="insertInfo" parameterType="com.wadejerry.scms.modules.onecard.dto.BimDeptDto" useGeneratedKeys="true" keyProperty="bimDeptId">
+  insert into bim_dept(bim_company_id,dept_code,pinyin,dept_name,in_code,use_system,create_time,update_time,dept_level,custom2) values(<!-- #{bimDeptId,jdbcType=INTEGER}, -->#{bimCompanyId,jdbcType=INTEGER},#{deptCode,jdbcType=INTEGER},#{pinyin,jdbcType=VARCHAR},#{deptName,jdbcType=VARCHAR},#{inCode,jdbcType=INTEGER},#{useSystem,jdbcType=VARCHAR},#{createTime,jdbcType=TIMESTAMP},#{updateTime,jdbcType=TIMESTAMP},#{deptLevel,jdbcType=INTEGER},#{custom2,jdbcType=INTEGER})
+  </insert>
+  <!-- 查询记录个数 -->
+  <select id="selectTotalCount" parameterType="int" resultType="java.lang.Integer">
+  select count(*) from bim_dept
+  </select>
+  <!-- 根据上级部门编号查询上级信息 -->
+  <select id="selectIncodeById" parameterType="int" resultMap="BaseResultMap">
+  select * from bim_dept where dept_code=#{0}
+  </select>
+  <!--查询部门编号或名称同时存在的记录数-->
+   <select id="selectCount" resultMap="BaseResultMap">
+  select * from bim_dept where dept_code=#{0} and dept_name=#{1}
+  </select> 
+  <!-- 修改dept信息 -->
+  <update id="updateInfo" parameterType="com.wadejerry.scms.modules.onecard.dto.BimDeptDto">
+  update bim_dept set dept_code=#{deptCode,jdbcType=INTEGER},pinyin=#{pinyin,jdbcType=VARCHAR},dept_name=#{deptName,jdbcType=VARCHAR},update_time=#{updateTime,jdbcType=TIMESTAMP} where bim_dept_id=#{bimDeptId,jdbcType=INTEGER}
+  </update>
+  <!-- 删除tree节点 -->
+  <delete id="deleteTreeNode" parameterType="com.wadejerry.scms.modules.onecard.dto.BimDeptDto">
+  delete from bim_dept where bim_dept_id=#{bimDeptId,jdbcType=INTEGER}
+  </delete>
+  <!-- 根据部门名称查询部门信息 -->
+  <select id="selectInfoByDeptName" parameterType="string" resultMap="BaseResultMap">
+  select * from bim_dept where dept_name=#{0}
+  </select>
+  <!-- 导出部门 -->
+  <select id="download"  resultType="java.util.HashMap" parameterType="int">
+  select dept_code,dept_name,in_code,pinyin,custom4 from bim_dept where bim_company_id=#{0}
+  </select>
+  <!-- 查看部门编号是否存在-->
+  <select id="selectCountByDeptCode"  resultType="int">
+  select count(*) from bim_dept where dept_code=#{0} and bim_company_id=#{1}
+  </select>
+  <!-- 查看部门名称是否存在-->
+  <select id="selectCountByDeptName"  resultType="int">
+  select count(*) from bim_dept where dept_name=#{0} and bim_company_id=#{1}
+  </select>
+  <!-- 查看上级部门编号是否存在-->
+  <select id="selectCountByInCode"  resultType="int">
+  select count(*) from bim_dept where bim_dept_id=#{0} and bim_company_id=#{1}
+  </select>
+  <!-- 导入部门信息 -->
+  <insert id="exportDept" parameterType="com.wadejerry.scms.modules.onecard.dto.BimDeptDto">
+  insert into bim_dept(bim_dept_id,bim_company_id,dept_code,pinyin,dept_name,in_code,dept_level,custom4) values(#{bimDeptId,jdbcType=INTEGER},#{bimCompanyId,jdbcType=INTEGER},#{deptCode,jdbcType=INTEGER},#{pinyin,jdbcType=VARCHAR},#{deptName,jdbcType=VARCHAR},#{inCode,jdbcType=INTEGER},#{deptLevel,jdbcType=INTEGER},#{custom4,jdbcType=VARCHAR})
+  </insert>
+  <!-- 查询上级部门的等级类型 -->
+  <select id="selectIncodeByDeptCode" resultMap="BaseResultMap">
+  select * from bim_dept where dept_code=#{0}
+  </select>
+  <select id="selectByDeptCode" resultMap="BaseResultMap">
+  select * from bim_dept where dept_code=#{0}
+  </select>
+  
+</mapper>

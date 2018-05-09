@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.wadejerry.scms.modules.pfm.dao.PfmTimeChargeTimeMapper" >
+  <resultMap id="BaseResultMap" type="com.wadejerry.scms.modules.pfm.model.PfmTimeChargeTime" >
+    <id column="time_charge_time_id" property="timeChargeTimeId" jdbcType="INTEGER" />
+    <result column="start_time" property="startTime" jdbcType="TIME"/>
+    <result column="end_time" property="endTime" jdbcType="TIME" />
+    <result column="charge_money" property="chargeMoney" jdbcType="NUMERIC" />
+    <result column="time_charge_id" property="timeChargeId" jdbcType="INTEGER" />
+    <result column="custom1" property="custom1" jdbcType="INTEGER" />
+    <result column="custom2" property="custom2" jdbcType="INTEGER" />
+    <result column="custom3" property="custom3" jdbcType="VARCHAR" />
+    <result column="custom4" property="custom4" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    time_charge_time_id, start_time, end_time, charge_money, time_charge_id, custom1, 
+    custom2, custom3, custom4
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from pfm_time_charge_time
+    where time_charge_time_id = #{timeChargeTimeId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from pfm_time_charge_time
+    where time_charge_time_id = #{timeChargeTimeId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.wadejerry.scms.modules.pfm.model.PfmTimeChargeTime" >
+    insert into pfm_time_charge_time (time_charge_time_id, start_time, end_time, 
+      charge_money, time_charge_id, custom1, 
+      custom2, custom3, custom4
+      )
+    values (#{timeChargeTimeId,jdbcType=INTEGER}, #{startTime,jdbcType=TIME}, #{endTime,jdbcType=TIME}, 
+      #{chargeMoney,jdbcType=NUMERIC}, #{timeChargeId,jdbcType=INTEGER}, #{custom1,jdbcType=INTEGER}, 
+      #{custom2,jdbcType=INTEGER}, #{custom3,jdbcType=VARCHAR}, #{custom4,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.wadejerry.scms.modules.pfm.model.PfmTimeChargeTime" >
+    insert into pfm_time_charge_time
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="timeChargeTimeId != null" >
+        time_charge_time_id,
+      </if>
+      <if test="startTime != null" >
+        start_time,
+      </if>
+      <if test="endTime != null" >
+        end_time,
+      </if>
+      <if test="chargeMoney != null" >
+        charge_money,
+      </if>
+      <if test="timeChargeId != null" >
+        time_charge_id,
+      </if>
+      <if test="custom1 != null" >
+        custom1,
+      </if>
+      <if test="custom2 != null" >
+        custom2,
+      </if>
+      <if test="custom3 != null" >
+        custom3,
+      </if>
+      <if test="custom4 != null" >
+        custom4,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="timeChargeTimeId != null" >
+        #{timeChargeTimeId,jdbcType=INTEGER},
+      </if>
+      <if test="startTime != null" >
+        #{startTime,jdbcType=TIME},
+      </if>
+      <if test="endTime != null" >
+        #{endTime,jdbcType=TIME},
+      </if>
+      <if test="chargeMoney != null" >
+        #{chargeMoney,jdbcType=NUMERIC},
+      </if>
+      <if test="timeChargeId != null" >
+        #{timeChargeId,jdbcType=INTEGER},
+      </if>
+      <if test="custom1 != null" >
+        #{custom1,jdbcType=INTEGER},
+      </if>
+      <if test="custom2 != null" >
+        #{custom2,jdbcType=INTEGER},
+      </if>
+      <if test="custom3 != null" >
+        #{custom3,jdbcType=VARCHAR},
+      </if>
+      <if test="custom4 != null" >
+        #{custom4,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.wadejerry.scms.modules.pfm.model.PfmTimeChargeTime" >
+    update pfm_time_charge_time
+    <set >
+      <if test="startTime != null" >
+        start_time = #{startTime,jdbcType=TIME},
+      </if>
+      <if test="endTime != null" >
+        end_time = #{endTime,jdbcType=TIME},
+      </if>
+      <if test="chargeMoney != null" >
+        charge_money = #{chargeMoney,jdbcType=NUMERIC},
+      </if>
+      <if test="timeChargeId != null" >
+        time_charge_id = #{timeChargeId,jdbcType=INTEGER},
+      </if>
+      <if test="custom1 != null" >
+        custom1 = #{custom1,jdbcType=INTEGER},
+      </if>
+      <if test="custom2 != null" >
+        custom2 = #{custom2,jdbcType=INTEGER},
+      </if>
+      <if test="custom3 != null" >
+        custom3 = #{custom3,jdbcType=VARCHAR},
+      </if>
+      <if test="custom4 != null" >
+        custom4 = #{custom4,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where time_charge_time_id = #{timeChargeTimeId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.wadejerry.scms.modules.pfm.model.PfmTimeChargeTime" >
+    update pfm_time_charge_time
+    set start_time = #{startTime,jdbcType=TIME},
+      end_time = #{endTime,jdbcType=TIME},
+      charge_money = #{chargeMoney,jdbcType=NUMERIC},
+      time_charge_id = #{timeChargeId,jdbcType=INTEGER},
+      custom1 = #{custom1,jdbcType=INTEGER},
+      custom2 = #{custom2,jdbcType=INTEGER},
+      custom3 = #{custom3,jdbcType=VARCHAR},
+      custom4 = #{custom4,jdbcType=VARCHAR}
+    where time_charge_time_id = #{timeChargeTimeId,jdbcType=INTEGER}
+  </update>
+  
+  <select id="selectByRuleId" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+   c.time_charge_time_id, c.start_time, c.end_time, c.charge_money, c.time_charge_id, c.custom1, 
+    c.custom2, c.custom3, c.custom4
+    from pfm_charge_rule a 
+    left join pfm_time_charge b on a.rule_id = b.rule_id
+    left join  pfm_time_charge_time c on b.time_charge_id = c.time_charge_id
+    where a.rule_id = #{id,jdbcType=INTEGER}
+  </select>
+</mapper>

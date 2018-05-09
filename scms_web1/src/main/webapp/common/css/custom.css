@@ -1,0 +1,160 @@
+@CHARSET "UTF-8";
+label{
+	font-weight:400;
+}
+
+/*--yystart,表格是在 AdminLTE.css中写死的，将表格样式直接全部复制过来  */
+/* .table-bordered {
+  border: 1px solid #f4f4f4;
+} */
+.table-bordered {
+  *border-collapse: collapse; IE7 and lower
+	border-spacing: 0;
+	border: solid #ccc 1px;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+    -webkit-box-shadow: 0 1px 1px #ccc; 
+    -moz-box-shadow: 0 1px 1px #ccc; 
+    box-shadow: 0 1px 1px #ccc;
+}
+/*--由于表格中本来就有颜色，所以这里，不确定鼠标经过是否仍需要添加颜色，故先注销  */
+/* .table-bordered tr:hover {
+    background: #fbf8e9;
+    -o-transition: all 0.1s ease-in-out;
+    -webkit-transition: all 0.1s ease-in-out;
+    -moz-transition: all 0.1s ease-in-out;
+    -ms-transition: all 0.1s ease-in-out;
+    transition: all 0.1s ease-in-out;     
+} 
+ */
+/*--yyend-----------------------  */
+.btn-group-line{
+	border-bottom: 1px solid #ccc;
+    -webkit-box-shadow: 0 1px 1px #ccc; 
+    -moz-box-shadow: 0 1px 1px #ccc; 
+    box-shadow: 0 1px 1px #ccc; 
+}
+
+.nav-tabs-custom > .nav-tabs {
+  margin: 0;
+  border-bottom-color: #ccc;
+  border-top-right-radius: 3px;
+  border-top-left-radius: 3px;
+}
+
+.nav-tabs-custom > .nav-tabs > li {
+  border-top: 2px solid transparent;
+  margin-bottom: -5px;
+  margin-right: 5px;
+}
+
+.nav > li > a {
+  position: relative;
+  display: block;
+  padding: 8px 8px;
+}
+
+.nav-tabs-custom > .nav-tabs > li.active > a,
+.nav-tabs-custom > .nav-tabs > li.active:hover > a {
+  background-color: #fff;
+  color: #444;
+  padding:6px 8px 6px 10px;
+}
+
+.btntreewidth{
+	/* border-right-width: 5px; */
+	width: 25%;
+	margin-left: 0px;
+}
+
+/*----yystart,给/pages/pfm/carmanage/car_manage.jsp 的做菜单4个按钮去除边框，25%显示，适配各个大小，在lib.js中再加上yy-btn-width类，覆盖前面类的属性  */
+.yy-btn-width{
+	margin-left: 0;
+}
+.yy-btn-width > .dropdown-toggle:not(:first-child) { 
+    margin-left: 0;
+}        
+.yy-btn-width > .btn:not(:first-child):not(:last-child):not(.dropdown-toggle) {
+  margin-left: 0;
+}    
+.yy-btn-width > .btn:last-child:not(:first-child),
+.yy-btn-width > .dropdown-toggle:not(:first-child) {
+    margin-left: 0;
+}
+/*---yyend----  */
+
+/*--yystart,这是bootstrap。css中的样式，将padding改为0，去掉填充--  */
+.breadcrumb {
+/*   padding: 8px 15px; */
+	padding: 0;
+  margin-bottom: 20px;
+  list-style: none;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+}   
+    
+.leftJichu{
+	margin-left: 10px;
+	font-size: 16px;
+}
+
+.content-header > h1 {
+	font-size: 16px;
+}
+
+.content-header{
+	    padding: 10px 0 5px 20px;
+}
+
+.content-header > .breadcrumb {
+    float: right;
+    background: rgba(0, 0, 0, 0);
+    margin-top: 0;
+    margin-bottom: 0;
+    font-size: 13px;
+    position: absolute;
+    top: 14px;
+    right: 40px;
+}
+
+.box {
+    position: relative;
+    border-radius: 3px;
+    background: #ffffff;
+    border-top: 3px solid rgba(58, 148, 142, 0.42);
+    margin-bottom: 20px;
+    width: 100%;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+    margin-left: 5px;
+    margin-right: 5px;
+}
+    
+.row {
+    margin-right: -13px;
+    margin-left: -10px;
+}
+.th{
+	font-weight:300;
+	color: #185450;
+}
+
+.form-control {
+    padding: 6px 5px;
+}
+.ztree li {
+    padding: 3px 1px 4px 1px;
+}
+.ztree li ul {
+    margin: 0px;
+    padding: 5px 0 5px 18px;
+}
+
+.nav-tabs-custom {
+    margin-bottom: 10px;
+    background: #fff;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+    border-radius: 3px;
+}
+
+    

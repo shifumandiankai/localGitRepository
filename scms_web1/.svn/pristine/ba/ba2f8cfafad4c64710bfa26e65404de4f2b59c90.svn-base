@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper  namespace="com.wadejerry.scms.modules.onecard.dao.BimPersonExtMapper">
+<resultMap id="BaseResultMap" type="com.wadejerry.scms.modules.onecard.model.BimPersonExt" >
+ <id column="person_ext_id" property="personExtId" jdbcType="INTEGER" />
+    <result column="person_id" property="personId" jdbcType="INTEGER" />
+    <result column="job_date" property="jobDate" jdbcType="TIMESTAMP" />
+    <result column="resignation_date" property="resignationDate" jdbcType="TIMESTAMP" />
+    <result column="birthday" property="birthday" jdbcType="TIMESTAMP" />
+    <result column="post_type" property="postType" jdbcType="VARCHAR" />
+    <result column="position" property="position" jdbcType="VARCHAR" />
+    <result column="national" property="national" jdbcType="VARCHAR" />
+    <result column="ethnic" property="ethnic" jdbcType="VARCHAR" />
+    <result column="political" property="political" jdbcType="VARCHAR" />
+    <result column="is_married" property="isMarried" jdbcType="INTEGER"/>
+    <result column="blood_type" property="bloodType" jdbcType="VARCHAR" />
+    <result column="cert_addr" property="certAddr" jdbcType="VARCHAR" />
+    <result column="cert_date" property="certDate" jdbcType="TIMESTAMP" />
+    <result column="work_addr" property="workAddr" jdbcType="VARCHAR" />
+    <result column="emergency_contact" property="emergencyContact" jdbcType="VARCHAR" />
+    <result column="emergency_phone" property="emergencyPhone" jdbcType="VARCHAR" />
+    <result column="titles" property="titles" jdbcType="VARCHAR" />
+    <result column="professtion" property="professtion" jdbcType="VARCHAR" />
+    <result column="educational" property="educational" jdbcType="VARCHAR" />
+    <result column="graduation_day" property="graduationDay" jdbcType="VARCHAR" />
+    <result column="now_addr" property="nowAddr" jdbcType="VARCHAR"/>
+    <result column="interest" property="interest" jdbcType="VARCHAR"/>
+    <result column="health" property="health" jdbcType="VARCHAR" />
+    <result column="spouse" property="spouse" jdbcType="VARCHAR" />
+    <result column="english_name" property="englishName" jdbcType="VARCHAR" />
+    <result column="note" property="note" jdbcType="VARCHAR" />
+</resultMap>
+<resultMap type="com.wadejerry.scms.modules.onecard.dto.BimPersonExtDto" id="DtoResultMap">
+    <id column="person_ext_id" property="personExtId" jdbcType="INTEGER" />
+    <result column="person_id" property="personId" jdbcType="INTEGER" />
+    <result column="person_code" property="personCode" jdbcType="VARCHAR" />
+    <result column="person_name" property="personName" jdbcType="VARCHAR" />
+    <result column="bim_dept_id" property="bimDeptId" jdbcType="INTEGER" />
+    <result column="english_name" property="englishName" jdbcType="VARCHAR" />
+    <result column="mail" property="mail" jdbcType="VARCHAR" />
+    <result column="job_date" property="jobDate" jdbcType="TIMESTAMP" />
+    <result column="resignation_date" property="resignationDate" jdbcType="TIMESTAMP" />
+    <result column="educational" property="educational" jdbcType="VARCHAR" />
+    <result column="ethnic" property="ethnic" jdbcType="VARCHAR" />
+   </resultMap>
+   <!-- 保存详细信息 -->
+    <!-- <insert id="saveInfo" parameterType="com.wadejerry.scms.modules.auth.dto.bimPersonExtDto">
+   insert into bim_person_ext (english_name,job_date,resignation_date,educational,ethnic) values(englishName,jobDate,resignationDate,educational,ethnic)
+   </insert>  -->
+   <!-- 保存详细信息 -->
+   <update id="updateInfo" parameterType="com.wadejerry.scms.modules.onecard.dto.BimPersonExtDto" >
+   update bim_person_ext set english_name=#{englishName,jdbcType=VARCHAR},job_date=#{jobDate,jdbcType=TIMESTAMP},resignation_date=#{resignationDate,jdbcType=TIMESTAMP},educational=#{educational,jdbcType=VARCHAR},ethnic=#{ethnic,jdbcType=VARCHAR} where person_id=#{personId,jdbcType=INTEGER}
+   </update>
+   <!-- 删除人员信息 -->
+   <delete id="deletePersonById" parameterType="int">
+  delete from bim_person_ext where person_id=#{0}
+  </delete>
+</mapper>

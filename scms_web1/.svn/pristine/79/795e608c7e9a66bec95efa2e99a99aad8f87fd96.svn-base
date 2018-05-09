@@ -1,0 +1,679 @@
+package com.wadejerry.scms.modules.pfm.controller;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.shiro.SecurityUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.wadejerry.scms.frame.constant.ConstParamLog;
+import com.wadejerry.scms.frame.entity.DataTableDto;
+import com.wadejerry.scms.frame.entity.LoginInfo;
+import com.wadejerry.scms.frame.entity.OperateResult;
+import com.wadejerry.scms.frame.entity.PageParamsDto;
+import com.wadejerry.scms.frame.log.LogRecord;
+import com.wadejerry.scms.modules.pfm.dao.PfmChargeRuleMapper;
+import com.wadejerry.scms.modules.pfm.dto.ChargeRuleDto;
+import com.wadejerry.scms.modules.pfm.model.PfmAnshi;
+import com.wadejerry.scms.modules.pfm.model.PfmBaoqi;
+import com.wadejerry.scms.modules.pfm.model.PfmChargeRule;
+import com.wadejerry.scms.modules.pfm.model.PfmDaynight;
+import com.wadejerry.scms.modules.pfm.model.PfmJianmianRelease;
+import com.wadejerry.scms.modules.pfm.model.PfmPeriod;
+import com.wadejerry.scms.modules.pfm.model.PfmPeriodTime;
+import com.wadejerry.scms.modules.pfm.model.PfmPertime;
+import com.wadejerry.scms.modules.pfm.model.PfmTimeCharge;
+import com.wadejerry.scms.modules.pfm.model.PfmTimeChargeTime;
+import com.wadejerry.scms.modules.pfm.model.PfmUnitPeriod;
+import com.wadejerry.scms.modules.pfm.model.PfmUnitPeriodTime;
+import com.wadejerry.scms.modules.pfm.service.PfmChargeRuleService;
+import com.wadejerry.scms.utils.AjaxUtil;
+import com.wadejerry.scms.utils.Log.LogManager;
+import com.wadejerry.scms.utils.date.DateUtil;
+import com.wadejerry.scms.utils.json.JacksonUtil;
+
+@Controller
+public class ChargeRuleController {
+	@Autowired
+	private PfmChargeRuleService pcrs;
+	@Autowired
+	private PfmChargeRuleMapper pcrnm;
+	@Autowired
+	private LogRecord logRecord;
+	@RequestMapping(value = "pfm/carmanage/getchargerule.do")
+	@ResponseBody
+	public void getAllChargeRule(HttpServletRequest request, HttpServletResponse response) {
+		PageParamsDto paramsDto = new PageParamsDto(request); // 获取分页参数
+		int iTotal =0;
+		List<ChargeRuleDto> dtoList = null;
+		if(!SecurityUtils.getSubject().isPermitted("RuleSee")){
+		}else{
+		iTotal= pcrs.getChargeRuleCount(paramsDto); // 获取记录总数
+		if (iTotal > 0) {
+			if (paramsDto.getLength() == -1) { // 查询所有记录
+				paramsDto.setLength(iTotal);
+			}
+			dtoList = pcrs.getChargeRuleListByPage(paramsDto); // 获取分页记录
+
+		}
+		}
+		DataTableDto data = new DataTableDto(); // 返回数据封装
+		data.setDataList(dtoList);
+		data.setDraw(paramsDto.getDraw());
+		data.setRecordsFiltered(iTotal);
+		data.setRecordsTotal(iTotal);
+		AjaxUtil.ajaxWriteDataTable(data, response);
+
+	}
+
+	@RequestMapping("pfm/carmanage/deletecr.do")
+	@ResponseBody
+	void delete(HttpServletResponse response, @RequestParam("condition") String condition) {
+		try {
+			List<ChargeRuleDto> dtolist = JacksonUtil.json2list(condition, ChargeRuleDto.class);
+			pcrs.deleteChargeRule(dtolist);
+			AjaxUtil.ajaxWrite(true, "", response); // 返回成功
+			logRecord.recordLog(ConstParamLog.LOG_MODULE_PFM_CHARGE_RULE, ConstParamLog.LOG_OPER_DELETE, ConstParamLog.LOG_TYPE_CONFIG, "");
+
+		} catch (Exception e) {
+			LogManager.logException(e);
+			AjaxUtil.ajaxWrite(false, e.getMessage(), response); // 返回失败
+		}
+		
+
+	}
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	@RequestMapping("/pfm/chargerule/add")
+	@ResponseBody
+	public void addRule(HttpServletResponse response, @RequestParam("condition") String condition,
+			@RequestParam(value = "times", required = false) String times,@RequestParam(value = "ruleId")String ruleId,@RequestParam("condition2")String condition2,@RequestParam("condition3")String condition3,@RequestParam("condition4")String condition4) {
+		try {
+			Map<String, Object> conditionMap = JacksonUtil.json2map(condition);
+			Map<String, Object>	conditionMap2 = JacksonUtil.json2map(condition2);
+			Map<String, Object>	conditionMap3 = JacksonUtil.json2map(condition3);
+			Map<String, Object>	conditionMap4 = JacksonUtil.json2map(condition4);
+			//////////////////////减免规则 conditionMap2
+			PfmJianmianRelease reducerule = new PfmJianmianRelease();
+			if(Integer.parseInt(conditionMap2.get("custom1").toString())==1){
+				reducerule.setMoney(new BigDecimal(0));
+				reducerule.setRuleName("");
+				reducerule.setNote("");
+				reducerule.setBimCompanyId(LoginInfo.getCompanyId());
+				reducerule.setStartTime(new Date());
+				reducerule.setEndTime(new Date());
+				reducerule.setCustom1(1);
+				
+				if(conditionMap2.containsKey("jianmianfangshi")){//减免规则
+					reducerule.setType(Short.parseShort(conditionMap2.get("jianmianfangshi").toString()));
+				}
+				
+			}else{
+				reducerule.setMoney(new BigDecimal(conditionMap2.get("jianmian").toString()));
+				reducerule.setRuleName(conditionMap2.get("ruleName").toString());
+				reducerule.setNote(conditionMap2.get("note").toString());
+				reducerule.setBimCompanyId(LoginInfo.getCompanyId());
+				reducerule.setStartTime(DateUtil.YMDHMdf.parse(conditionMap2.get("startdate").toString()));
+			reducerule.setEndTime(DateUtil.YMDHMdf.parse(conditionMap2.get("enddate").toString()));
+			reducerule.setCustom1(Integer.parseInt(conditionMap2.get("custom1").toString()));
+			
+			if(conditionMap2.containsKey("jianmianfangshi")){//减免规则
+				reducerule.setType(Short.parseShort(conditionMap2.get("jianmianfangshi").toString()));
+			}
+			}
+			if("".equals(ruleId)){//没有选中的规则id，则做添加操作
+				reducerule.setCarTypeId(Integer.parseInt(conditionMap2.get("carTypeId").toString()));
+				}
+			else{
+				reducerule.setAbnormalReleaseId(Integer.parseInt(conditionMap2.get("jianmianyichangId").toString()));
+				
+			}
+			//////////////////////移动减免 conditionMap4
+			PfmJianmianRelease mobilereducerule = new PfmJianmianRelease();
+			if(Integer.parseInt(conditionMap4.get("custom1").toString())==1){
+				mobilereducerule.setMoney(new BigDecimal(0));
+				mobilereducerule.setRuleName("");
+				mobilereducerule.setNote("");
+				mobilereducerule.setBimCompanyId(LoginInfo.getCompanyId());
+				mobilereducerule.setStartTime(new Date());
+				mobilereducerule.setEndTime(new Date());
+				mobilereducerule.setCustom1(1);
+				
+				if(conditionMap2.containsKey("jianmianfangshi")){//减免规则
+					mobilereducerule.setType(Short.parseShort(conditionMap4.get("jianmianfangshi").toString()));
+				}
+				
+			}else{
+				mobilereducerule.setMoney(new BigDecimal(conditionMap4.get("jianmian").toString()));
+				mobilereducerule.setRuleName(conditionMap4.get("ruleName").toString());
+				mobilereducerule.setNote(conditionMap4.get("note").toString());
+				mobilereducerule.setBimCompanyId(LoginInfo.getCompanyId());
+				mobilereducerule.setStartTime(DateUtil.YMDHMdf.parse(conditionMap4.get("startdate").toString()));
+				mobilereducerule.setEndTime(DateUtil.YMDHMdf.parse(conditionMap4.get("enddate").toString()));
+				mobilereducerule.setCustom1(Integer.parseInt(conditionMap4.get("custom1").toString()));
+			
+			if(conditionMap4.containsKey("jianmianfangshi")){//减免规则
+				mobilereducerule.setType(Short.parseShort(conditionMap4.get("jianmianfangshi").toString()));
+			}
+			}
+			if("".equals(ruleId)){//没有选中的规则id，则做添加操作
+				mobilereducerule.setCarTypeId(Integer.parseInt(conditionMap4.get("carTypeId").toString()));
+				}
+			else{
+				mobilereducerule.setAbnormalReleaseId(Integer.parseInt(conditionMap4.get("jianmianyichangId").toString()));
+				
+			}
+		
+			////////////////////////异常规则 conditionMap3
+			PfmJianmianRelease exceptionrule = new PfmJianmianRelease();
+			if(Integer.parseInt(conditionMap3.get("custom1").toString())==1){
+				exceptionrule.setMoney(new BigDecimal(0));
+				exceptionrule.setRuleName("");
+				exceptionrule.setNote("");
+				exceptionrule.setBimCompanyId(LoginInfo.getCompanyId());
+				exceptionrule.setStartTime(new Date());
+				exceptionrule.setEndTime(new Date());
+				exceptionrule.setCustom1(1);
+				
+				if(conditionMap3.containsKey("jianmianfangshi")){//减免规则
+					exceptionrule.setType(Short.parseShort(conditionMap3.get("jianmianfangshi").toString()));
+				}
+				
+			}else{
+				exceptionrule.setMoney(new BigDecimal(conditionMap3.get("jianmian").toString()));
+				exceptionrule.setRuleName(conditionMap3.get("ruleName").toString());
+				exceptionrule.setNote(conditionMap3.get("note").toString());
+				exceptionrule.setBimCompanyId(LoginInfo.getCompanyId());
+				exceptionrule.setStartTime(DateUtil.YMDHMdf.parse(conditionMap3.get("startdate").toString()));
+				exceptionrule.setEndTime(DateUtil.YMDHMdf.parse(conditionMap3.get("enddate").toString()));
+				exceptionrule.setCustom1(Integer.parseInt(conditionMap3.get("custom1").toString()));
+			
+			if(conditionMap3.containsKey("jianmianfangshi")){//减免规则
+				exceptionrule.setType(Short.parseShort(conditionMap3.get("jianmianfangshi").toString()));
+			}
+			}
+		if("".equals(ruleId)){//没有选中的规则id，则做添加操作
+			
+			exceptionrule.setCarTypeId(Integer.parseInt(conditionMap3.get("carTypeId").toString()));//
+			
+			}
+		else{
+			exceptionrule.setAbnormalReleaseId(Integer.parseInt(conditionMap3.get("jianmianyichangId").toString()));
+			
+		}
+
+			switch (conditionMap.get("ruleType").toString()) {
+			case "0": {
+				
+				List<Map<String, String>> timesMap = JacksonUtil.toCollection(times,
+						new TypeReference<List<Map<String, String>>>() {
+						});
+				PfmChargeRule rule = new PfmChargeRule();
+				if (Integer.parseInt(conditionMap.get("carType").toString()) != -1)
+					rule.setCarTypeId(Integer.parseInt(conditionMap.get("carType").toString()));
+				rule.setInsertTime(new Date());
+				rule.setRuleName(conditionMap.get("ruleName").toString());
+				rule.setRuleType((short) 0);
+				rule.setTempMatch(Short.parseShort(conditionMap.get("tempMatch").toString()));
+				rule.setUpdateTime(new Date());
+				rule.setUserName(LoginInfo.getLoginName());
+				rule.setBimCompanyId(LoginInfo.getCompanyId());
+
+				PfmTimeCharge timecharge = new PfmTimeCharge();
+				timecharge.setFreeTime(Integer.parseInt(conditionMap.get("freeTime").toString()));
+				if (!conditionMap.containsKey("useTopMoney"))
+				{
+					timecharge.setUseTopMoney((short) 0);
+					
+				}
+				else {
+					timecharge.setUseTopMoney(Short.parseShort(conditionMap.get("useTopMoney").toString()));
+					timecharge.setTopMoney(new BigDecimal(conditionMap.get("topMoney").toString()));
+				}
+
+				List<PfmTimeChargeTime> timeslist = new ArrayList<>();
+				for (Map p : timesMap) {
+					PfmTimeChargeTime ptc = new PfmTimeChargeTime();
+					ptc.setChargeMoney(new BigDecimal(p.get("money").toString()));
+					ptc.setStartTime(DateUtil.HMsdf.parse(p.get("start").toString()));
+					ptc.setEndTime(DateUtil.HMsdf.parse(p.get("end").toString()));
+					timeslist.add(ptc);
+
+				}
+				if("".equals(ruleId)){
+				AjaxUtil.ajaxWrite(pcrs.addFenShiRule(rule, timecharge, timeslist,reducerule,exceptionrule,mobilereducerule), response);
+				}
+				else{//修改
+					
+					rule.setRuleId(Integer.parseInt(ruleId));
+					AjaxUtil.ajaxWrite(pcrs.updateFenshiRule(rule, timecharge, timeslist,reducerule,exceptionrule,mobilereducerule), response);
+
+				}
+			}
+
+				break;
+			case "1": {
+				List<Map<String, String>> timesMap = JacksonUtil.toCollection(times,
+						new TypeReference<List<Map<String, String>>>() {
+						});
+				PfmChargeRule rule = new PfmChargeRule();
+				if (Integer.parseInt(conditionMap.get("carType").toString()) != -1)
+					rule.setCarTypeId(Integer.parseInt(conditionMap.get("carType").toString()));
+				rule.setInsertTime(new Date());
+				rule.setRuleName(conditionMap.get("ruleName").toString());
+				rule.setRuleType((short) 1);
+				rule.setTempMatch(Short.parseShort(conditionMap.get("tempMatch").toString()));
+				rule.setUpdateTime(new Date());
+				rule.setUserName(LoginInfo.getLoginName());
+				rule.setBimCompanyId(LoginInfo.getCompanyId());
+
+				PfmPeriod period = new PfmPeriod();
+				period.setFreeTime(Integer.parseInt(conditionMap.get("freeTime").toString()));
+				if (conditionMap.containsKey("useTopMoney"))
+					{	
+						period.setUseTopMoney((short) 0);
+						period.setTopMoney(new BigDecimal(conditionMap.get("topMoney").toString()));
+					}
+				
+				else
+					period.setUseTopMoney((short) 1);
+				period.setParkOverMaxPeriodMoney(new BigDecimal(conditionMap.get("maxMoney").toString()));
+				List<PfmPeriodTime> timeslist = new ArrayList<>();
+				for (Map p : timesMap) {
+					PfmPeriodTime ppt = new PfmPeriodTime();
+					ppt.setChargeMoney(new BigDecimal(p.get("money").toString()));
+					ppt.setStartPeriod(Short.parseShort((p.get("start").toString())));
+					ppt.setEndPeriod(Short.parseShort(p.get("end").toString()));
+					timeslist.add(ppt);
+
+				}
+				if("".equals(ruleId)){
+				AjaxUtil.ajaxWrite(pcrs.addFenShiDuanRule(rule, period, timeslist,reducerule,exceptionrule,mobilereducerule), response);
+
+				}
+					else{//修改
+					
+					rule.setRuleId(Integer.parseInt(ruleId));
+					AjaxUtil.ajaxWrite(pcrs.updateFenshiDuanRule(rule, period, timeslist,reducerule,exceptionrule,mobilereducerule), response);
+
+					
+				}
+			}
+
+				break;
+			case "2": {
+				List<Map<String, String>> timesMap = JacksonUtil.toCollection(times,
+						new TypeReference<List<Map<String, String>>>() {
+						});
+				PfmChargeRule rule = new PfmChargeRule();
+				if (Integer.parseInt(conditionMap.get("carType").toString()) != -1)
+					rule.setCarTypeId(Integer.parseInt(conditionMap.get("carType").toString()));
+				rule.setInsertTime(new Date());
+				rule.setRuleName(conditionMap.get("ruleName").toString());
+				rule.setRuleType((short) 2);
+				rule.setTempMatch(Short.parseShort(conditionMap.get("tempMatch").toString()));
+				rule.setUpdateTime(new Date());
+				rule.setUserName(LoginInfo.getLoginName());
+				rule.setBimCompanyId(LoginInfo.getCompanyId());
+
+				PfmUnitPeriod period = new PfmUnitPeriod();
+				period.setFreeTime(Short.parseShort(conditionMap.get("freeTime").toString()));
+				if (conditionMap.containsKey("useTopMoney"))
+				{
+					period.setUseTopMoney((short) 0);
+					period.setTopMoney(new BigDecimal(conditionMap.get("topMoney").toString()));
+				}
+				else
+					period.setUseTopMoney((short) 1);
+				if (conditionMap.get("includeFreeTime").equals("0"))
+					period.setIncludeFreeTime((short) 0);
+				else
+					period.setIncludeFreeTime((short) (1));
+				List<PfmUnitPeriodTime> timeslist = new ArrayList<>();
+				for (Map p : timesMap) {
+					PfmUnitPeriodTime pupt = new PfmUnitPeriodTime();
+					pupt.setStartTime(DateUtil.HMsdf.parse(p.get("start").toString()));
+					pupt.setEndTime(DateUtil.HMsdf.parse(p.get("end").toString()));
+					pupt.setChargeMoney(new BigDecimal(p.get("money").toString()));
+					if(!p.get("topmoney").toString().trim().equals("")){
+					pupt.setTopMoney(new BigDecimal(p.get("topmoney").toString()));
+					}
+					pupt.setUnit(Integer.parseInt(p.get("unit").toString()));
+					pupt.setLeastOverPeriodTime(Integer.parseInt(p.get("mintime").toString()));
+					timeslist.add(pupt);
+
+				}
+				if("".equals(ruleId)){
+				AjaxUtil.ajaxWrite(pcrs.addFenDanweiShiDuanRule(rule, period, timeslist,reducerule,exceptionrule,mobilereducerule), response);
+
+				}
+				else{
+					rule.setRuleId(Integer.parseInt(ruleId));
+					AjaxUtil.ajaxWrite(pcrs.updateDanweishiDuanRule(rule, period, timeslist,reducerule,exceptionrule,mobilereducerule), response);
+
+				}
+			}
+				break;
+			case "3": {
+				PfmChargeRule rule = new PfmChargeRule();
+				if (Integer.parseInt(conditionMap.get("carType").toString()) != -1)
+					rule.setCarTypeId(Integer.parseInt(conditionMap.get("carType").toString()));
+				rule.setInsertTime(new Date());
+				rule.setRuleName(conditionMap.get("ruleName").toString());
+				rule.setRuleType((short) 3);
+				rule.setTempMatch(Short.parseShort(conditionMap.get("tempMatch").toString()));
+				rule.setUpdateTime(new Date());
+				rule.setUserName(LoginInfo.getLoginName());
+				rule.setBimCompanyId(LoginInfo.getCompanyId());
+
+				PfmPertime time = new PfmPertime();
+				time.setChargeMoney(new BigDecimal(conditionMap.get("danjia").toString()));
+				if("".equals(ruleId)){
+
+				AjaxUtil.ajaxWrite(pcrs.addAnciRule(rule, time,reducerule,exceptionrule,mobilereducerule), response);
+
+				}
+				else{
+					rule.setRuleId(Integer.parseInt(ruleId));
+					AjaxUtil.ajaxWrite(pcrs.updateAnciRule(rule, time,reducerule,exceptionrule,mobilereducerule), response);
+
+				}
+			}
+
+				break;
+
+			case "4": {
+				PfmChargeRule rule = new PfmChargeRule();
+				if (Integer.parseInt(conditionMap.get("carType").toString()) != -1)
+					rule.setCarTypeId(Integer.parseInt(conditionMap.get("carType").toString()));
+				rule.setInsertTime(new Date());
+				rule.setRuleName(conditionMap.get("ruleName").toString());
+				rule.setRuleType((short) 4);
+				rule.setTempMatch(Short.parseShort(conditionMap.get("tempMatch").toString()));
+				rule.setUpdateTime(new Date());
+				rule.setUserName(LoginInfo.getLoginName());
+				rule.setBimCompanyId(LoginInfo.getCompanyId());
+
+				PfmAnshi anshi = new PfmAnshi();
+				anshi.setFirstPartChargeMoney(new BigDecimal(conditionMap.get("firstMoney").toString()));
+				anshi.setFirstPartChargeTime(Integer.parseInt(conditionMap.get("firstTime").toString()));
+				anshi.setSeparateChargeMoney(new BigDecimal(conditionMap.get("intervalMoney").toString()));
+				anshi.setSeparateChargeTime(Integer.parseInt(conditionMap.get("intervalTime").toString()));
+				anshi.setFreeTime(Integer.parseInt(conditionMap.get("freeTime").toString()));
+				if (conditionMap.containsKey("useTopMoney"))
+				{
+					anshi.setUseTopMoney(Short.valueOf( conditionMap.get("useTopMoney").toString()));
+					anshi.setTopMoney(new BigDecimal(conditionMap.get("topMoney").toString()));
+				}
+				else{
+					anshi.setUseTopMoney((short)0);
+				}
+				
+				if("".equals(ruleId)){
+				AjaxUtil.ajaxWrite(pcrs.addAnshiRule(rule, anshi,reducerule,exceptionrule,mobilereducerule), response);
+
+				}
+				else{
+					rule.setRuleId(Integer.parseInt(ruleId));
+					AjaxUtil.ajaxWrite(pcrs.updateAnShiRule(rule, anshi,reducerule,exceptionrule,mobilereducerule), response);
+
+				}
+			}
+
+				break;
+			case "5": {
+				PfmChargeRule rule = new PfmChargeRule();
+				if (Integer.parseInt(conditionMap.get("carType").toString()) != -1)
+					rule.setCarTypeId(Integer.parseInt(conditionMap.get("carType").toString()));
+				rule.setInsertTime(new Date());
+				rule.setRuleName(conditionMap.get("ruleName").toString());
+				rule.setRuleType((short) 5);
+				rule.setTempMatch(Short.parseShort(conditionMap.get("tempMatch").toString()));
+				rule.setUpdateTime(new Date());
+				rule.setUserName(LoginInfo.getLoginName());
+				rule.setBimCompanyId(LoginInfo.getCompanyId());
+
+				PfmBaoqi baoqi=new PfmBaoqi();
+				baoqi.setMoney(new BigDecimal(conditionMap.get("money").toString()));
+				baoqi.setType(Short.parseShort(conditionMap.get("type").toString()));
+				if("".equals(ruleId)){
+
+				AjaxUtil.ajaxWrite(pcrs.addBaoqiRule(rule, baoqi,reducerule,exceptionrule,mobilereducerule), response);
+
+				}
+				else{
+					rule.setRuleId(Integer.parseInt(ruleId));
+					AjaxUtil.ajaxWrite(pcrs.updateBaoqiRule(rule, baoqi,reducerule,exceptionrule,mobilereducerule), response);
+
+				}
+			}
+
+				break;
+			case "6": {
+				PfmChargeRule rule = new PfmChargeRule();
+				if (Integer.parseInt(conditionMap.get("carType").toString()) != -1)
+					rule.setCarTypeId(Integer.parseInt(conditionMap.get("carType").toString()));
+				rule.setInsertTime(new Date());
+				rule.setRuleName(conditionMap.get("ruleName").toString());
+				rule.setRuleType((short) 6);
+				rule.setTempMatch(Short.parseShort(conditionMap.get("tempMatch").toString()));
+				rule.setUpdateTime(new Date());
+				rule.setUserName(LoginInfo.getLoginName());
+				rule.setBimCompanyId(LoginInfo.getCompanyId());
+				if("".equals(ruleId))
+				{
+				AjaxUtil.ajaxWrite(pcrs.addFreeRule(rule,reducerule,exceptionrule,mobilereducerule), response);
+
+				}
+				else{			
+					rule.setRuleId(Integer.parseInt(ruleId));
+					AjaxUtil.ajaxWrite(pcrs.updateFreeRule(rule,reducerule,exceptionrule,mobilereducerule), response);
+
+				}
+			}
+
+				break;
+
+			case "7": {
+				PfmChargeRule rule = new PfmChargeRule();
+				if (Integer.parseInt(conditionMap.get("carType").toString()) != -1)
+					rule.setCarTypeId(Integer.parseInt(conditionMap.get("carType").toString()));
+				rule.setInsertTime(new Date());
+				rule.setRuleName(conditionMap.get("ruleName").toString());
+				rule.setRuleType((short) 7);
+				rule.setTempMatch(Short.parseShort(conditionMap.get("tempMatch").toString()));
+				rule.setUpdateTime(new Date());
+				rule.setUserName(LoginInfo.getLoginName());
+				rule.setBimCompanyId(LoginInfo.getCompanyId());
+
+				PfmDaynight daynight = new PfmDaynight();
+				daynight.setPeriodStartTime(DateUtil.HMsdf.parse(conditionMap.get("periodStartTime").toString()));
+				daynight.setFirstTime(Integer.parseInt(conditionMap.get("firstPeriodTime").toString()));
+				daynight.setFirstTimeCharge(new BigDecimal(conditionMap.get("firstPeriodMoney").toString()));
+				daynight.setUnitTime(Short.parseShort(conditionMap.get("unitTime").toString()));
+				daynight.setUnitTimeCharge(new BigDecimal(conditionMap.get("unitMoney").toString()));
+				daynight.setPertimeStartTime(DateUtil.HMsdf.parse(conditionMap.get("anciStartTime").toString()));
+				daynight.setPertimeCharge(new BigDecimal(conditionMap.get("meiciMoney").toString()));
+				daynight.setFreeTime(Short.parseShort(conditionMap.get("freeTime").toString()));
+				if (conditionMap.containsKey("overFreeTimeCharge")) {
+					daynight.setIfChargeOverFreeTime((short) 0);
+					
+				} else {
+					daynight.setIfChargeOverFreeTime((short) 1);
+				}
+				if (conditionMap.containsKey("oneSuanOne")) {
+					daynight.setOneOne((short) 0);
+				} else {
+					daynight.setOneOne((short) 1);
+				}
+				if (conditionMap.containsKey("useTopMoneyin24")) {
+					daynight.setUseTopMomeyIn24((short) 0);
+					daynight.setTopMoney(new BigDecimal(conditionMap.get("topMoney").toString()));
+				} else {
+					daynight.setUseTopMomeyIn24((short) 1);
+				}
+				if (conditionMap.containsKey("byPeriodin24")) {
+					daynight.setByTimePeriod((short) 0);
+				} else {
+					daynight.setByTimePeriod((short) 1);
+				}
+				if("".equals(ruleId)){
+				AjaxUtil.ajaxWrite(pcrs.addDaynightRule(rule, daynight,reducerule,exceptionrule,mobilereducerule), response);
+
+				}
+				else{
+					rule.setRuleId(Integer.parseInt(ruleId));
+					AjaxUtil.ajaxWrite(pcrs.updateDaynightRule(rule, daynight,reducerule,exceptionrule,mobilereducerule), response);
+
+				}
+			}
+
+				break;
+			case "8": {
+				PfmChargeRule rule = new PfmChargeRule();
+				if (Integer.parseInt(conditionMap.get("carType").toString()) != -1)
+					rule.setCarTypeId(Integer.parseInt(conditionMap.get("carType").toString()));
+				rule.setInsertTime(new Date());
+				rule.setRuleName(conditionMap.get("ruleName").toString());
+				rule.setRuleType((short) 8);
+				rule.setTempMatch(Short.parseShort(conditionMap.get("tempMatch").toString()));
+				rule.setUpdateTime(new Date());
+				rule.setUserName(LoginInfo.getLoginName());
+				rule.setBimCompanyId(LoginInfo.getCompanyId());
+				if("".equals(ruleId))
+				{
+				AjaxUtil.ajaxWrite(pcrs.addFreeRule(rule,reducerule,exceptionrule,mobilereducerule), response);
+
+				}
+				else{			
+					rule.setRuleId(Integer.parseInt(ruleId));
+					AjaxUtil.ajaxWrite(pcrs.updateFreeRule(rule,reducerule,exceptionrule,mobilereducerule), response);
+
+				}
+			}
+
+				break;
+			default:
+				break;
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+
+			AjaxUtil.ajaxWrite(false, "操作失败！", response);
+
+		}
+
+	}
+
+	/*@RequestMapping("/pfm/chargerule/addjianmianrule")
+	@ResponseBody
+	public void addJianmianRule(@RequestParam("condition")String condition,这是收费规则的id @RequestParam("ruleId")String ruleId,HttpServletResponse response){
+		Map<String, Object> conditionMap;
+		try {
+			conditionMap = JacksonUtil.json2map(condition);
+			
+			PfmJianmianRelease rule = new PfmJianmianRelease();
+			if(Integer.parseInt(conditionMap.get("custom1").toString())==1){
+				rule.setMoney(new BigDecimal(0));
+				rule.setRuleName("");
+				rule.setNote("");
+				rule.setBimCompanyId(LoginInfo.getCompanyId());
+				rule.setStartTime(new Date());
+				rule.setEndTime(new Date());
+				rule.setCustom1(1);
+				
+				if(conditionMap.containsKey("jianmianfangshi")){//减免规则
+					rule.setType(Short.parseShort(conditionMap.get("jianmianfangshi").toString()));
+				}
+				
+			}else{
+			rule.setMoney(new BigDecimal(conditionMap.get("jianmian").toString()));
+			rule.setRuleName(conditionMap.get("ruleName").toString());
+			rule.setNote(conditionMap.get("note").toString());
+			rule.setBimCompanyId(LoginInfo.getCompanyId());
+			rule.setStartTime(DateUtil.YMDHMdf.parse(conditionMap.get("startdate").toString()));
+			rule.setEndTime(DateUtil.YMDHMdf.parse(conditionMap.get("enddate").toString()));
+			rule.setCustom1(Integer.parseInt(conditionMap.get("custom1").toString()));
+			
+			if(conditionMap.containsKey("jianmianfangshi")){//减免规则
+				rule.setType(Short.parseShort(conditionMap.get("jianmianfangshi").toString()));
+			}
+			}
+		if("".equals(ruleId)){//没有选中的规则id，则做添加操作
+			rule.setCarTypeId(Integer.parseInt(conditionMap.get("carTypeId").toString()));//
+			AjaxUtil.ajaxWrite(pcrs.addJianmianRule(rule),  response);
+			}
+		else{
+			rule.setAbnormalReleaseId(Integer.parseInt(conditionMap.get("jianmianyichangId").toString()));
+			AjaxUtil.ajaxWrite(pcrs.updateJianmianRule(rule),  response);
+		}
+		} catch (Exception e) {
+			e.printStackTrace();
+			AjaxUtil.ajaxWrite(false, "服务器异常！", response);
+		}
+	
+		
+	}*/
+	@RequestMapping("/pfm/chargerule/getchargerulebyid")
+	@ResponseBody
+	public void getChargeRuleByid(HttpServletResponse response,@RequestParam("ruleid")String ruleId){
+		Map  map=pcrs.getChargeRuleByID(Integer.parseInt(ruleId));
+		
+		AjaxUtil.ajaxWriteObject(map, response);
+	}
+	
+	@RequestMapping("/pfm/chargerule/getjianmianrulebyid")
+	@ResponseBody
+	public void getjianmianRuleByid(HttpServletResponse response,@RequestParam("ruleid")String ruleId){
+		Map  map=pcrs.getJianmianRuleByID(Integer.parseInt(ruleId));
+	
+		AjaxUtil.ajaxWriteObject(map, response);
+	}
+	
+	@RequestMapping("/pfm/chargerule/getfenshitimearr")
+	@ResponseBody
+	public void getFenshiTimeArray(HttpServletResponse response,@RequestParam("ruleid")String ruleId){
+		
+		
+		AjaxUtil.ajaxWriteObject(pcrs.getFenshiTimeArray(Integer.parseInt(ruleId)), response);
+	}
+	
+	@RequestMapping("/pfm/chargerule/getfenshiduantimearr")
+	@ResponseBody
+	public void getFenshiduanTimeArray(HttpServletResponse response,@RequestParam("ruleid")String ruleId){
+		
+		
+		AjaxUtil.ajaxWriteObject(pcrs.getFenshiduanTimeArray(Integer.parseInt(ruleId)), response);
+	}
+	@RequestMapping("/pfm/chargerule/getdanweishiduantimearr")
+	@ResponseBody
+	public void getDanweishiduanTimeArray(HttpServletResponse response,@RequestParam("ruleid")String ruleId){
+		
+		
+		AjaxUtil.ajaxWriteObject(pcrs.getDanweishiduanTimeArray(Integer.parseInt(ruleId)), response);
+	}
+	@RequestMapping("/pfm/chargerule/getifhasrule")
+	@ResponseBody
+	public void getIfHasRule(HttpServletResponse response,@RequestParam("carTypeId")String carTypeId){
+		OperateResult r = new OperateResult();
+		if(pcrnm.selectByCarTypeId(Integer.parseInt(carTypeId))>0){
+			r.setResult(false);
+		}
+		else{
+			r.setResult(true);
+		}
+		AjaxUtil.ajaxWrite(r, response);
+	}
+}

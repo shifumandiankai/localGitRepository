@@ -1,0 +1,609 @@
+var wade = wade || {};
+wade.role = wade.role || {};
+var config1 = new Object();
+var config2 = new Object();
+var config3 = new Object();
+var config4 = new Object();
+/*var ztreeConf = $.extend({},
+		{
+		    id: "tree",
+		    url: "/entrance/gettree.do",
+		    // 获取所有节点
+		    btns: [],
+		    setting: {
+		        data: {
+		            simpleData: {
+		                enable: true
+		                // 简单数据
+		            }
+		        },
+		        view: {
+		            selectedMulti: false
+		        },
+		        callback: {
+		           onClick: nodeClick,
+		           beforeClick:beforeClick
+		           
+		        }
+		    }
+		});
+
+function beforeClick(treeId, treeNode, clickFlag){
+	if($('#li1').hasClass('active')){
+		var dev=$('#form1');
+		var wapdev=$('#chargerecordexample_wrapper');
+	}
+	if($('#li2').hasClass('active')){
+		var dev=$('#form2');
+		var wapdev=$('#normalexample_wrapper');
+	}
+	if($('#li3').hasClass('active')){
+		var dev=$('#form3');
+		var wapdev=$('#abnormalexample_wrapper');
+	}
+	if($('#li4').hasClass('active')){
+		var dev=$('#form4');
+		var wapdev=$('#parkreportexample_wrapper');
+	}
+	if(!treeNode.hasPermission){
+		if($('#li1').hasClass('active')){
+			var dev=$('#form1');
+			var wapdev=$('#chargerecordexample_wrapper');
+		}
+		if($('#li2').hasClass('active')){
+			var dev=$('#form2');
+			var wapdev=$('#normalexample_wrapper');
+		}
+		if($('#li3').hasClass('active')){
+			var dev=$('#form3');
+			var wapdev=$('#abnormalexample_wrapper');
+		}
+		if($('#li4').hasClass('active')){
+			var dev=$('#form4');
+			var wapdev=$('#parkreportexample_wrapper');
+		}
+		alert("您没有权限，请联系管理员");
+		dev.find('*[name="hasPermission"]').val('1');
+		var jsonuserinfo =dev.serializeObject();
+		var formdata =JSON.stringify(jsonuserinfo);
+		wapdev.find('*[name="searchValue0_search_hidden"]').val(formdata);
+		wapdev.find('*[name="searchValue0_search_hidden"]').trigger("keyup.DT");
+		dev.find('*[name="hasPermission"]').val("");
+		return false;
+		
+	}
+}
+
+wade.libs.tree(ztreeConf);//初始化树控件
+
+//点击节点触发事件
+function nodeClick(event, treeId, treeNode) {
+	if($('#li1').hasClass('active')){
+		var dev=$('#form1');
+		var wapdev=$('#chargerecordexample_wrapper');
+	}
+	if($('#li2').hasClass('active')){
+		var dev=$('#form2');
+		var wapdev=$('#normalexample_wrapper');
+	}
+	if($('#li3').hasClass('active')){
+		var dev=$('#form3');
+		var wapdev=$('#abnormalexample_wrapper');
+	}
+	if($('#li4').hasClass('active')){
+		var dev=$('#form4');
+		var wapdev=$('#parkreportexample_wrapper');
+	}
+	dev.find('*[name="flag"]').val(1);
+	var val=treeNode.id;
+	var str=val.substring(0,1);
+	var zTree = $.fn.zTree.getZTreeObj("tree");
+	if(str=='p'){
+		
+		
+		var parkid=val.substring(1);
+		dev.find('*[name="parkId"]').val(parkid);
+		var jsonuserinfo =dev.serializeObject();
+		var formdata =JSON.stringify(jsonuserinfo);
+		wapdev.find('*[name="searchValue0_search_hidden"]').val(formdata);
+		wapdev.find('*[name="searchValue0_search_hidden"]').trigger("keyup.DT");
+		dev.find('*[name="parkId"]').val("");
+		dev.find('*[name="entranceId"]').val("");
+		dev.find('*[name="carriagewayId"]').val("");
+	}
+	if(str=='e'){
+		var entranceId=val.substring(1);
+		var parentnode=zTree.getNodeByParam("id",treeNode.pId, null);//车道节点
+		var parkval=parentnode.id;
+		dev.find('*[name="parkId"]').val(parkval.substring(1));
+		dev.find('*[name="entranceId"]').val(entranceId);
+		var jsonuserinfo = dev.serializeObject();
+		var formdata =JSON.stringify(jsonuserinfo);
+		wapdev.find('*[name="searchValue0_search_hidden"]').val(formdata);
+		wapdev.find('*[name="searchValue0_search_hidden"]').trigger("keyup.DT");
+		dev.find('*[name="parkId"]').val("");
+		dev.find('*[name="entranceId"]').val("");
+		dev.find('*[name="carriagewayId"]').val("");
+	}
+	
+	if(str=='c'){
+		var carriagewayId=val.substring(1);
+		var entrancenode=zTree.getNodeByParam("id",treeNode.pId, null);//出入口节点
+		var parknode=zTree.getNodeByParam("id",entrancenode.pId, null);//车场节点
+		var parkval=parknode.id;
+		var entranceval=entrancenode.id;
+		dev.find('*[name="parkId"]').val(parkval.substring(1));
+		dev.find('*[name="entranceId"]').val(entranceval.substring(1));
+		dev.find('*[name="carriagewayId"]').val(carriagewayId);
+		var jsonuserinfo =dev.serializeObject();
+		var formdata =JSON.stringify(jsonuserinfo);
+		wapdev.find('*[name="searchValue0_search_hidden"]').val(formdata);
+		wapdev.find('*[name="searchValue0_search_hidden"]').trigger("keyup.DT");
+		dev.find('*[name="parkId"]').val("");
+		dev.find('*[name="entranceId"]').val("");
+		dev.find('*[name="carriagewayId"]').val("");
+		
+	}
+	
+}
+
+*/
+
+/*window.onload = function () { 
+    new uploadPreview({ UpBtn: "devup_img", DivShow: "devimgdiv", ImgShow: "devimgShow"});
+}*/
+
+
+
+$('*[name="startTime"]').datetimepicker({
+	//autoclose:true,
+	 /*timeFormat: "HH:mm:ss",
+     dateFormat: "yy-mm-dd"	*/
+	showSecond: true,
+    timeFormat: 'hh:mm:ss',
+    stepHour: 1,
+    stepMinute: 1,
+    stepSecond: 1
+});	
+$('*[name="endTime"]').datetimepicker({
+	//autoclose:true,
+	 /*timeFormat: "HH:mm:ss",
+     dateFormat: "yy-mm-dd"	*/
+	showSecond: true,
+    timeFormat: 'hh:mm:ss',
+    stepHour: 1,
+    stepMinute: 1,
+    stepSecond: 1
+});
+//绑定出入口
+/*$.ajax({
+	 url: "/report/configentranceName.do",
+     dataType: 'json',
+     type:'post',
+     success: function (data) {
+     	var result=eval(data);
+     	if(result.length!=0){
+     		for(var i in result){
+         	$('select[name="entranceName"]').append('<option value="'+result[i].id+'">'+result[i].text+'</option>');	
+         	}
+ 		}
+     }
+});
+*/
+$.ajax({
+	 url: "/report/configentranceName.do",
+     dataType: 'json',
+     type:'post',
+     quietMillis: 250,
+     success: function (result) {
+   	  $('*[name="entranceId"]').select2({
+      		//dropdownParent:devClone,
+      		multiple:true,
+      		allowClear: true,
+      		data:result
+      	});
+     	
+  	   
+     }
+});
+//绑定车辆类型
+$.ajax({
+	 url: "/report/parkreport/configCarType.do",
+     dataType: 'json',
+     type:'post',
+     success: function (data) {
+     	var result=eval(data);
+     	if(result.length!=0){
+     		for(var i in result){
+         	$('select[name="carTypeId"]').append('<option value="'+result[i].id+'">'+result[i].text+'</option>');	
+         	}
+ 		}
+     }
+});
+
+
+//收费记录对象
+	config1.columns = new Array("carNumber","personName","carTypeName","ruleName","parkingDuration","chargeFee","jianmianFee","jianmianRuleName","userName","inTime","outTime","inPhoto","outPhoto");
+	config1.defs = new Array("inPhoto","outPhoto");
+	config1.id="chargerecordexample";
+	config1.getUrl="/report/selectAllListByPage.do";
+	config1.btns=[
+{'id':"10001",'name':'查询',"fun":config1sel},
+{'id':'10002','name':'导出',"fun":exportcharge},
+{'id':"10003",'name':'图片',"fun":chargephoto},
+	              ];
+	config1.search = new Array(
+			{
+				'type' : 'search_hidden',
+				'placeholder' : null,
+				'url' : null,
+				'index' : 0
+			}
+			);
+//正常通行记录对象
+	config2.columns = new Array("recordId","carNumber","direction","personName","carTypeName","parkName","entranceName","eventTime","carriagewayName","boothName","userName","photo");
+	// 需要隐藏的列
+	config2.defs = new Array("recordId","photo");
+	config2.id="normalexample";
+	config2.getUrl="/report/selectNormalListByPage.do";
+	config2.btns=[
+{'id':"10001",'name':'查询',"fun":config2sel},
+{'id':'10002','name':'导出',"fun":exportnormal},
+{'id':'10003','name':'车辆图片',"fun":photo}
+	              ];
+	config2.search = new Array(
+			{
+				'type' : 'search_hidden',
+				'placeholder' : null,
+				'url' : null,
+				'index' : 0
+			}
+			);
+
+//异常通行记录对象
+	config3.columns = new Array("recordId","direction","eventTime","parkName","entranceName","carriagewayName","boothName","userName");
+	config3.defs = new Array("recordId");
+	config3.id="abnormalexample";
+	config3.getUrl="/report/selectabNormalListByPage.do";
+	config3.btns=[
+{'id':"10001",'name':'查询',"fun":config3sel},
+{'id':'10002','name':'导出',"fun":exportabnormal},
+{'id':'10003','name':'车辆图片',"fun":photo}
+	              ];
+	config3.search = new Array(
+			{
+				'type' : 'search_hidden',
+				'placeholder' : null,
+				'url' : null,
+				'index' : 0
+			}
+			);
+//场内车辆记录对象
+	config4.columns = new Array("carNumber","direction","personName","carTypeName","parkName","entranceName","eventTime","carriagewayName","boothName","userName");
+	config4.id="parkreportexample";
+	config4.getUrl="/report/parkreport/selectListByPage.do";
+	//config4.getUrl="/parkreport/selectListByPage.do";
+	config4.btns=[
+{'id':"10001",'name':'查询',"fun":config4sel},
+{'id':'10002','name':'导出',"fun":exportpark},
+{'id':'10003','name':'车辆图片',"fun":photo}
+	              ];
+	config4.search = new Array(
+			{
+				'type' : 'search_hidden',
+				'placeholder' : null,
+				'url' : null,
+				'index' : 0
+			}
+			);
+wade.libs.datatable(config1);
+wade.libs.datatable(config2);
+wade.libs.datatable(config3);
+wade.libs.datatable(config4);
+
+
+//收费记录导出
+ function exportcharge(sel_tr,all_tr,sel_obj_arr,sel_obj){
+	 var dev=$('#form1');
+		var wapdev=$('#chargerecordexample_wrapper');
+		var startTime=dev.find('*[name="startTime"]').val();
+		var endTime=dev.find('*[name="endTime"]').val();
+		if(startTime>endTime&&startTime!=''&&endTime!=''){
+			var errMsg='开始时间不能小于结束时间';	
+			dev.find('.point-out').hide();
+			dev.find("#startTimeNotice").html('<span class="point-box errorbgTop dropdown"  ><i class="sprite icon_arrow_up2 pa"></i>' + errMsg + '</span>').show();
+			return false;
+		}
+		var carval=dev.find('input[name="carNumber"]').val();
+		var res=RegExpObj.isCarNum(carval);
+		if(carval!=''&&!res){
+			alert(0);
+			var errMsg='车牌号码格式不正确';	
+			dev.find('.point-out').hide();
+			dev.find("#carNumberNotice").html('<span class="point-box errorbgTop dropdown"  ><i class="sprite icon_arrow_up2 pa"></i>' + errMsg + '</span>').show();
+			return false;
+		}
+		
+		var jsonuserinfo = dev.serializeObject();
+		var formdata =JSON.stringify(jsonuserinfo);
+		//window.open("/report/Czreport/exportDay/"+formdata+".do");
+	    window.open("/report/exportcharge/"+formdata+".do");
+ }
+//收费记录查询
+ function config1sel(sel_tr,all_tr,sel_obj_arr,sel_obj){
+	// var dev=$("#" + config1.id+'_wrapper');
+	 var  dev=$('#form1');
+	 var wapdev=$("#" + config1.id+'_wrapper');
+	 var startTime=dev.find('*[name="startTime"]').val();
+	 var endTime=dev.find('*[name="endTime"]').val();
+	 if(startTime>endTime&&startTime!=''&&endTime!=''){
+			var errMsg='开始时间不能小于结束时间';	
+			dev.find('.point-out').hide();
+			dev.find("#startTimeNotice").html('<span class="point-box errorbgTop dropdown"  ><i class="sprite icon_arrow_up2 pa"></i>' + errMsg + '</span>').show();
+			return false;
+		}
+		var carval=dev.find('input[name="carNumber"]').val();
+		//alert(carval);
+		var res=RegExpObj.isCarNum(carval);
+		if(carval!=''&&!res){
+			var errMsg='车牌号码格式不正确';	
+			dev.find('.point-out').hide();
+			dev.find("#carNumberNotice").html('<span class="point-box errorbgTop dropdown"  ><i class="sprite icon_arrow_up2 pa"></i>' + errMsg + '</span>').show();
+			return false;
+		}
+		var jsonuserinfo = $("#form1").serializeObject();
+		var formdata =JSON.stringify(jsonuserinfo);
+		wapdev.find('*[name="searchValue0_search_hidden"]').val(formdata);
+		wapdev.find('*[name="searchValue0_search_hidden"]').trigger("keyup.DT");
+ }
+//正常通行记录查询
+function config2sel(sel_tr,all_tr,sel_obj_arr,sel_obj){
+	var wapdev=$("#" + config2.id+'_wrapper');
+	var  dev=$('#form2');
+	var startTime=dev.find('*[name="startTime"]').val();
+	var endTime=dev.find('*[name="endTime"]').val();
+	if(startTime>endTime&&startTime!=''&&endTime!=''){
+		var errMsg='开始时间不能小于结束时间';	
+		dev.find('.point-out').hide();
+		dev.find("#startTimeNotice").html('<span class="point-box errorbgTop dropdown"  ><i class="sprite icon_arrow_up2 pa"></i>' + errMsg + '</span>').show();
+		return false;
+	}
+	var carval=dev.find('input[name="carNumber"]').val();
+	var res=RegExpObj.isCarNum(carval);
+	if(carval!=''&&!res){
+		var errMsg='车牌号码格式不正确';	
+		dev.find('.point-out').hide();
+		dev.find("#carNumberNotice").html('<span class="point-box errorbgTop dropdown"  ><i class="sprite icon_arrow_up2 pa"></i>' + errMsg + '</span>').show();
+		return false;
+	}
+	var jsonuserinfo = $("#form2").serializeObject();
+	var formdata =JSON.stringify(jsonuserinfo);
+	wapdev.find('*[name="searchValue0_search_hidden"]').val(formdata);
+	wapdev.find('*[name="searchValue0_search_hidden"]').trigger("keyup.DT");
+}
+//异常通行记录查询
+function config3sel(sel_tr,all_tr,sel_obj_arr,sel_obj){
+	var dev=$("#" + config3.id+'_wrapper');
+	var startTime=dev.find('*[name="startTime"]').val();
+	var endTime=dev.find('*[name="endTime"]').val();
+	if(startTime>endTime&&startTime!=''&&endTime!=''){
+		var errMsg='开始时间不能小于结束时间';	
+		dev.find('.point-out').hide();
+		dev.find("#startTimeNotice").html('<span class="point-box errorbgTop dropdown"  ><i class="sprite icon_arrow_up2 pa"></i>' + errMsg + '</span>').show();
+		return false;
+	}
+	var jsonuserinfo = $("#form3").serializeObject();
+	var formdata =JSON.stringify(jsonuserinfo);
+	dev.find('*[name="searchValue0_search_hidden"]').val(formdata);
+	dev.find('*[name="searchValue0_search_hidden"]').trigger("keyup.DT");
+}
+//场内车辆记录查询
+function config4sel(sel_tr,all_tr,sel_obj_arr,sel_obj){
+	var wapdev=$("#" + config4.id+'_wrapper');
+	var  dev=$('#form4');
+	var startTime=dev.find('*[name="startTime"]').val();
+	var endTime=dev.find('*[name="endTime"]').val();
+	if(startTime>endTime&&startTime!=''&&endTime!=''){
+		var errMsg='开始时间不能小于结束时间';	
+		dev.find('.point-out').hide();
+		dev.find("#startTimeNotice").html('<span class="point-box errorbgTop dropdown"  ><i class="sprite icon_arrow_up2 pa"></i>' + errMsg + '</span>').show();
+		return false;
+	}
+	var carval=dev.find('input[name="carNumber"]').val();
+	var res=RegExpObj.isCarNum(carval);
+	if(carval!=''&&!res){
+		var errMsg='车牌号码格式不正确';	
+		dev.find('.point-out').hide();
+		dev.find("#carNumberNotice").html('<span class="point-box errorbgTop dropdown"  ><i class="sprite icon_arrow_up2 pa"></i>' + errMsg + '</span>').show();
+		return false;
+	}
+	var jsonuserinfo = $("#form4").serializeObject();
+	var formdata =JSON.stringify(jsonuserinfo);
+	wapdev.find('*[name="searchValue0_search_hidden"]').val(formdata);
+	wapdev.find('*[name="searchValue0_search_hidden"]').trigger("keyup.DT");
+}
+//正常通行记录导出
+function exportnormal(sel_tr,all_tr,sel_obj_arr,sel_obj){
+	var dev=$('#form2');
+	var wapdev=$('#normalexample_wrapper');
+	var startTime=dev.find('*[name="startTime"]').val();
+	var endTime=dev.find('*[name="endTime"]').val();
+	if(startTime>endTime&&startTime!=''&&endTime!=''){
+		var errMsg='开始时间不能小于结束时间';	
+		dev.find('.point-out').hide();
+		dev.find("#startTimeNotice").html('<span class="point-box errorbgTop dropdown"  ><i class="sprite icon_arrow_up2 pa"></i>' + errMsg + '</span>').show();
+		return false;
+	}
+	var carval=$('input[name="carNumber"]').val();
+	var res=RegExpObj.isCarNum(carval);
+	if(carval!=''&&!res){
+		var errMsg='车牌号码格式不正确';	
+		dev.find('.point-out').hide();
+		dev.find("#carNumberNotice").html('<span class="point-box errorbgTop dropdown"  ><i class="sprite icon_arrow_up2 pa"></i>' + errMsg + '</span>').show();
+		return false;
+	}
+	var jsonuserinfo = dev.serializeObject();
+	var formdata =JSON.stringify(jsonuserinfo);
+	
+	window.open("/report/exportnormal/"+formdata+".do");
+}
+//异常通行记录导出
+function exportabnormal(){
+	var dev=$('#form3');
+	var wapdev=$('#abnormalexample_wrapper');
+	var startTime=dev.find('*[name="startTime"]').val();
+	var endTime=dev.find('*[name="endTime"]').val();
+	if(startTime>endTime&&startTime!=''&&endTime!=''){
+		var errMsg='开始时间不能小于结束时间';	
+		dev.find('.point-out').hide();
+		dev.find("#startTimeNotice").html('<span class="point-box errorbgTop dropdown"  ><i class="sprite icon_arrow_up2 pa"></i>' + errMsg + '</span>').show();
+		return false;
+	}
+	
+	var jsonuserinfo = dev.serializeObject();
+	var formdata =JSON.stringify(jsonuserinfo);
+	
+	window.open("/report/exportabnormal/"+formdata+".do");
+}
+//场内车辆记录导出
+function exportpark(){
+	var dev=$('#form4');
+	var wapdev=$('#parkreportexample_wrapper');
+	var startTime=dev.find('*[name="startTime"]').val();
+	var endTime=dev.find('*[name="endTime"]').val();
+	if(startTime>endTime&&startTime!=''&&endTime!=''){
+		var errMsg='开始时间不能小于结束时间';	
+		dev.find('.point-out').hide();
+		dev.find("#startTimeNotice").html('<span class="point-box errorbgTop dropdown"  ><i class="sprite icon_arrow_up2 pa"></i>' + errMsg + '</span>').show();
+		return false;
+	}
+	var carval=$('input[name="carNumber"]').val();
+	var res=RegExpObj.isCarNum(carval);
+	if(carval!=''&&!res){
+		var errMsg='车牌号码格式不正确';	
+		dev.find('.point-out').hide();
+		dev.find("#carNumberNotice").html('<span class="point-box errorbgTop dropdown"  ><i class="sprite icon_arrow_up2 pa"></i>' + errMsg + '</span>').show();
+		return false;
+	}
+	var jsonuserinfo = dev.serializeObject();
+	var formdata =JSON.stringify(jsonuserinfo);
+	
+	window.open("/report/parkreport/export/"+formdata+".do");
+}
+//正常通行记录图片
+function photo(sel_tr,all_tr,sel_obj_arr,sel_obj){
+	if(sel_obj==null){
+		wade.libs.alert('请选择车辆',2);
+		return;
+	}
+	var devClone = $("#photoModel").clone(true);
+	devClone.modal({backdrop: 'static', keyboard: false}).on('hidden.bs.modal',function(event){
+		$(this).remove();
+	});
+	devClone.find('#imgShow').attr("src",sel_obj.photo);
+	/*devClone.find('#imgShow').attr('id','devimgShow');
+	devClone.find('#imgdiv').attr('id','devimgdiv');
+	devClone.find('#up_img').attr('id','devup_img');
+	 new uploadPreview({ UpBtn: "devup_img", DivShow: "devimgdiv", ImgShow: "devimgShow"});*/
+	/*if(sel_obj.photo!=null){
+		devClone.find('#imgShow').attr("src",sel_obj.photo);
+	}else{
+		devClone.find('#photodiv').attr('style','block');
+		devClone.find('*input[name="recordId"]').val(sel_obj.recordId);
+		
+	}*/
+	
+	
+	/*//点击上传头像按钮
+	devClone.find('#upload').click(function(){
+		 
+    devClone.find('#uploadForm').submit();	
+	});
+	
+	devClone.find('#uploadForm').submit(function() {
+		  //event.preventDefault();
+		   //alert(0);
+	    var form = $(this);
+	    var formData = new FormData(this);
+	    //console.log(formData);
+	   $.ajax({
+	        type: form.attr('method'),
+	        url: form.attr('action'),
+	        data: formData,
+	        contentType: false,
+	        cache: false,
+	        processData:false,
+	        success:function(data) {
+	        var result = JSON.parse(data);
+	        if (result.success) {
+	            alert("恭喜！车辆图片上传成功！");
+	            //$("#photo").click();
+	           $("#imgShow").attr("src",result.msg);
+	           $("#up_img").val("");
+	          
+	        } else {
+	        	alert("车辆图片上传失败！");
+	        }}
+	    }) ;
+	    
+	});*/
+	
+	
+	
+}
+
+//消费记录查询图片
+function chargephoto(sel_tr,all_tr,sel_obj_arr,sel_obj){
+	if(sel_obj==null){
+		wade.libs.alert('请选择车辆',2);
+		return;
+	}
+	var devClone = $("#ChargephotoModel").clone(true);
+	devClone.modal({backdrop: 'static', keyboard: false}).on('hidden.bs.modal',function(event){
+		$(this).remove();
+	});
+	//alert(sel_obj.inPhoto);
+	//alert(sel_obj.outPhoto);
+	devClone.find('#imgShowin').attr("src",sel_obj.inPhoto);
+	devClone.find('#imgShowout').attr("src",sel_obj.outPhoto);
+}
+
+
+
+/*//正常通行记录导出
+$('#exportnormal').click(function(){
+	
+	window.open("/report/exportnormal.do");
+});*/
+/*//异常通行记录导出
+$('#exportabnormal').click(function(){
+	
+	window.open("/report/exportabnormal.do");
+});*/
+/*//场内车辆记录导出
+$('#exportpark').click(function(){
+	
+	window.open("/report/parkreport/export.do");
+});*/
+
+//图片显示
+/*$('#photo1').click(function(){
+	var sel_tr =  $('#' + config1.id + " tr.active");
+	var all_tr=$('#' + config1.id + " tr");
+	var i=0;
+	var sel_obj_arr=[];
+	var sel_obj = null;
+	var oaData=null;
+	$.each(all_tr,function(index,value){
+		
+		if($(value).hasClass('active')) {
+
+			return;
+		}
+	});
+	if(!sel_obj){
+		wade.libs.alert('请选择编辑项',2);
+		return;
+	}		
+	
+});*/

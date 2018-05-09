@@ -1,0 +1,40 @@
+package com.wadejerry.scms.modules.pfm.controller;
+
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.wadejerry.scms.frame.entity.LoginInfo;
+import com.wadejerry.scms.modules.pfm.dto.PfmFeeRecDto;
+import com.wadejerry.scms.modules.pfm.service.PfmFeeRecService;
+import com.wadejerry.scms.utils.AjaxUtil;
+import com.wadejerry.scms.utils.date.DateUtil;
+@Controller
+public class PfmFeeRecController {
+	@Autowired
+	private HttpServletRequest request;
+	@Autowired
+	private HttpServletResponse response;
+	@Autowired
+	private PfmFeeRecService pfmfeerecService;
+	//查询账户消费记录，用来显示前10条记录
+	@RequestMapping("/account/selectrecording.do")
+	@ResponseBody
+	public void SelectRecord(){
+		String cardid=request.getParameter("cardid");
+		String Fee=null;
+		List<PfmFeeRecDto> listDto=pfmfeerecService.selectRecording(Integer.valueOf(cardid),LoginInfo.getCompanyId());
+		for(PfmFeeRecDto tempDto:listDto){
+			String date=DateUtil.YMDHMdf.format(tempDto.getTime());
+			tempDto.setStrTime(date);
+		}
+		AjaxUtil.ajaxWriteObject(listDto,response);
+	}
+
+}

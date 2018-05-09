@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.wadejerry.scms.modules.auth.dao.BimCompanyMapper" >
+  <resultMap id="BaseResultMap" type="com.wadejerry.scms.modules.auth.model.BimCompany" >
+    <id column="bim_company_id" property="bimCompanyId" jdbcType="INTEGER" />
+    <result column="company_code" property="companyCode" jdbcType="INTEGER" />
+    <result column="company_name" property="companyName" jdbcType="VARCHAR" />
+    <result column="use_system" property="useSystem" jdbcType="CHAR" />
+    <result column="address" property="address" jdbcType="VARCHAR" />
+    <result column="phone" property="phone" jdbcType="CHAR" />
+    <result column="enable_time" property="enableTime" jdbcType="TIMESTAMP" />
+    <result column="disable_time" property="disableTime" jdbcType="TIMESTAMP" />
+    <result column="reg_code" property="regCode" jdbcType="CHAR" />
+    <result column="note" property="note" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="status" property="status" jdbcType="SMALLINT" />
+    <result column="custom1" property="custom1" jdbcType="INTEGER" />
+    <result column="custom2" property="custom2" jdbcType="INTEGER" />
+    <result column="custom3" property="custom3" jdbcType="VARCHAR" />
+    <result column="custom4" property="custom4" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    bim_company_id, company_code, company_name, use_system, address, phone, enable_time, 
+    disable_time, reg_code, note, create_time, update_time, status, custom1, custom2, 
+    custom3, custom4
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from bim_company
+    where bim_company_id = #{bimCompanyId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from bim_company
+    where bim_company_id = #{bimCompanyId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.wadejerry.scms.modules.auth.model.BimCompany" >
+    insert into bim_company (bim_company_id, company_code, company_name, 
+      use_system, address, phone, 
+      enable_time, disable_time, reg_code, 
+      note, create_time, update_time, 
+      status, custom1, custom2, 
+      custom3, custom4)
+    values (#{bimCompanyId,jdbcType=INTEGER}, #{companyCode,jdbcType=INTEGER}, #{companyName,jdbcType=VARCHAR}, 
+      #{useSystem,jdbcType=CHAR}, #{address,jdbcType=VARCHAR}, #{phone,jdbcType=CHAR}, 
+      #{enableTime,jdbcType=TIMESTAMP}, #{disableTime,jdbcType=TIMESTAMP}, #{regCode,jdbcType=CHAR}, 
+      #{note,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, 
+      #{status,jdbcType=SMALLINT}, #{custom1,jdbcType=INTEGER}, #{custom2,jdbcType=INTEGER}, 
+      #{custom3,jdbcType=VARCHAR}, #{custom4,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.wadejerry.scms.modules.auth.model.BimCompany" >
+    insert into bim_company
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="bimCompanyId != null" >
+        bim_company_id,
+      </if>
+      <if test="companyCode != null" >
+        company_code,
+      </if>
+      <if test="companyName != null" >
+        company_name,
+      </if>
+      <if test="useSystem != null" >
+        use_system,
+      </if>
+      <if test="address != null" >
+        address,
+      </if>
+      <if test="phone != null" >
+        phone,
+      </if>
+      <if test="enableTime != null" >
+        enable_time,
+      </if>
+      <if test="disableTime != null" >
+        disable_time,
+      </if>
+      <if test="regCode != null" >
+        reg_code,
+      </if>
+      <if test="note != null" >
+        note,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="custom1 != null" >
+        custom1,
+      </if>
+      <if test="custom2 != null" >
+        custom2,
+      </if>
+      <if test="custom3 != null" >
+        custom3,
+      </if>
+      <if test="custom4 != null" >
+        custom4,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="bimCompanyId != null" >
+        #{bimCompanyId,jdbcType=INTEGER},
+      </if>
+      <if test="companyCode != null" >
+        #{companyCode,jdbcType=INTEGER},
+      </if>
+      <if test="companyName != null" >
+        #{companyName,jdbcType=VARCHAR},
+      </if>
+      <if test="useSystem != null" >
+        #{useSystem,jdbcType=CHAR},
+      </if>
+      <if test="address != null" >
+        #{address,jdbcType=VARCHAR},
+      </if>
+      <if test="phone != null" >
+        #{phone,jdbcType=CHAR},
+      </if>
+      <if test="enableTime != null" >
+        #{enableTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="disableTime != null" >
+        #{disableTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="regCode != null" >
+        #{regCode,jdbcType=CHAR},
+      </if>
+      <if test="note != null" >
+        #{note,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=SMALLINT},
+      </if>
+      <if test="custom1 != null" >
+        #{custom1,jdbcType=INTEGER},
+      </if>
+      <if test="custom2 != null" >
+        #{custom2,jdbcType=INTEGER},
+      </if>
+      <if test="custom3 != null" >
+        #{custom3,jdbcType=VARCHAR},
+      </if>
+      <if test="custom4 != null" >
+        #{custom4,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.wadejerry.scms.modules.auth.model.BimCompany" >
+    update bim_company
+    <set >
+      <if test="companyCode != null" >
+        company_code = #{companyCode,jdbcType=INTEGER},
+      </if>
+      <if test="companyName != null" >
+        company_name = #{companyName,jdbcType=VARCHAR},
+      </if>
+      <if test="useSystem != null" >
+        use_system = #{useSystem,jdbcType=CHAR},
+      </if>
+      <if test="address != null" >
+        address = #{address,jdbcType=VARCHAR},
+      </if>
+      <if test="phone != null" >
+        phone = #{phone,jdbcType=CHAR},
+      </if>
+      <if test="enableTime != null" >
+        enable_time = #{enableTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="disableTime != null" >
+        disable_time = #{disableTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="regCode != null" >
+        reg_code = #{regCode,jdbcType=CHAR},
+      </if>
+      <if test="note != null" >
+        note = #{note,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=SMALLINT},
+      </if>
+      <if test="custom1 != null" >
+        custom1 = #{custom1,jdbcType=INTEGER},
+      </if>
+      <if test="custom2 != null" >
+        custom2 = #{custom2,jdbcType=INTEGER},
+      </if>
+      <if test="custom3 != null" >
+        custom3 = #{custom3,jdbcType=VARCHAR},
+      </if>
+      <if test="custom4 != null" >
+        custom4 = #{custom4,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where bim_company_id = #{bimCompanyId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.wadejerry.scms.modules.auth.model.BimCompany" >
+    update bim_company
+    set company_code = #{companyCode,jdbcType=INTEGER},
+      company_name = #{companyName,jdbcType=VARCHAR},
+      use_system = #{useSystem,jdbcType=CHAR},
+      address = #{address,jdbcType=VARCHAR},
+      phone = #{phone,jdbcType=CHAR},
+      enable_time = #{enableTime,jdbcType=TIMESTAMP},
+      disable_time = #{disableTime,jdbcType=TIMESTAMP},
+      reg_code = #{regCode,jdbcType=CHAR},
+      note = #{note,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      status = #{status,jdbcType=SMALLINT},
+      custom1 = #{custom1,jdbcType=INTEGER},
+      custom2 = #{custom2,jdbcType=INTEGER},
+      custom3 = #{custom3,jdbcType=VARCHAR},
+      custom4 = #{custom4,jdbcType=VARCHAR}
+    where bim_company_id = #{bimCompanyId,jdbcType=INTEGER}
+  </update>
+</mapper>

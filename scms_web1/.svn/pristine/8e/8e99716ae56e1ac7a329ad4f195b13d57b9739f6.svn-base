@@ -1,0 +1,280 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.wadejerry.scms.modules.pfm.dao.PfmChargeRuleMapper" >
+  <resultMap id="BaseResultMap" type="com.wadejerry.scms.modules.pfm.model.PfmChargeRule" >
+    <id column="rule_id" property="ruleId" jdbcType="INTEGER" />
+    <result column="bim_company_id" property="bimCompanyId" jdbcType="INTEGER" />
+    <result column="rule_name" property="ruleName" jdbcType="VARCHAR" />
+    <result column="car_type_id" property="carTypeId" jdbcType="INTEGER" />
+    <result column="rule_type" property="ruleType" jdbcType="SMALLINT" />
+    <result column="insert_time" property="insertTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="user_name" property="userName" jdbcType="VARCHAR" />
+    <result column="custom1" property="custom1" jdbcType="INTEGER" />
+    <result column="custom2" property="custom2" jdbcType="INTEGER" />
+    <result column="custom3" property="custom3" jdbcType="VARCHAR" />
+    <result column="custom4" property="custom4" jdbcType="VARCHAR" />
+    <result column="temp_match" property="tempMatch" jdbcType="SMALLINT" />
+  </resultMap>
+  <resultMap id="dtomap" type="com.wadejerry.scms.modules.pfm.dto.ChargeRuleDto">
+  	<id column="rule_id" property="ruleId" jdbcType="INTEGER"></id>
+  	<result column="rule_name" property="ruleName" jdbcType="VARCHAR" />
+	<result column="rule_type" property="ruleType" jdbcType="VARCHAR" />
+  	<result column="type_name" property="typeName" jdbcType="VARCHAR" />
+  	<result column="temp_match" property="tempMatch" jdbcType="VARCHAR"/>
+  	<result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+  	<result column="user_name" property="userName" jdbcType="VARCHAR" />
+  	<result column="rule_type_index" property="ruleTypeIndex" jdbcType="INTEGER" />
+  	<result column="jianmian_id" property="jianmianId" jdbcType="INTEGER" />
+  	<result column="yichang_id" property="yichangId" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    rule_id, bim_company_id, rule_name, car_type_id, rule_type, insert_time, update_time, 
+    user_name, custom1, custom2, custom3, custom4, temp_match
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from pfm_charge_rule
+    where rule_id = #{ruleId,jdbcType=INTEGER}
+  </select>
+  <select id="selectByCarType" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from pfm_charge_rule
+    where car_type_id = #{Id,jdbcType=INTEGER}
+  </select>
+  <select id="selectByCarId" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from pfm_charge_rule
+    where car_type_id = (select car_type_id from pfm_car_type_rel where car_info_id=#{Id,jdbcType=INTEGER})
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from pfm_charge_rule
+    where rule_id = #{ruleId,jdbcType=INTEGER}
+  </delete>
+   <delete id="deleteByCarType" parameterType="java.lang.Integer" >
+    delete from pfm_charge_rule
+    where car_type_id = #{Id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.wadejerry.scms.modules.pfm.model.PfmChargeRule" >
+    insert into pfm_charge_rule (rule_id, bim_company_id, rule_name, 
+      car_type_id, rule_type, insert_time, 
+      update_time, user_name, custom1, 
+      custom2, custom3, custom4, 
+      temp_match)
+    values (#{ruleId,jdbcType=INTEGER}, #{bimCompanyId,jdbcType=INTEGER}, #{ruleName,jdbcType=VARCHAR}, 
+      #{carTypeId,jdbcType=INTEGER}, #{ruleType,jdbcType=SMALLINT}, #{insertTime,jdbcType=TIMESTAMP}, 
+      #{updateTime,jdbcType=TIMESTAMP}, #{userName,jdbcType=VARCHAR}, #{custom1,jdbcType=INTEGER}, 
+      #{custom2,jdbcType=INTEGER}, #{custom3,jdbcType=VARCHAR}, #{custom4,jdbcType=VARCHAR}, 
+      #{tempMatch,jdbcType=SMALLINT})
+  </insert>
+  <insert id="insertSelective" parameterType="com.wadejerry.scms.modules.pfm.model.PfmChargeRule"
+  useGeneratedKeys="true" keyProperty="ruleId" >
+    insert into pfm_charge_rule
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="ruleId != null" >
+        rule_id,
+      </if>
+      <if test="bimCompanyId != null" >
+        bim_company_id,
+      </if>
+      <if test="ruleName != null" >
+        rule_name,
+      </if>
+      <if test="carTypeId != null" >
+        car_type_id,
+      </if>
+      <if test="ruleType != null" >
+        rule_type,
+      </if>
+      <if test="insertTime != null" >
+        insert_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+      <if test="userName != null" >
+        user_name,
+      </if>
+      <if test="custom1 != null" >
+        custom1,
+      </if>
+      <if test="custom2 != null" >
+        custom2,
+      </if>
+      <if test="custom3 != null" >
+        custom3,
+      </if>
+      <if test="custom4 != null" >
+        custom4,
+      </if>
+      <if test="tempMatch != null" >
+        temp_match,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="ruleId != null" >
+        #{ruleId,jdbcType=INTEGER},
+      </if>
+      <if test="bimCompanyId != null" >
+        #{bimCompanyId,jdbcType=INTEGER},
+      </if>
+      <if test="ruleName != null" >
+        #{ruleName,jdbcType=VARCHAR},
+      </if>
+      <if test="carTypeId != null" >
+        #{carTypeId,jdbcType=INTEGER},
+      </if>
+      <if test="ruleType != null" >
+        #{ruleType,jdbcType=SMALLINT},
+      </if>
+      <if test="insertTime != null" >
+        #{insertTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="userName != null" >
+        #{userName,jdbcType=VARCHAR},
+      </if>
+      <if test="custom1 != null" >
+        #{custom1,jdbcType=INTEGER},
+      </if>
+      <if test="custom2 != null" >
+        #{custom2,jdbcType=INTEGER},
+      </if>
+      <if test="custom3 != null" >
+        #{custom3,jdbcType=VARCHAR},
+      </if>
+      <if test="custom4 != null" >
+        #{custom4,jdbcType=VARCHAR},
+      </if>
+      <if test="tempMatch != null" >
+        #{tempMatch,jdbcType=SMALLINT},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.wadejerry.scms.modules.pfm.model.PfmChargeRule" >
+    update pfm_charge_rule
+    <set >
+      <if test="bimCompanyId != null" >
+        bim_company_id = #{bimCompanyId,jdbcType=INTEGER},
+      </if>
+      <if test="ruleName != null" >
+        rule_name = #{ruleName,jdbcType=VARCHAR},
+      </if>
+      <if test="carTypeId != null" >
+        car_type_id = #{carTypeId,jdbcType=INTEGER},
+      </if>
+      <if test="ruleType != null" >
+        rule_type = #{ruleType,jdbcType=SMALLINT},
+      </if>
+      <if test="insertTime != null" >
+        insert_time = #{insertTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="userName != null" >
+        user_name = #{userName,jdbcType=VARCHAR},
+      </if>
+      <if test="custom1 != null" >
+        custom1 = #{custom1,jdbcType=INTEGER},
+      </if>
+      <if test="custom2 != null" >
+        custom2 = #{custom2,jdbcType=INTEGER},
+      </if>
+      <if test="custom3 != null" >
+        custom3 = #{custom3,jdbcType=VARCHAR},
+      </if>
+      <if test="custom4 != null" >
+        custom4 = #{custom4,jdbcType=VARCHAR},
+      </if>
+      <if test="tempMatch != null" >
+        temp_match = #{tempMatch,jdbcType=SMALLINT},
+      </if>
+    </set>
+    where rule_id = #{ruleId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.wadejerry.scms.modules.pfm.model.PfmChargeRule" >
+    update pfm_charge_rule
+    set bim_company_id = #{bimCompanyId,jdbcType=INTEGER},
+      rule_name = #{ruleName,jdbcType=VARCHAR},
+      car_type_id = #{carTypeId,jdbcType=INTEGER},
+      rule_type = #{ruleType,jdbcType=SMALLINT},
+      insert_time = #{insertTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      user_name = #{userName,jdbcType=VARCHAR},
+      custom1 = #{custom1,jdbcType=INTEGER},
+      custom2 = #{custom2,jdbcType=INTEGER},
+      custom3 = #{custom3,jdbcType=VARCHAR},
+      custom4 = #{custom4,jdbcType=VARCHAR},
+      temp_match = #{tempMatch,jdbcType=SMALLINT}
+    where rule_id = #{ruleId,jdbcType=INTEGER}
+  </update>
+  <select id="selectAllCount" resultType="int">
+   	 select COUNT(rule_id)
+ 	 from pfm_charge_rule a 
+ 	 where a.bim_company_id=#{companyId,jdbcType=INTEGER}
+ 	 <if test="pageParam.searchValue0!=''.toString()">
+		AND  to_char(a.car_type_id,'FM999999999MI')=#{pageParam.searchValue0,jdbcType=INTEGER}
+		</if>
+	 and (#{pageParam.loginUserLevel}=1<if test="carTypeIds!=null and carTypeIds.size()!=0">  or a.car_type_id in<foreach collection="carTypeIds" item="item" open="(" close=")" separator=",">#{item}</foreach> </if>)
+  </select >
+  
+  <select id="selectByCompanyid" resultMap="dtomap">
+  
+  select rule_id ,a.rule_name,
+  	case  rule_type
+  		when 0 then '分时收费' 
+  		when 1 then '分时段收费'
+  		when 2 then '按单位时段收费'
+  		when 3 then '按次收费'
+  		when 4 then '按时收费'
+  		when 5 then '包期收费'
+  		when 6 then '不收费'
+  		when 7 then '日夜分时按次收费'
+  		when 8 then '派车'
+  		else null end rule_type,
+  		case temp_match when  0 then '是' when 1 then '否' else '未知' end temp_match,
+  		a.update_time, a.user_name,b.type_name,a.rule_type rule_type_index,c.abnormal_release_id jianmian_id,d.abnormal_release_id yichang_id
+  from pfm_charge_rule a
+  left join pfm_car_type b on a.car_type_id=b.car_type_id
+  left join pfm_jianmian_release c on a.car_type_id=c.car_type_id and c.type is not null <!--> 规则对应的车辆类型对应的减免规则<-->
+  left join pfm_jianmian_release d on a.car_type_id=d.car_type_id and d.type is  null <!--> 规则对应的车辆类型对应的异常放行规则<-->
+  
+    where a.bim_company_id=#{companyId,jdbcType=INTEGER}
+  <if test="pageParam.searchValue0!=''.toString()">
+		AND  to_char(a.car_type_id,'FM999999999MI')=#{pageParam.searchValue0,jdbcType=INTEGER}
+		</if>
+		 and (#{pageParam.loginUserLevel}=1<if test="carTypeIds!=null and carTypeIds.size()!=0">  or a.car_type_id in<foreach collection="carTypeIds" item="item" open="(" close=")" separator=",">#{item}</foreach> </if>)
+  ${pageParam.order}
+		LIMIT
+		#{pageParam.length,jdbcType=INTEGER} OFFSET #{pageParam.start,jdbcType=INTEGER}
+  
+ 
+  </select>
+  
+  <select id="selectByCarTypeId" parameterType="int" resultType="int">
+  
+  select count(rule_id) 
+  from pfm_charge_rule 
+  where car_type_id=#{id,jdbcType=INTEGER}
+  </select>
+  
+  <select id="selectBaoqi" parameterType="int" resultMap="BaseResultMap">
+
+	select d.* from (select * from pfm_car_info where person_id is null
+	union all
+	select
+	x.car_info_id,x.person_id,x.bim_company_id,x.car_number,y.person_name,x.card_id,y.cert_id,y.address,y.phone,y.sex,x.photo,x.status,x.enable_time,x.disable_time,x.insert_time,x.update_time,x.note,x.user_name,x.custom1,x.custom2,x.custom3,x.custom4,x.is_del
+	from pfm_car_info x inner join bim_person y on x.person_id=y.person_id 
+	) a left join pfm_car_type_rel c on a.car_info_id=c.car_info_id
+		left join pfm_charge_rule d on c.car_type_id=d.car_type_id
+		where d.rule_type=5 and a.car_info_id=#{id} and a.is_del=0
+		
+  
+  </select>
+</mapper>

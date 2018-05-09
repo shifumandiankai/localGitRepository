@@ -1,0 +1,288 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.wadejerry.scms.modules.pfm.dao.PfmOrderMapper" >
+  <resultMap id="BaseResultMap" type="com.wadejerry.scms.modules.pfm.model.PfmOrder" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="order_no" property="orderNo" jdbcType="VARCHAR" />
+    <result column="generate_time" property="generateTime" jdbcType="TIMESTAMP" />
+    <result column="complete_time" property="completeTime" jdbcType="TIMESTAMP" />
+    <result column="pay_state" property="payState" jdbcType="INTEGER" />
+    <result column="event_time" property="eventTime" jdbcType="TIMESTAMP" />
+    <result column="car_number" property="carNumber" jdbcType="VARCHAR" />
+    <result column="car_type_id" property="carTypeId" jdbcType="INTEGER" />
+    <result column="car_type_name" property="carTypeName" jdbcType="VARCHAR" />
+    <result column="rule_id" property="ruleId" jdbcType="INTEGER" />
+    <result column="rule_name" property="ruleName" jdbcType="VARCHAR" />
+    <result column="charge_fee" property="chargeFee" jdbcType="NUMERIC" />
+    <result column="jianmian_fee" property="jianmianFee" jdbcType="NUMERIC" />
+    <result column="parking_duration" property="parkingDuration" jdbcType="INTEGER" />
+    <result column="park_id" property="parkId" jdbcType="INTEGER" />
+    <result column="park_name" property="parkName" jdbcType="VARCHAR" />
+    <result column="in_record_id" property="inRecordId" jdbcType="INTEGER" />
+    <result column="in_entrance_id" property="inEntranceId" jdbcType="INTEGER" />
+    <result column="in_entrance_name" property="inEntranceName" jdbcType="VARCHAR" />
+    <result column="in_time" property="inTime" jdbcType="TIMESTAMP" />
+    <result column="client_name" property="clientName" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, order_no, generate_time, complete_time, pay_state, event_time, car_number, car_type_id, 
+    car_type_name, rule_id, rule_name, charge_fee, jianmian_fee, parking_duration, park_id, 
+    park_name, in_record_id, in_entrance_id, in_entrance_name, in_time, client_name
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from pfm_order
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from pfm_order
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.wadejerry.scms.modules.pfm.model.PfmOrder" >
+    insert into pfm_order (id, order_no, generate_time, 
+      complete_time, pay_state, event_time, 
+      car_number, car_type_id, car_type_name, 
+      rule_id, rule_name, charge_fee, 
+      jianmian_fee, parking_duration, park_id, 
+      park_name, in_record_id, in_entrance_id, 
+      in_entrance_name, in_time, client_name
+      )
+    values (#{id,jdbcType=INTEGER}, #{orderNo,jdbcType=VARCHAR}, #{generateTime,jdbcType=TIMESTAMP}, 
+      #{completeTime,jdbcType=TIMESTAMP}, #{payState,jdbcType=INTEGER}, #{eventTime,jdbcType=TIMESTAMP}, 
+      #{carNumber,jdbcType=VARCHAR}, #{carTypeId,jdbcType=INTEGER}, #{carTypeName,jdbcType=VARCHAR}, 
+      #{ruleId,jdbcType=INTEGER}, #{ruleName,jdbcType=VARCHAR}, #{chargeFee,jdbcType=NUMERIC}, 
+      #{jianmianFee,jdbcType=NUMERIC}, #{parkingDuration,jdbcType=INTEGER}, #{parkId,jdbcType=INTEGER}, 
+      #{parkName,jdbcType=VARCHAR}, #{inRecordId,jdbcType=INTEGER}, #{inEntranceId,jdbcType=INTEGER}, 
+      #{inEntranceName,jdbcType=VARCHAR}, #{inTime,jdbcType=TIMESTAMP}, #{clientName,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.wadejerry.scms.modules.pfm.model.PfmOrder" >
+    insert into pfm_order
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="orderNo != null" >
+        order_no,
+      </if>
+      <if test="generateTime != null" >
+        generate_time,
+      </if>
+      <if test="completeTime != null" >
+        complete_time,
+      </if>
+      <if test="payState != null" >
+        pay_state,
+      </if>
+      <if test="eventTime != null" >
+        event_time,
+      </if>
+      <if test="carNumber != null" >
+        car_number,
+      </if>
+      <if test="carTypeId != null" >
+        car_type_id,
+      </if>
+      <if test="carTypeName != null" >
+        car_type_name,
+      </if>
+      <if test="ruleId != null" >
+        rule_id,
+      </if>
+      <if test="ruleName != null" >
+        rule_name,
+      </if>
+      <if test="chargeFee != null" >
+        charge_fee,
+      </if>
+      <if test="jianmianFee != null" >
+        jianmian_fee,
+      </if>
+      <if test="parkingDuration != null" >
+        parking_duration,
+      </if>
+      <if test="parkId != null" >
+        park_id,
+      </if>
+      <if test="parkName != null" >
+        park_name,
+      </if>
+      <if test="inRecordId != null" >
+        in_record_id,
+      </if>
+      <if test="inEntranceId != null" >
+        in_entrance_id,
+      </if>
+      <if test="inEntranceName != null" >
+        in_entrance_name,
+      </if>
+      <if test="inTime != null" >
+        in_time,
+      </if>
+      <if test="clientName != null" >
+        client_name,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="orderNo != null" >
+        #{orderNo,jdbcType=VARCHAR},
+      </if>
+      <if test="generateTime != null" >
+        #{generateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="completeTime != null" >
+        #{completeTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="payState != null" >
+        #{payState,jdbcType=INTEGER},
+      </if>
+      <if test="eventTime != null" >
+        #{eventTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="carNumber != null" >
+        #{carNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="carTypeId != null" >
+        #{carTypeId,jdbcType=INTEGER},
+      </if>
+      <if test="carTypeName != null" >
+        #{carTypeName,jdbcType=VARCHAR},
+      </if>
+      <if test="ruleId != null" >
+        #{ruleId,jdbcType=INTEGER},
+      </if>
+      <if test="ruleName != null" >
+        #{ruleName,jdbcType=VARCHAR},
+      </if>
+      <if test="chargeFee != null" >
+        #{chargeFee,jdbcType=NUMERIC},
+      </if>
+      <if test="jianmianFee != null" >
+        #{jianmianFee,jdbcType=NUMERIC},
+      </if>
+      <if test="parkingDuration != null" >
+        #{parkingDuration,jdbcType=INTEGER},
+      </if>
+      <if test="parkId != null" >
+        #{parkId,jdbcType=INTEGER},
+      </if>
+      <if test="parkName != null" >
+        #{parkName,jdbcType=VARCHAR},
+      </if>
+      <if test="inRecordId != null" >
+        #{inRecordId,jdbcType=INTEGER},
+      </if>
+      <if test="inEntranceId != null" >
+        #{inEntranceId,jdbcType=INTEGER},
+      </if>
+      <if test="inEntranceName != null" >
+        #{inEntranceName,jdbcType=VARCHAR},
+      </if>
+      <if test="inTime != null" >
+        #{inTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="clientName != null" >
+        #{clientName,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.wadejerry.scms.modules.pfm.model.PfmOrder" >
+    update pfm_order
+    <set >
+      <if test="orderNo != null" >
+        order_no = #{orderNo,jdbcType=VARCHAR},
+      </if>
+      <if test="generateTime != null" >
+        generate_time = #{generateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="completeTime != null" >
+        complete_time = #{completeTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="payState != null" >
+        pay_state = #{payState,jdbcType=INTEGER},
+      </if>
+      <if test="eventTime != null" >
+        event_time = #{eventTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="carNumber != null" >
+        car_number = #{carNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="carTypeId != null" >
+        car_type_id = #{carTypeId,jdbcType=INTEGER},
+      </if>
+      <if test="carTypeName != null" >
+        car_type_name = #{carTypeName,jdbcType=VARCHAR},
+      </if>
+      <if test="ruleId != null" >
+        rule_id = #{ruleId,jdbcType=INTEGER},
+      </if>
+      <if test="ruleName != null" >
+        rule_name = #{ruleName,jdbcType=VARCHAR},
+      </if>
+      <if test="chargeFee != null" >
+        charge_fee = #{chargeFee,jdbcType=NUMERIC},
+      </if>
+      <if test="jianmianFee != null" >
+        jianmian_fee = #{jianmianFee,jdbcType=NUMERIC},
+      </if>
+      <if test="parkingDuration != null" >
+        parking_duration = #{parkingDuration,jdbcType=INTEGER},
+      </if>
+      <if test="parkId != null" >
+        park_id = #{parkId,jdbcType=INTEGER},
+      </if>
+      <if test="parkName != null" >
+        park_name = #{parkName,jdbcType=VARCHAR},
+      </if>
+      <if test="inRecordId != null" >
+        in_record_id = #{inRecordId,jdbcType=INTEGER},
+      </if>
+      <if test="inEntranceId != null" >
+        in_entrance_id = #{inEntranceId,jdbcType=INTEGER},
+      </if>
+      <if test="inEntranceName != null" >
+        in_entrance_name = #{inEntranceName,jdbcType=VARCHAR},
+      </if>
+      <if test="inTime != null" >
+        in_time = #{inTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="clientName != null" >
+        client_name = #{clientName,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.wadejerry.scms.modules.pfm.model.PfmOrder" >
+    update pfm_order
+    set order_no = #{orderNo,jdbcType=VARCHAR},
+      generate_time = #{generateTime,jdbcType=TIMESTAMP},
+      complete_time = #{completeTime,jdbcType=TIMESTAMP},
+      pay_state = #{payState,jdbcType=INTEGER},
+      event_time = #{eventTime,jdbcType=TIMESTAMP},
+      car_number = #{carNumber,jdbcType=VARCHAR},
+      car_type_id = #{carTypeId,jdbcType=INTEGER},
+      car_type_name = #{carTypeName,jdbcType=VARCHAR},
+      rule_id = #{ruleId,jdbcType=INTEGER},
+      rule_name = #{ruleName,jdbcType=VARCHAR},
+      charge_fee = #{chargeFee,jdbcType=NUMERIC},
+      jianmian_fee = #{jianmianFee,jdbcType=NUMERIC},
+      parking_duration = #{parkingDuration,jdbcType=INTEGER},
+      park_id = #{parkId,jdbcType=INTEGER},
+      park_name = #{parkName,jdbcType=VARCHAR},
+      in_record_id = #{inRecordId,jdbcType=INTEGER},
+      in_entrance_id = #{inEntranceId,jdbcType=INTEGER},
+      in_entrance_name = #{inEntranceName,jdbcType=VARCHAR},
+      in_time = #{inTime,jdbcType=TIMESTAMP},
+      client_name = #{clientName,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  
+  <select id="queryByOrderId" parameterType="String" resultMap="BaseResultMap">
+  select * from Pfm_order where order_no = #{id} limit 1
+  
+  </select>
+</mapper>

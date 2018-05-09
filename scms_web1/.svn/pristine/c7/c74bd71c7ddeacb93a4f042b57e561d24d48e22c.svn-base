@@ -1,0 +1,24 @@
+package com.wadejerry.scms.weixin.util;
+
+import java.util.Random;
+
+public class RandomString {
+	
+	public static  String base = "abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+	public static String randomStr(int len){
+		
+		if(len<0)
+			return "";
+		StringBuilder sb = new StringBuilder();
+		Random rd =  new Random();
+		for(int i=0;i<len;i++){
+			int a = rd.nextInt(base.length());
+			sb.append(base.charAt(a));
+			
+		}
+		
+		return sb.toString();
+		
+	}
+
+}

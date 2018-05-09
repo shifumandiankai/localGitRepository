@@ -1,0 +1,53 @@
+package com.wadejerry.scms.modules.sysconfig.controller;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.wadejerry.scms.modules.sysconfig.service.BimsysParamService;
+import com.wadejerry.scms.utils.AjaxUtil;
+import com.wadejerry.scms.utils.Log.LogManager;
+
+@Controller
+public class BimsysParamController {
+	@Autowired
+	private HttpServletResponse response;
+	@Autowired
+	private HttpServletRequest request;
+	@Autowired
+	private BimsysParamService bimsysParamService;
+	/*
+	 * 保存系统参数
+	 */
+	@RequestMapping("/saveSysParams.do")
+	@ResponseBody
+	public void SaveParams(){
+		try{
+		String alarmstr=request.getParameter("alarm");
+		String configstr=request.getParameter("config");
+		String commonstr=request.getParameter("common");
+		String workstr=request.getParameter("work");
+		String monitorstr=request.getParameter("monitor");
+		String validatestr=request.getParameter("validate");
+		String AutoSetTimeTime=request.getParameter("AutoSetTimeTime");
+		//int a=1/0;
+		int  alarm=Integer.valueOf(alarmstr);
+		int config=Integer.valueOf(configstr);
+		int common=Integer.valueOf(commonstr);
+		int work=Integer.valueOf(workstr);
+		int monitor=Integer.valueOf(monitorstr);
+		int validate=Integer.valueOf(validatestr);
+		bimsysParamService.SaveParams(alarm,config,common,work,monitor,validate,AutoSetTimeTime);
+		}
+		catch (Exception e) {
+			LogManager.logException(e);
+			AjaxUtil.ajaxWrite(false,"保存失败", response);	//返回失败
+			return;
+		}
+		 AjaxUtil.ajaxWrite(true, "", response); // 返回成功
+	}
+}

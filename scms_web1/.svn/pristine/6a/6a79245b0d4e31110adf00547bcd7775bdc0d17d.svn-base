@@ -1,0 +1,387 @@
+package com.wadejerry.scms.webservice.server;
+
+import java.io.IOException;
+import java.rmi.RemoteException;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.axis2.AxisFault;
+import org.apache.axis2.context.MessageContext;
+import org.apache.axis2.transport.http.HTTPConstants;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.session.Session;
+import org.apache.shiro.session.SessionException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import com.wadejerry.scms.frame.AppContext;
+import com.wadejerry.scms.frame.web.SystemParams;
+import com.wadejerry.scms.modules.device.dao.PfmServerMapper;
+import com.wadejerry.scms.modules.device.model.PfmServer;
+import com.wadejerry.scms.modules.device.service.ServerService;
+import com.wadejerry.scms.modules.pfm.dao.WebServiceMapper;
+import com.wadejerry.scms.modules.pfm.model.PfmParkingLot;
+import com.wadejerry.scms.modules.pfm.service.PfmParkingLotService;
+import com.wadejerry.scms.utils.Log.LogManager;
+import com.wadejerry.scms.webservice.client.PayServiceStub;
+import com.wadejerry.scms.webservice.client.PayServiceStub.GetPayQRCodeByCarNumResponse;
+import com.wadejerry.scms.webservice.client.PayServiceStub.ScanCodePayResponse;
+import com.wadejerry.scms.webservice.client.PfmWebServiceStub;
+import com.wadejerry.scms.webservice.client.PfmWebServiceStub.GetParkInfoByCarNum;
+import com.wadejerry.scms.webservice.client.PfmWebServiceStub.GetParkInfoByCarNumResponse;
+import com.wadejerry.scms.webservice.client.PfmWebServiceStub.ParkInfoResult;
+import com.wadejerry.scms.webservice.server.support.CommonResult;
+import com.wadejerry.scms.webservice.server.support.pay.PayResult;
+import com.wadejerry.scms.webservice.server.support.pay.QRCodeResult;
+import com.wadejerry.scms.webservice.server.support.pay.dto.ParkInfoDto;
+import com.wadejerry.scms.webservice.server.support.pay.dto.PayInfoDto;
+import com.wadejerry.scms.webservice.server.support.pfm.dto.PfmServerDto;
+import com.wadejerry.scms.webservice.server.utils.ClientSessionKEY;
+
+/**
+* 
+* @ClassName: PayService
+* @Description: 关于支付的webService接口
+* @author zhanying
+* @date 2017年6月16日 下午3:58:23
+*
+ */
+@Component("payService")
+public class PayService {
+	
+	@Autowired
+	private PfmParkingLotService pfmParkingLotService; //车场Service
+	@Autowired
+	private ServerService serverService; //服务管理Service
+	@Autowired
+	private PfmServerMapper serverMapper; //停车场服务mapper
+	
+	/**
+	* 获取支付二维码
+	* @author zhanying 2017年6月30日 上午9:13:37
+	* @param  @param parkId 车场id
+	* @param  @param carNum 车牌号码
+	* @param  @param clientName 客户端名称
+	* @param  @param payMode 支付方式  0 微信和支付宝 1 微信 2 支付宝
+	* @param  @return  支付码信息
+	* @modificationHistory=========================逻辑或功能性重大变更记录
+	* @modify by user: 
+	* @modify by reason:
+	 */
+	public QRCodeResult GetPayQRCodeByCarNum(int parkId, String carNum, String clientName,int payMode){
+		//返回的结果,默认false
+		QRCodeResult result = new QRCodeResult();
+		result.setiRet(false);	
+		try {
+			//根据车场id获取车场序列号
+			PfmParkingLot parkDto = pfmParkingLotService.selectByPrimaryKey(parkId);
+			if(parkDto == null ) {	
+				result.setStrError("车场信息不存在");
+				return result;
+			} 
+			String parkSerialNo =parkDto.getParkingLotCode();
+			if(parkSerialNo == null || parkSerialNo == "") {
+				result.setStrError("车场序列号无效");
+				return result;
+			}	
+			//获取车场对应的服务信息
+			List<PfmServer> pfmServerList= serverService.selectAllServer();
+			PfmServer pfmServer = null;
+			for(PfmServer server : pfmServerList) {
+				if(server.getParkId() == parkId) {
+					pfmServer = server;
+					break;
+				}
+			}
+			if(pfmServer == null) {
+				result.setStrError("车场未关联服务");
+				return result;
+			}
+			ParkInfoResult parkInfoResult = null;
+			//连接服务查询收费信息
+			PfmWebServiceStub stub = new PfmWebServiceStub("http://"+pfmServer.getIp()+
+					":"+pfmServer.getPort()+"/PfmWebService/service");
+			GetParkInfoByCarNum getParkInfoByCarNum = new GetParkInfoByCarNum();
+			getParkInfoByCarNum.setCarNumber(carNum);
+			GetParkInfoByCarNumResponse response = stub.getParkInfoByCarNum(getParkInfoByCarNum);
+			parkInfoResult =  response.getGetParkInfoByCarNumResult(); 
+			//获取收费信息成功
+			if(parkInfoResult.getIRet()!= 0) {
+				result.setiRet(false);
+				result.setStrError(parkInfoResult.getStrMessage());
+				return result;
+			}
+			//String payUrl="http://localhost/services/PayService?wsdl";
+			PayServiceStub payServiceStub = new PayServiceStub(SystemParams.payUrl);
+			//调用支付平台接口获取支付二维码
+			PayServiceStub.GetPayQRCodeByCarNum  parkInfo = new PayServiceStub.GetPayQRCodeByCarNum();
+			//车场序号
+			parkInfo.setParkSerialNo(Integer.parseInt(parkSerialNo));
+			//停车信息
+			PayServiceStub.ParkInfoDto parkInfoDto = new PayServiceStub.ParkInfoDto();		
+			parkInfoDto.setCarNumber(parkInfoResult.getParkInfoDto().getCarNumber());
+			parkInfoDto.setChargeFee(parkInfoResult.getParkInfoDto().getChargeFee());
+			parkInfoDto.setClientName(clientName);
+			parkInfoDto.setInTime(parkInfoResult.getParkInfoDto().getInRecordDto().getInTime());
+			parkInfoDto.setOutTime(parkInfoResult.getParkInfoDto().getEventTime());
+			parkInfo.setParkInfoDto(parkInfoDto);
+			//获取支付二维码
+			GetPayQRCodeByCarNumResponse response1 = payServiceStub.getPayQRCodeByCarNum(parkInfo);
+			//支付平台获取支付码成功
+			if(response1.get_return().getIRet()){		
+				//填充二维码及订单信息
+				byte[] rqCode=new byte[response1.get_return().getQrCode().getInputStream().available()];  
+				response1.get_return().getQrCode().getInputStream().read(rqCode);
+				result.setWeixinPayCode(rqCode);
+				result.setOrderId(response1.get_return().getOrderId());
+				//通知返回支付信息
+				PayInfoDto p = new PayInfoDto();
+				p.setCarNumber(parkInfoResult.getParkInfoDto().getCarNumber());
+				p.setChargeFee(parkInfoResult.getParkInfoDto().getChargeFee());
+				p.setInTime(parkInfoResult.getParkInfoDto().getInRecordDto().getInTime());
+				p.setOutTime(parkInfoResult.getParkInfoDto().getEventTime());
+				result.setPayInfoDto(p);
+				result.setiRet(true);
+			} else {
+				//获取支付码失败
+				result.setStrError(response1.get_return().getStrError());
+			}
+		} catch (AxisFault e) {
+			LogManager.logException(e);
+		} catch (NumberFormatException e) {
+			LogManager.logException(e);
+		} catch (RemoteException e) {
+			LogManager.logException(e);
+		} catch (IOException e) {
+			LogManager.logException(e);
+		} finally {
+			//TODO 记录日志
+		}
+		return result;		
+	}
+	
+	/**
+	* 扫码支付
+	* @author zhanying 2017年6月16日 下午4:37:57
+	* @param  @param sessionId 客户端登录的SessionId
+	* @param  @param boothId 岗亭id
+	* @param  @param parkInfoDto 
+	* @param  @return 
+	* @modificationHistory=========================逻辑或功能性重大变更记录
+	* @modify by user: 
+	* @modify by reason:
+	 */
+	public PayResult ScanCodePay(String sessionId,int boothId,ParkInfoDto parkInfoDto){
+		//返回值
+		PayResult payResult = new  PayResult();
+		payResult.setiRet(false);
+		try {
+			//验证sessionId 是否有效
+			CommonResult result =CheckSession(sessionId);
+			if(result.isiRet()) {
+				//根据岗亭id获取车场序列号
+				WebServiceMapper pfmbm = (WebServiceMapper) AppContext.getBean("webServiceMapper");
+				//获取岗亭关联的服务及车场信息 。getStrError暂存企业id 
+				PfmServerDto pfmServer = pfmbm.selectPfmServerByBoothId(Integer.parseInt(result.getStrError()) , boothId);
+				//根据车场id获取车场序号
+				PfmParkingLot parkDto = pfmParkingLotService.selectByPrimaryKey(pfmServer.getParkId());
+				String parkSerialNo =parkDto.getParkingLotCode();
+				if(parkSerialNo == null || parkSerialNo == "") {
+					payResult.setStrError("车场序列号无效");
+					return payResult;
+				}	
+				PayServiceStub payServiceStub = new PayServiceStub(SystemParams.payUrl);
+				//调用支付平台接口获取支付二维码
+				PayServiceStub.ScanCodePay scanCodePay = new PayServiceStub.ScanCodePay();
+				//车场序号
+				scanCodePay.setParkSerialNo(Integer.parseInt(parkSerialNo));
+				//停车信息
+				PayServiceStub.ParkInfoDto param = new PayServiceStub.ParkInfoDto();		
+				param.setCarNumber(parkInfoDto.getCarNumber());
+				param.setChargeFee(parkInfoDto.getChargeFee());
+				param.setInTime(parkInfoDto.getInTime());
+				param.setOutTime(parkInfoDto.getOutTime());
+				param.setPayCode(parkInfoDto.getPayCode());
+				scanCodePay.setParkInfoDto(param);
+				//调用支付平台接口请求付款
+				ScanCodePayResponse response = payServiceStub.scanCodePay(scanCodePay);
+				if(response.get_return().getIRet() ){
+					payResult.setiRet(true);
+					com.wadejerry.scms.webservice.server.support.pay.dto.PayInfoDto dto = 
+							new com.wadejerry.scms.webservice.server.support.pay.dto.PayInfoDto();
+					dto.setRowAutoId(response.get_return().getPayInfoDtoArr()[0].getRowAutoId());
+					dto.setStatus(response.get_return().getPayInfoDtoArr()[0].getStatus());
+					payResult.setPayInfoDto(dto);
+				} else {
+					payResult.setStrError(response.get_return().getStrError());
+				}
+			} else {
+				payResult.setStrError(result.getStrError());
+			}
+			 return payResult;
+		} catch (NumberFormatException e) {
+			LogManager.logException(e);
+		} catch (AxisFault e) {
+			LogManager.logException(e);
+		} catch (RemoteException e) {
+			LogManager.logException(e);
+		} finally {
+			//TODO 记录日志
+		}
+		return  payResult;
+	}
+	
+	/**
+	* 查询二维码支付结果
+	* @author zhanying 2017年6月16日 下午4:43:08
+	* @param  @param orderId  订单号
+	* @param  @return  支付结果
+	* @modificationHistory=========================逻辑或功能性重大变更记录
+	* @modify by user: 
+	* @modify by reason:
+	 */
+	public PayResult QueryQRCodePayResult(String orderId) {
+		//验证serverId 是否有效
+		PayResult parkResult = new PayResult();
+		parkResult.setiRet(false);
+		try {
+			PayServiceStub payServiceStub = new PayServiceStub(SystemParams.payUrl);
+			//填充参数,订单序号
+			com.wadejerry.scms.webservice.client.PayServiceStub.QueryQRCodePayResult 
+			param = new  com.wadejerry.scms.webservice.client.PayServiceStub.QueryQRCodePayResult();
+			param.setOrderId(orderId);	
+			//调用支付平台接口获取返回值
+			com.wadejerry.scms.webservice.client.PayServiceStub.QueryQRCodePayResultResponse response = 
+					payServiceStub.queryQRCodePayResult(param);
+			if(response.get_return().getIRet() ) {
+				//填充订单信息
+				com.wadejerry.scms.webservice.server.support.pay.dto.PayInfoDto dto = 
+						new com.wadejerry.scms.webservice.server.support.pay.dto.PayInfoDto();
+				 com.wadejerry.scms.webservice.client.PayServiceStub.PayInfoDto payInfoDto  =
+						 response.get_return().getPayInfoDtoArr()[0];
+				dto.setCarNumber(payInfoDto.getCarNumber());
+				dto.setChargeFee(payInfoDto.getChargeFee());
+				dto.setInTime(payInfoDto.getInTime());
+				dto.setOutTime(payInfoDto.getOutTime());
+				dto.setInTime(payInfoDto.getInTime());
+				dto.setParkSerialNo(payInfoDto.getParkSerialNo());
+				dto.setPayTime(payInfoDto.getPayTime());
+				dto.setRowAutoId(payInfoDto.getRowAutoId());
+				dto.setStatus(payInfoDto.getStatus());
+				parkResult.setPayInfoDto(dto);
+				parkResult.setiRet(true);
+			} else {
+				parkResult.setStrError(response.get_return().getStrError());
+			}
+		} catch (AxisFault e) {
+			LogManager.logException(e);
+		} catch (RemoteException e) {
+			LogManager.logException(e);
+		}
+		return parkResult;
+	}
+	
+	
+	/**
+	* 获取大于指定行号支付结果
+	* @author zhanying 2017年6月29日 下午2:32:33
+	* @param  @param parkSerialNo
+	* @param  @param rowAutoId
+	* @param  @return 
+	* @modificationHistory=========================逻辑或功能性重大变更记录
+	* @modify by user: 
+	* @modify by reason:
+	 */
+	public PayResult GetPayResultList(long updatetime,int serverId) {
+		//验证serverId 是否有效
+		PayResult parkResult = new PayResult();
+		parkResult.setiRet(false);
+		try {
+			PfmServer server = serverMapper.selectByPrimaryKey(serverId);
+			if (server != null) {
+				//根据车场id获取车场序号
+				PfmParkingLot parkDto = pfmParkingLotService.selectByPrimaryKey(server.getParkId());
+				String parkSerialNo =parkDto.getParkingLotCode();
+				if(parkSerialNo == null || parkSerialNo == "") {
+					parkResult.setStrError("车场序列号无效");
+					return parkResult;
+				}	
+				//调用支付平台接口,根据orderId获取支付信息
+				//String payUrl="http://localhost/services/PayService?wsdl";
+				PayServiceStub payServiceStub = new PayServiceStub(SystemParams.payUrl);
+				//填充参数,订单序号
+				com.wadejerry.scms.webservice.client.PayServiceStub.GetPayResultList 
+				param = new  com.wadejerry.scms.webservice.client.PayServiceStub.GetPayResultList();
+				param.setParkSerialNo(Integer.parseInt(parkSerialNo));
+				param.setDate(updatetime);
+				//调用支付平台接口获取返回值
+				com.wadejerry.scms.webservice.client.PayServiceStub.GetPayResultListResponse response = 
+						payServiceStub.getPayResultList(param);
+				if(response.get_return().getIRet() ) {
+					
+					//填充订单信息
+					com.wadejerry.scms.webservice.server.support.pay.dto.PayInfoDto dto = null; 				
+					PayInfoDto[] payInfoDtoArr = new PayInfoDto[response.get_return().getPayInfoDtoArr().length];
+					int i = 0;
+					for(com.wadejerry.scms.webservice.client.PayServiceStub.PayInfoDto payInfoDto : response.get_return().getPayInfoDtoArr()) {
+						dto = new com.wadejerry.scms.webservice.server.support.pay.dto.PayInfoDto();
+						dto.setCarNumber(payInfoDto.getCarNumber());
+						dto.setChargeFee(payInfoDto.getChargeFee());
+						dto.setInTime(payInfoDto.getInTime());
+						dto.setOutTime(payInfoDto.getOutTime());
+						dto.setInTime(payInfoDto.getInTime());
+						dto.setParkSerialNo(payInfoDto.getParkSerialNo());
+						dto.setPayTime(payInfoDto.getPayTime());
+						dto.setRowAutoId(payInfoDto.getRowAutoId());
+						dto.setStatus(payInfoDto.getStatus());
+						payInfoDtoArr[i] = dto;
+						i++;
+					}		
+					parkResult.setPayInfoDtoArr(payInfoDtoArr);	
+					parkResult.setiRet(true);
+				} else {
+					parkResult.setStrError(response.get_return().getStrError());
+				}
+			} else {
+				parkResult.setStrError("服务不存在");
+			}
+		} catch (AxisFault e) {
+			LogManager.logException(e);
+		} catch (RemoteException e) {
+			LogManager.logException(e);
+		}
+		return parkResult;
+	}
+	
+	/**
+	* 检测sessionId是否有效
+	* @author zhanying 2017年7月4日 下午1:47:22
+	* @param  @param sessionId
+	* @param  @return 
+	* @modificationHistory=========================逻辑或功能性重大变更记录
+	* @modify by user: 
+	* @modify by reason:
+	 */
+	private CommonResult CheckSession(String sessionId) {
+		CommonResult result = new CommonResult();
+		result.setiRet(false);
+		try {
+			MessageContext mc = MessageContext.getCurrentMessageContext();
+			HttpServletRequest request = (HttpServletRequest)mc.getProperty(HTTPConstants.MC_HTTP_SERVLETREQUEST);
+			HttpServletResponse response = (HttpServletResponse)mc.getProperty(HTTPConstants.MC_HTTP_SERVLETRESPONSE);
+			Session session = SecurityUtils.getSecurityManager().getSession(new ClientSessionKEY(request,response,sessionId));
+			if(session==null){
+				result.setStrError("session为空");
+			} else {
+				result.setStrError(session.getAttribute("companyId").toString());
+				result.setiRet(true);
+			}
+		} catch (SessionException e) {
+			result.setStrError("未登录或登录超时");
+			LogManager.logException(e);
+		}
+		return result;
+	}
+}

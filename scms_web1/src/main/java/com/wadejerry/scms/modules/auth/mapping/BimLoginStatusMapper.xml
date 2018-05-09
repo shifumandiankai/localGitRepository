@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wadejerry.scms.modules.auth.dao.BimLoginStatusMapper">
+  <resultMap id="BaseResultMap" type="com.wadejerry.scms.modules.auth.model.BimLoginStatus">
+    <id column="log_id" jdbcType="INTEGER" property="logId" />
+    <result column="user_id" jdbcType="INTEGER" property="userId" />
+    <result column="user_name" jdbcType="VARCHAR" property="userName" />
+    <result column="login_addr" jdbcType="VARCHAR" property="loginAddr" />
+    <result column="login_port" jdbcType="INTEGER" property="loginPort" />
+    <result column="login_time" jdbcType="TIMESTAMP" property="loginTime" />
+    <result column="login_way" jdbcType="VARCHAR" property="loginWay" />
+    <result column="session_id" jdbcType="VARCHAR" property="sessionId" />
+    <result column="custom1" jdbcType="INTEGER" property="custom1" />
+    <result column="custom2" jdbcType="INTEGER" property="custom2" />
+    <result column="custom3" jdbcType="VARCHAR" property="custom3" />
+    <result column="custom4" jdbcType="VARCHAR" property="custom4" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    log_id, user_id, user_name, login_addr, login_port, login_time, login_way, session_id, 
+    custom1, custom2, custom3, custom4
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from bim_login_status
+    where log_id = #{logId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from bim_login_status
+    where log_id = #{logId,jdbcType=INTEGER}
+  </delete>
+    <delete id="deleteAll" >
+    delete from bim_login_status
+  </delete>
+  <delete id="deleteBySessionId" parameterType="java.lang.String">
+  		delete from bim_login_status where session_id=#{sessionid}
+  </delete>
+  <insert id="insert" parameterType="com.wadejerry.scms.modules.auth.model.BimLoginStatus">
+    insert into bim_login_status (log_id, user_id, user_name, 
+      login_addr, login_port, login_time, 
+      login_way, session_id, custom1, 
+      custom2, custom3, custom4
+      )
+    values (#{logId,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{userName,jdbcType=VARCHAR}, 
+      #{loginAddr,jdbcType=VARCHAR}, #{loginPort,jdbcType=INTEGER}, #{loginTime,jdbcType=TIMESTAMP}, 
+      #{loginWay,jdbcType=VARCHAR}, #{sessionId,jdbcType=VARCHAR}, #{custom1,jdbcType=INTEGER}, 
+      #{custom2,jdbcType=INTEGER}, #{custom3,jdbcType=VARCHAR}, #{custom4,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.wadejerry.scms.modules.auth.model.BimLoginStatus">
+    insert into bim_login_status
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="logId != null">
+        log_id,
+      </if>
+      <if test="userId != null">
+        user_id,
+      </if>
+      <if test="userName != null">
+        user_name,
+      </if>
+      <if test="loginAddr != null">
+        login_addr,
+      </if>
+      <if test="loginPort != null">
+        login_port,
+      </if>
+      <if test="loginTime != null">
+        login_time,
+      </if>
+      <if test="loginWay != null">
+        login_way,
+      </if>
+      <if test="sessionId != null">
+        session_id,
+      </if>
+      <if test="custom1 != null">
+        custom1,
+      </if>
+      <if test="custom2 != null">
+        custom2,
+      </if>
+      <if test="custom3 != null">
+        custom3,
+      </if>
+      <if test="custom4 != null">
+        custom4,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="logId != null">
+        #{logId,jdbcType=INTEGER},
+      </if>
+      <if test="userId != null">
+        #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="userName != null">
+        #{userName,jdbcType=VARCHAR},
+      </if>
+      <if test="loginAddr != null">
+        #{loginAddr,jdbcType=VARCHAR},
+      </if>
+      <if test="loginPort != null">
+        #{loginPort,jdbcType=INTEGER},
+      </if>
+      <if test="loginTime != null">
+        #{loginTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="loginWay != null">
+        #{loginWay,jdbcType=VARCHAR},
+      </if>
+      <if test="sessionId != null">
+        #{sessionId,jdbcType=VARCHAR},
+      </if>
+      <if test="custom1 != null">
+        #{custom1,jdbcType=INTEGER},
+      </if>
+      <if test="custom2 != null">
+        #{custom2,jdbcType=INTEGER},
+      </if>
+      <if test="custom3 != null">
+        #{custom3,jdbcType=VARCHAR},
+      </if>
+      <if test="custom4 != null">
+        #{custom4,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.wadejerry.scms.modules.auth.model.BimLoginStatus">
+    update bim_login_status
+    <set>
+      <if test="userId != null">
+        user_id = #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="userName != null">
+        user_name = #{userName,jdbcType=VARCHAR},
+      </if>
+      <if test="loginAddr != null">
+        login_addr = #{loginAddr,jdbcType=VARCHAR},
+      </if>
+      <if test="loginPort != null">
+        login_port = #{loginPort,jdbcType=INTEGER},
+      </if>
+      <if test="loginTime != null">
+        login_time = #{loginTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="loginWay != null">
+        login_way = #{loginWay,jdbcType=VARCHAR},
+      </if>
+      <if test="sessionId != null">
+        session_id = #{sessionId,jdbcType=VARCHAR},
+      </if>
+      <if test="custom1 != null">
+        custom1 = #{custom1,jdbcType=INTEGER},
+      </if>
+      <if test="custom2 != null">
+        custom2 = #{custom2,jdbcType=INTEGER},
+      </if>
+      <if test="custom3 != null">
+        custom3 = #{custom3,jdbcType=VARCHAR},
+      </if>
+      <if test="custom4 != null">
+        custom4 = #{custom4,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where log_id = #{logId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.wadejerry.scms.modules.auth.model.BimLoginStatus">
+    update bim_login_status
+    set user_id = #{userId,jdbcType=INTEGER},
+      user_name = #{userName,jdbcType=VARCHAR},
+      login_addr = #{loginAddr,jdbcType=VARCHAR},
+      login_port = #{loginPort,jdbcType=INTEGER},
+      login_time = #{loginTime,jdbcType=TIMESTAMP},
+      login_way = #{loginWay,jdbcType=VARCHAR},
+      session_id = #{sessionId,jdbcType=VARCHAR},
+      custom1 = #{custom1,jdbcType=INTEGER},
+      custom2 = #{custom2,jdbcType=INTEGER},
+      custom3 = #{custom3,jdbcType=VARCHAR},
+      custom4 = #{custom4,jdbcType=VARCHAR}
+    where log_id = #{logId,jdbcType=INTEGER}
+  </update>
+  
+</mapper>

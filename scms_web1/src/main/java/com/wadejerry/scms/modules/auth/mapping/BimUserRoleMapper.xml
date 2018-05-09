@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.wadejerry.scms.modules.auth.dao.BimUserRoleMapper">
+	<resultMap id="BaseResultMap"
+		type="com.wadejerry.scms.modules.auth.model.BimUserRole">
+		<id column="bim_use_role_id" property="bimUseRoleId" jdbcType="INTEGER" />
+		<result column="bim_role_id" property="bimRoleId" jdbcType="INTEGER" />
+		<result column="user_id" property="userId" jdbcType="INTEGER" />
+		<result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+		<result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+		<result column="custom1" property="custom1" jdbcType="INTEGER" />
+		<result column="custom2" property="custom2" jdbcType="INTEGER" />
+		<result column="custom3" property="custom3" jdbcType="VARCHAR" />
+		<result column="custom4" property="custom4" jdbcType="VARCHAR" />
+	</resultMap>
+	
+	<resultMap id='UserRoleRelResultMap' type ='com.wadejerry.scms.modules.auth.dto.UserRoleRelDto'>
+		<result column="role_id" property="roleId" jdbcType="INTEGER" />
+		<result column="role_name" property="roleName" jdbcType="INTEGER" />
+		<result column="user_id" property="userId" jdbcType="INTEGER" />
+	</resultMap>
+	
+	<sql id="Base_Column_List">
+		bim_use_role_id, bim_role_id, user_id, create_time, update_time, custom1, custom2,
+		custom3, custom4
+	</sql>
+	
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap"
+		parameterType="java.lang.Integer">
+		select
+		<include refid="Base_Column_List" />
+		from bim_user_role
+		where bim_use_role_id = #{bimUseRoleId,jdbcType=INTEGER}
+	</select>
+	
+	<!-- 获取指定操作员的角色列表 -->
+	<select id='selectUserRoleDtoByUserId' resultMap='UserRoleRelResultMap'
+		parameterType="java.lang.Integer">
+		select x.bim_role_id as role_id,y.user_name as role_name,x.user_id
+		from bim_user_role x ,bim_user y
+		where x.bim_role_id = y.bim_user_id and  x.user_id = #{userId,jdbcType=INTEGER}
+	</select>
+	
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+		delete from bim_user_role
+		where bim_use_role_id = #{bimUseRoleId,jdbcType=INTEGER}
+	</delete>
+	
+	<!-- 删除指定操作员的角色关联信息 -->
+	<delete id ='deleteByUserId' parameterType ='java.lang.Integer'>
+		delete from bim_user_role
+		where user_id = #{userId,jdbcType=INTEGER}
+	</delete>
+	
+	<insert id="insert" parameterType="com.wadejerry.scms.modules.auth.model.BimUserRole">
+		insert into bim_user_role (bim_use_role_id, bim_role_id, user_id,
+		create_time, update_time, custom1,
+		custom2, custom3, custom4
+		)
+		values (#{bimUseRoleId,jdbcType=INTEGER}, #{bimRoleId,jdbcType=INTEGER},
+		#{userId,jdbcType=INTEGER},
+		#{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{custom1,jdbcType=INTEGER},
+		#{custom2,jdbcType=INTEGER}, #{custom3,jdbcType=VARCHAR},
+		#{custom4,jdbcType=VARCHAR}
+		)
+	</insert>
+	<insert id="insertSelective" parameterType="com.wadejerry.scms.modules.auth.model.BimUserRole">
+		insert into bim_user_role
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="bimUseRoleId != null">
+				bim_use_role_id,
+			</if>
+			<if test="bimRoleId != null">
+				bim_role_id,
+			</if>
+			<if test="userId != null">
+				user_id,
+			</if>
+			<if test="createTime != null">
+				create_time,
+			</if>
+			<if test="updateTime != null">
+				update_time,
+			</if>
+			<if test="custom1 != null">
+				custom1,
+			</if>
+			<if test="custom2 != null">
+				custom2,
+			</if>
+			<if test="custom3 != null">
+				custom3,
+			</if>
+			<if test="custom4 != null">
+				custom4,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="bimUseRoleId != null">
+				#{bimUseRoleId,jdbcType=INTEGER},
+			</if>
+			<if test="bimRoleId != null">
+				#{bimRoleId,jdbcType=INTEGER},
+			</if>
+			<if test="userId != null">
+				#{userId,jdbcType=INTEGER},
+			</if>
+			<if test="createTime != null">
+				#{createTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="updateTime != null">
+				#{updateTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="custom1 != null">
+				#{custom1,jdbcType=INTEGER},
+			</if>
+			<if test="custom2 != null">
+				#{custom2,jdbcType=INTEGER},
+			</if>
+			<if test="custom3 != null">
+				#{custom3,jdbcType=VARCHAR},
+			</if>
+			<if test="custom4 != null">
+				#{custom4,jdbcType=VARCHAR},
+			</if>
+		</trim>
+	</insert>
+	<update id="updateByPrimaryKeySelective" parameterType="com.wadejerry.scms.modules.auth.model.BimUserRole">
+		update bim_user_role
+		<set>
+			<if test="bimRoleId != null">
+				bim_role_id = #{bimRoleId,jdbcType=INTEGER},
+			</if>
+			<if test="userId != null">
+				user_id = #{userId,jdbcType=INTEGER},
+			</if>
+			<if test="createTime != null">
+				create_time = #{createTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="updateTime != null">
+				update_time = #{updateTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="custom1 != null">
+				custom1 = #{custom1,jdbcType=INTEGER},
+			</if>
+			<if test="custom2 != null">
+				custom2 = #{custom2,jdbcType=INTEGER},
+			</if>
+			<if test="custom3 != null">
+				custom3 = #{custom3,jdbcType=VARCHAR},
+			</if>
+			<if test="custom4 != null">
+				custom4 = #{custom4,jdbcType=VARCHAR},
+			</if>
+		</set>
+		where bim_use_role_id = #{bimUseRoleId,jdbcType=INTEGER}
+	</update>
+	<update id="updateByPrimaryKey" parameterType="com.wadejerry.scms.modules.auth.model.BimUserRole">
+		update bim_user_role
+		set bim_role_id = #{bimRoleId,jdbcType=INTEGER},
+		user_id = #{userId,jdbcType=INTEGER},
+		create_time = #{createTime,jdbcType=TIMESTAMP},
+		update_time = #{updateTime,jdbcType=TIMESTAMP},
+		custom1 = #{custom1,jdbcType=INTEGER},
+		custom2 = #{custom2,jdbcType=INTEGER},
+		custom3 = #{custom3,jdbcType=VARCHAR},
+		custom4 = #{custom4,jdbcType=VARCHAR}
+		where bim_use_role_id = #{bimUseRoleId,jdbcType=INTEGER}
+	</update>
+	
+	<select id="countByRoleId" parameterType="int" resultType="int">
+	
+	select count(*) from bim_user_role where bim_role_id=#{id}
+	</select>
+</mapper>

@@ -1,0 +1,103 @@
+var config = $.extend({},{
+	btns: new Array({'id':'10001','name':'add','fun':null},	//需要显示的按钮
+				{'id':'10002','name':'edit',"fun":null},
+				{'id':"10003",'name':'del',"fun":null}),
+	search:new Array({'type':'search','placeholder':'消息','url':null,'index':0}), //查询条件
+	id:"example1",	//dataTable ID
+	addDiv:"exampleModal", //新增弹出的DIV ID
+	editDiv:"exampleModal",	//编辑弹出的DIV ID
+	getUrl:"/messagelist",	//获取数据请求路径
+	delUrl:"/message/del.do",	//删除数据请求路径
+	saveUrl:"/message/save.do",	//保存数据请求路径
+	columns: new Array(	//绑定数据的列
+			"message","beginTime","endTime","deviceScreenIdArr","updateTime","userName","screenids","pfmTaskMessageId"),
+	defs:["screenids","pfmTaskMessageId"],
+	add_shown:shown, //弹出新增或编辑对话框后执行的方法,
+});	
+wade.libs.datatable(config);	//初始化datatable
+
+function shown(devClone,flag,sel_obj){
+	
+	 $.ajax({	//获取角色数据
+	        url: "/message/GetRolesSelectData.do",
+	        dataType: 'json',
+	        quietMillis: 250,
+	        success: function (result) {
+	        		devClone.find('*[name=deviceScreen]').select2({
+	        		dropdownParent:devClone,
+	        		multiple:true,
+	        		data:result,
+	        		 placeholder: '请选择显示屏，可多选',
+	        		 language: 'zh-CN' 
+	        	});
+	        	if(flag ==1){
+	        		if(sel_obj){
+	        			var s = sel_obj.screenids.split(',');
+					wade.libs.datatable_fill_form_data(		
+					"deviceScreen",s,devClone);
+	        		}
+	        	}
+	        }
+	    }); 
+	 if(flag==1){
+	
+	 }
+	 function verifyMessage(val){
+		 if (val=="") {
+				devClone.find('.point-out').hide();
+				devClone.find("#messageNotice").html('<span class="point-box errorbgTop dropdown"  ><i class="sprite icon_arrow_up2 pa"></i>' + "请输入消息" + '</span>').show();
+				return false;
+			}
+			else if(val.length>15){
+				devClone.find('.point-out').hide();
+				devClone.find("#messageNotice").html('<span class="point-box errorbgTop dropdown"  ><i class="sprite icon_arrow_up2 pa"></i>' + "消息不能大于15个字符" + '</span>').show();
+         		return false;
+			}
+			return true;
+	 }
+	 devClone.find('input[name=message]').on("blur",function() {verifyMessage($(this).val());}).on('focus',function(){ devClone.find("#messageNotice").hide();});
+	 function verifyStartDate(val){
+		
+		 if (val.trim()=="") {
+				devClone.find('.point-out').hide();
+				devClone.find("#beginTimeNotice").html('<span class="point-box errorbgTop dropdown"  ><i class="sprite icon_arrow_up2 pa"></i>' + "请输入起始时间" + '</span>').show();
+				return false;
+			}
+		
+			return true;
+	 }
+	 function verifyEndDate(val){
+		
+		 if (val.trim()=="") {
+				devClone.find('.point-out').hide();
+				devClone.find("#endTimeNotice").html('<span class="point-box errorbgTop dropdown"  ><i class="sprite icon_arrow_up2 pa"></i>' + "请输入结束时间" + '</span>').show();
+				return false;
+			}
+			
+			return true;
+	 }
+	devClone.find('input[name=beginTime]').attr('id','begintime').on('focus',function(){ devClone.find("#beginTimeNotice").hide();});
+	devClone.find('input[name=endTime]').attr('id','endtime').on('focus',function(){ devClone.find("#endTimeNotice").hide();});
+	 
+	 
+	 devClone.find(".btn-primary").on("click",function(event) {
+			
+			var val1 = devClone.find('input[name=message]').val();
+			if (!verifyMessage(val1)) {
+				event.stopImmediatePropagation(); // 阻止提交数据
+				return false;
+			}
+			var val2 = devClone.find('input[name=beginTime]').val();
+			if (!verifyStartDate(val2)) {
+				event.stopImmediatePropagation(); // 阻止提交数据
+				return false;
+			}
+			var val3 = devClone.find('input[name=endTime]').val();
+			if (!verifyEndDate(val3)) {
+				event.stopImmediatePropagation(); // 阻止提交数据
+				return false;
+			}
+			
+			return true;
+		});
+}

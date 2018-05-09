@@ -1,0 +1,87 @@
+package com.wadejerry.scms.mq.consumer.queue;
+
+import javax.jms.JMSException;
+import javax.jms.Message;
+import javax.jms.MessageListener;
+import javax.jms.TextMessage;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.wadejerry.scms.modules.pfm.dao.PfmRecordMapper;
+import com.wadejerry.scms.modules.pfm.dao.WebServiceMapper;
+import com.wadejerry.scms.modules.pfm.model.PfmRecord;
+import com.wadejerry.scms.mq.dto.InRecordDto;
+import com.wadejerry.scms.utils.Log.LogManager;
+import com.wadejerry.scms.utils.date.DateUtil;
+import com.wadejerry.scms.utils.json.JacksonUtil;
+
+
+/**
+* 转存车辆进的记录 
+* @ClassName: InRecordQueue
+* @Description: TODO
+* @author zhanying
+* @date 2017年3月30日 下午11:56:01
+*
+ */
+@Component
+@Transactional
+public class InRecordQueue implements MessageListener {
+
+	@Autowired
+	private PfmRecordMapper recordMapper;
+	@Autowired
+	private WebServiceMapper webservicemapper;
+	@Override
+	public void onMessage(Message message) {
+		try {
+			String jsonStr = ((TextMessage) message).getText();
+			InRecordDto inRecordDto = JacksonUtil.toObject(jsonStr, InRecordDto.class);
+			//TODO 转存数据到数据库 传过来的时间都是字符串 格式"yyyy-MM-dd HH:mm:ss"
+			
+			PfmRecord record = new PfmRecord();
+			record.setAdvance(inRecordDto.getAdvance());
+			record.setAdvanceType(inRecordDto.getAdvancetype());
+			record.setBoothId(inRecordDto.getInBoothId());
+			record.setBoothName(inRecordDto.getInBoothName());
+			record.setCardId(inRecordDto.getCardId());
+			record.setCarId(inRecordDto.getCarId());
+			record.setCarNumber(inRecordDto.getCarNumber());
+			record.setCarriagewayId(inRecordDto.getInCarriagewayId());
+			record.setCarriagewayName(inRecordDto.getInCarriagewayName());
+			record.setCarTypeId(inRecordDto.getCarTypeId());
+			record.setCarTypeName(inRecordDto.getCarTypeName());
+			record.setDeviceId(inRecordDto.getInDeviceId());
+			record.setDeviceName(inRecordDto.getInDeviceName());
+			record.setDirection(1);
+			record.setEntranceId(inRecordDto.getInEntranceId());
+			record.setEntranceName(inRecordDto.getInEntranceName());
+			record.setEventTime(DateUtil.df.parse(inRecordDto.getStrInTime()));
+			record.setFlag(inRecordDto.getFlag());
+			record.setInRecordId(inRecordDto.getInRecordId());
+			record.setInsertTime(DateUtil.df.parse(inRecordDto.getStrInsertTime()));
+			record.setNote(inRecordDto.getNote());
+			record.setParkId(inRecordDto.getParkId());
+			record.setParkName(inRecordDto.getParkName());
+			record.setPersonName(inRecordDto.getPersonName());
+			record.setPhoto(inRecordDto.getInPhoto());
+			//record.setRecordId(inRecordDto.getInRecordId());
+			record.setUserId(inRecordDto.getUserId());
+			record.setUserName(inRecordDto.getUserName());
+			if(webservicemapper.selectCountFromPfmRecordByCarNumAndinsertTime(record.getCarNumber(), record.getEventTime())>0){
+				LogManager.logDebug("进场Record重复添加信息"+inRecordDto);
+				return;
+			}
+			recordMapper.insertSelective(record);
+			
+		} catch (JMSException e) {
+			LogManager.logException(e);
+		} 
+		catch(Exception e){
+			LogManager.logException(e);
+		}
+	}
+
+}

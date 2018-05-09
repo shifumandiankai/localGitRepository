@@ -1,0 +1,110 @@
+package com.wadejerry.scms.modules.pfm.serviceImpl;
+
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.wadejerry.scms.frame.entity.ReportPageParamsDto;
+import com.wadejerry.scms.modules.pfm.dao.pfmCzReportMapper;
+import com.wadejerry.scms.modules.pfm.dto.CzReportDto;
+import com.wadejerry.scms.modules.pfm.service.pfmCzReportService;
+@Service("pfmCzReportService")
+public class pfmCzReportServiceImpl implements pfmCzReportService{
+    @Autowired
+    private pfmCzReportMapper czReportMapper;
+
+	@Override
+	public int selectRecordTotal(Date startTime, Date endTime, String carNumber, List<Integer> listtypeId,String size) {
+		
+		return czReportMapper.selectRecordTotal(startTime,endTime,carNumber,listtypeId,size);
+	}
+
+	/*@Override
+	public List<CzReportDto> selectAllListByPage(ReportPageParamsDto paramsDto) {
+		
+		return czReportMapper.selectDayAllListByPage(paramsDto);
+	}*/
+
+	@Override
+	public List<CzReportDto> selectAllListByPage(Date startTime, Date endTime, String carNumber,
+			List<Integer> listtypeId, String size, int length, int start) {
+	
+		return czReportMapper.selectDayAllListByPage(startTime,endTime,carNumber,listtypeId,size,length,start);
+	}
+
+	@Override
+	public Date selectCarTypeName(Integer typeId) {
+		
+		return czReportMapper.selectCarTypeName(typeId);
+	}
+
+	@Override
+	public List selectDoubleRecordTotal(Date startTime, Date endTime, String carNumber, Integer temp, String size,List listcarType) {
+		
+		return czReportMapper.selectDoubleRecordTotal(startTime,endTime,carNumber,temp,size,listcarType);
+	}
+
+	@Override
+	public List<CzReportDto> selectDoubleListByPage(Date startTime, Date endTime, String carNumber, Integer temp,
+			String size, int length, int start,List listcarType) {
+		
+		return czReportMapper.selectDoubleListByPage(startTime,endTime,carNumber,temp,size,length,start,listcarType);
+	}
+
+	@Override
+	public List<String> selectByTypeList() {
+		
+		return czReportMapper.selectByTypeList();
+	}
+
+	@Override
+	public Date selectInserttime(Date startTime, Date endTime, String carNumber, Integer temp, String size,List<Integer> listcarType) {
+		
+		return czReportMapper.selectInserttime(startTime,endTime,carNumber,temp,size,listcarType);
+	}
+
+	@Override
+	public List<Map<String, Object>> exportDay(Date startTime,Date endTime,List<Integer> listTypeId, String size) {
+		
+		return czReportMapper.exportDay(startTime,endTime,listTypeId,size);
+	}
+
+	@Override
+	public List<CzReportDto> selectMonthRecordTotal(Integer year, Integer month, String carNumber, Integer typeId, String size,Date startTime,Date endTime,Integer nowMonth,Integer endmonth,List<Integer> listcarType) {
+		
+		return czReportMapper.selectMonthRecordTotal(year,month,carNumber,typeId,size,startTime,endTime,nowMonth,endmonth,listcarType);
+	}
+
+	@Override
+	public List<CzReportDto> selectMonthListByPage(Integer year, Integer month, String carNumber, Integer typeId,
+			String size, int length, int start, Date startTime,Date endTime,Integer nowMonth,Integer endMonth,List<Integer> listcarType) {
+		
+		return czReportMapper.selectMonthListByPage(year,month,carNumber,typeId,size,length,start,startTime,endTime,nowMonth,endMonth,listcarType);
+	}
+
+	@Override
+	public List<CzReportDto> selectMonthInserttime(Integer year, Integer month, String carNumber, Integer typeId,
+			String size, Date startTime, Date endTime, Integer nowMonth) {
+		
+		return czReportMapper.selectMonthInserttime(year,month,carNumber,typeId,size,startTime,endTime,nowMonth);
+	}
+
+	@Override
+	public List<CzReportDto> selectYearRecordTotal(Integer year, String carNumber, Integer typeId, String size,
+			Date startTime, Date endTime, Integer endyear, List<Integer> listcarType,Integer nowyear) {
+		
+		return czReportMapper.selectYearRecordTotal(year,carNumber,typeId,size,startTime,endTime,endyear,listcarType,nowyear);
+	}
+
+	@Override
+	public List<CzReportDto> selectYearListByPage(Integer startyear, Integer endyear, String carNumber, Integer typeId,
+			String size, int length, int start, Date startTime, Date endTime, Integer nowYear,
+			List<Integer> listcarType) {
+		
+		return czReportMapper.selectYearListByPage(startyear,endyear,carNumber,typeId,size,length,start,startTime,endTime,nowYear,listcarType);
+	}
+
+}

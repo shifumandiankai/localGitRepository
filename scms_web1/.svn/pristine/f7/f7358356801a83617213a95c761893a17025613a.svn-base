@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.wadejerry.scms.modules.device.dao.PfmDevicelrpMapper">
+<resultMap id="BaseResultMap" type="com.wadejerry.scms.modules.device.model.Devicelrp" >
+<id column="pfm_device_lpr_id" property="pfmDeviceLprId" jdbcType="INTEGER" />
+    <result column="bim_company_id" property="bimCompanyId" jdbcType="INTEGER" />
+    <result column="pfm_server_id" property="pfmServerId" jdbcType="INTEGER" />
+    <result column="device_code" property="deviceCode" jdbcType="VARCHAR" />
+    <result column="device_name" property="deviceName" jdbcType="VARCHAR" />
+    <result column="ip" property="ip" jdbcType="VARCHAR" />
+    <result column="port" property="port" jdbcType="VARCHAR" />
+    <result column="mac" property="mac" jdbcType="VARCHAR" />
+     <result column="login_id" property="loginId" jdbcType="VARCHAR" />
+     <result column="login_password" property="loginPassword" jdbcType="VARCHAR" />
+    <result column="insert_time" property="insertTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="user_name" property="userName" jdbcType="VARCHAR" />
+    <result column="pfm_screen_id" property="pfmScreenId" jdbcType="INTEGER" />
+</resultMap>
+<resultMap type="com.wadejerry.scms.modules.device.dto.DevicelrpDto" id="DtoResultMap">
+ <id column="pfm_device_lpr_id" property="pfmDeviceLprId" jdbcType="INTEGER" />
+ <result column="bim_company_id" property="bimCompanyId" jdbcType="INTEGER" />
+ <result column="device_code" property="deviceCode" jdbcType="VARCHAR" />
+ <result column="device_name" property="deviceName" jdbcType="VARCHAR" />
+ <result column="ip" property="ip" jdbcType="VARCHAR" />
+ <result column="port" property="port" jdbcType="VARCHAR" />
+ <result column="server_name" property="serverName" jdbcType="VARCHAR" />
+ <result column="login_id" property="loginId" jdbcType="VARCHAR" />
+ <result column="login_password" property="loginPassword" jdbcType="VARCHAR" />
+ <result column="insert_time" property="insertTime" jdbcType="TIMESTAMP" />
+ <result column="pfm_server_id" property="pfmServerId" jdbcType="INTEGER" />
+ <result column="pfm_screen_id" property="pfmScreenId" jdbcType="INTEGER" />
+ <result column="device_id" property="deviceId" jdbcType="INTEGER" />
+ <result column="carriageway_name" property="carriagewayName" jdbcType="VARCHAR" />
+ <result column="screen_name" property="screenName" jdbcType="VARCHAR" />
+ 
+</resultMap>
+
+<resultMap type="com.wadejerry.scms.modules.pfm.dto.ConfigServiceDto" id="ConfigMap">
+ <id column="pfm_server_id" property="pfmServerId" jdbcType="INTEGER" />
+ <result column="bim_company_id" property="bimCompanyId" jdbcType="INTEGER" />
+ <result column="server_name" property="serverName" jdbcType="VARCHAR" />
+ <result column="device_name" property="deviceName" jdbcType="VARCHAR" />
+ <result column="ip" property="ip" jdbcType="VARCHAR" />
+ <result column="port" property="port" jdbcType="VARCHAR" />
+ <result column="insert_time" property="insertTime" jdbcType="TIMESTAMP" />
+ <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+
+</resultMap>
+<select id="getRecordTotal" parameterType="com.wadejerry.scms.frame.entity.PageParamsDto"  resultType="java.lang.Integer" >
+  select count(pfm_device_lpr_id) from pfm_device_lpr where
+  <!--用户或角色名称模糊查询-->
+  	(#{searchValue0,jdbcType=VARCHAR}='' or device_code like CONCAT('%',#{searchValue0,jdbcType=VARCHAR},'%' ) or ip like CONCAT('%',#{searchValue0,jdbcType=VARCHAR},'%' ))
+  	<!-- 过滤企业 -->
+  	and bim_company_id = #{companyId,jdbcType=INTEGER}
+  </select>
+  <!-- 分页获取操作员信息 -->
+  <select id="getListByPage" parameterType="com.wadejerry.scms.frame.entity.PageParamsDto" resultMap="DtoResultMap" >
+ select d.pfm_device_lpr_id, d.device_code,d.device_name,d.ip,d.port,s.server_name,d.login_id,d.login_password,d.insert_time,d.pfm_screen_id,s.pfm_server_id,r.device_id,c.carriageway_name,n.device_name as screen_name from pfm_device_lpr d left join pfm_server s on d.pfm_server_id=s.pfm_server_id  left join pfm_carriageway_device_rel r on d.pfm_device_lpr_id=r.device_id left join pfm_carriageway c on c.carriageway_id=r.carriageway_id left join pfm_device_screen n on n.pfm_device_screen_id=d.pfm_screen_id
+	  	where 
+	  	
+		  	(#{searchValue0,jdbcType=VARCHAR}='' or d.device_code like CONCAT('%',#{searchValue0,jdbcType=VARCHAR},'%' ) or d.ip like CONCAT('%',#{searchValue0,jdbcType=VARCHAR},'%' )) 	
+	  	and (d.bim_company_id = #{companyId,jdbcType=INTEGER})   ${order} 
+	  	LIMIT  #{length,jdbcType=INTEGER} OFFSET  #{start,jdbcType=INTEGER} 
+  </select> 
+ 
+  <!-- 根据设备编号查询 -->
+  <select id="findByDeviceCode"  resultMap="BaseResultMap">
+  select pfm_device_lpr_id,bim_company_id,pfm_server_id,device_code,device_name,ip,port,mac,login_id,login_password,insert_time from pfm_device_lpr where device_code=#{0} and bim_company_id=#{1} 
+  </select>
+  <!-- 根据device_lpr_id查询 -->
+  <select id="selectId" resultMap="BaseResultMap">
+  select * from pfm_device_lpr where pfm_device_lpr_id=#{0}
+  </select>
+  <!-- 根据设备名称查询 -->
+  <select id="findByDeviceName"  resultMap="BaseResultMap">
+  select * from pfm_device_lpr where device_name=#{0} and bim_company_id=#{1} 
+  </select>
+  <select id="selectAllLpr" resultMap="DtoResultMap">
+  select pfm_device_lpr_id,device_name from pfm_device_lpr 
+  </select>
+  <!-- 查询服务器设备 -->
+  <select id="selectConfig" resultMap="ConfigMap">
+  select pfm_server_id,server_name from pfm_server 
+  </select>
+  <!-- 查询screenId是否存在 -->
+  <select id="findByLpr"  resultMap="DtoResultMap">
+  select * from pfm_device_lpr where pfm_device_lpr_id=#{0} 
+  </select>
+  <!-- 添加设备 -->
+  <insert id="insertDtoInfo" parameterType="com.wadejerry.scms.modules.device.dto.DevicelrpDto">
+  insert into pfm_device_lpr(bim_company_id,pfm_server_id,device_code,device_name,ip,port,login_id,login_password,insert_time,mac) values(#{bimCompanyId,jdbcType=INTEGER},#{pfmServerId,jdbcType=INTEGER},#{deviceCode,jdbcType=VARCHAR},#{deviceName,jdbcType=VARCHAR},#{ip,jdbcType=VARCHAR},#{port,jdbcType=INTEGER},#{loginId,jdbcType=VARCHAR},#{loginPassword,jdbcType=VARCHAR},#{insertTime,jdbcType=TIMESTAMP},#{mac,jdbcType=VARCHAR})
+  </insert>
+  <!-- 修改screenid -->
+  <update id="insertByScreenId">
+  update pfm_device_lpr set pfm_screen_id=#{0},update_time=#{2} where pfm_device_lpr_id=#{1}
+  </update>
+  <!-- 修改screenid -->
+  <update id="updateByScreenId">
+  update pfm_device_lpr set pfm_screen_id=null,update_time=#{1}where pfm_screen_id=#{0}
+  </update>
+  <!-- 修改信息 -->
+  <update id="updateDtoInfo" parameterType="com.wadejerry.scms.modules.device.dto.DevicelrpDto">
+  update pfm_device_lpr set device_code=#{deviceCode,jdbcType=VARCHAR},device_name=#{deviceName,jdbcType=VARCHAR},ip=#{ip,jdbcType=VARCHAR},port=#{port,jdbcType=INTEGER},login_id=#{loginId,jdbcType=VARCHAR},login_password=#{loginPassword,jdbcType=VARCHAR},update_time=#{updateTime,jdbcType=TIMESTAMP},pfm_server_id=#{pfmServerId,jdbcType=INTEGER} where pfm_device_lpr_id=#{pfmDeviceLprId,jdbcType=INTEGER} 
+  </update>
+  <!-- 删除信息 -->
+  <delete id="deleteById">
+  delete from pfm_device_lpr where pfm_device_lpr_id=#{0};
+  </delete>
+  <!-- 保存lpr设备 -->
+  <!-- <update id="SaveLpr" >
+  update  pfm_booth <set><if test="int_channel1!=null">int_channel1=#{int_channel1},</if><if test="out_channel1!=null">out_channel1=#{out_channel1},</if><if test="int_channel2!=0">int_channel2=#{int_channel2},</if><if test="out_channel2!=0">out_channel2=#{out_channel2},</if></set> where pfm_booth_id=#{id}
+  </update> -->
+  <update id="SaveLpr" >
+  update  pfm_booth set int_channel1=#{int_channel1},out_channel1=#{out_channel1},int_channel2=#{int_channel2},out_channel2=#{out_channel2},int_channel3=#{int_channel3},out_channel3=#{out_channel3},int_channel4=#{int_channel4},out_channel4=#{out_channel4} where pfm_booth_id=#{id}
+  </update> 
+  <!-- 修改服务器配置 -->
+  <update id="updateConfig">
+  update pfm_device_lpr set pfm_server_id=#{0},update_time=#{2} where pfm_device_lpr_id=#{1}
+  </update>
+  <!-- 查询server信息 -->
+  <select id="selectServerInfo"  resultMap="DtoResultMap">
+  select * from pfm_server where server_name=#{0}
+  </select>
+  
+  <select id="selectDeviceCountBy" resultType="int">
+  		select count(*) from pfm_device_lpr where bim_company_id=#{companyid} and pfm_server_id=#{serverid} and ip=#{ip} 
+  
+  </select>
+  <select id="selectDeviceCountBy2" resultType="int">
+  		select count(*) from pfm_device_lpr where bim_company_id=#{companyid} and pfm_server_id=#{serverid} and ip=#{ip}  and pfm_device_lpr_id !=#{id}
+  
+  </select>
+</mapper>

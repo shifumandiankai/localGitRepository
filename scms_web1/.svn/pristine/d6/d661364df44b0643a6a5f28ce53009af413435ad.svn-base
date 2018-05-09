@@ -1,0 +1,94 @@
+<%@ page contentType="text/html; charset=UTF-8"%>
+<div class="modal open" id="exampleModal" tabindex="-1" role="dialog"
+	aria-labelledby="exampleModalLabel">
+	<div class="modal-dialog" role="document" style="width: 700px;">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal"
+					aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<h4 class="modal-title" id="exampleModalLabel">服务器</h4>
+			</div>
+			<div class="modal-body">
+				<form class="form-horizontal">
+					<div class="server-wizard">
+						<ul class="server-wizard-ul">
+							<li class="server-wizard-li"><a class="selected" isdone="1"
+								href="#href1"><span>1、服务器类型</span></a></li>
+							<li class="server-wizard-li"><a class="disabled" isdone="0"
+								href="#href2"><span>2、ip地址配置</span></a></li>
+						</ul>
+						<div class="step-container">
+							<input type="hidden" name="serverType">
+							<div class="step1">
+								<div class="servers">
+									<table>
+										<tr>
+											<shiro:hasPermission name="ParkingServer"><td class="server-type"><i class="server-1-1"></i><br>停车场服务器</td></shiro:hasPermission>
+											<shiro:lacksPermission name="ParkingServer"><td></td></shiro:lacksPermission>
+											<td></td>
+										</tr>
+										<tr>
+											<td colspan="2"><div class="line"></div>
+											<td>
+										</tr>
+									</table>
+								</div>
+							</div>
+							<div class="step2" style="display: none;">
+								<div class="serverForm">
+									<div class="control-group">
+										<label for="ipName">服务器名称*</label><input type="hidden"
+											name="pfmServerId">
+										<div class="form-ele" style="position: relative;">
+											<div id="serverNameNotice" class="point-out"
+												style="width: 348px; top: -38px; left: 0px; display: none;"></div>
+											<input id="ipName" type="text" name="serverName" />
+										</div>
+									</div>
+									<div class="control-group">
+										<label for="ip">ip*</label>
+										<div class="form-ele" style="position: relative;">
+											<div id="ipNotice" class="point-out"
+												style="width: 348px; top: -38px; left: 0px; display: none;"></div>
+											<input id="ip" type="text" name="ip" />
+										</div>
+									</div>
+									<div class="control-group">
+										<label for="port">端口号*</label>
+										<div class="form-ele" style="position: relative;">
+											<div id="portNotice" class="point-out"
+												style="width: 348px; top: -38px; left: 0px; display: none;"></div>
+											<input id="port" type="text" name="port" />
+										</div>
+									</div>
+									<div class="control-group">
+										<label for="netZone">网域*</label>
+										<div class="form-ele" style="position: relative;">
+											<select id="netZone"  name="netZone" >
+											</select>
+										</div>
+									</div>
+									<div class="control-group">
+										<label for="parkId">车场*</label>
+										<div class="form-ele" style="position: relative;">
+											<select id="parkId"  name="parkId" >
+											</select>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default prev disabled">上一步</button>
+				<button type="button" class="btn btn-primary next">下一步</button>
+				<button type="button" class="btn btn-primary finish disabled">完成</button>
+				<button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+			</div>
+		</div>
+	</div>
+</div>
+

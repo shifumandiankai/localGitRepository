@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.wadejerry.scms.modules.log.dao.BimOperationLogMapper" >
+  <resultMap id="BaseResultMap" type="com.wadejerry.scms.modules.log.model.BimOperationLog" >
+    <id column="operationlog_id" property="operationlogId" jdbcType="INTEGER" />
+    <result column="log_time" property="logTime" jdbcType="TIMESTAMP" />
+    <result column="system_code" property="systemCode" jdbcType="INTEGER" />
+    <result column="module_code" property="moduleCode" jdbcType="INTEGER" />
+    <result column="module_name" property="moduleName" jdbcType="VARCHAR" />
+    <result column="oper_type" property="operType" jdbcType="INTEGER" />
+    <result column="log_type" property="logType" jdbcType="INTEGER" />
+    <result column="log_info" property="logInfo" jdbcType="VARCHAR" />
+    <result column="user_id" property="userId" jdbcType="INTEGER" />
+    <result column="user_name" property="userName" jdbcType="VARCHAR" />
+    <result column="login_add" property="loginAdd" jdbcType="VARCHAR" />
+    <result column="custom1" property="custom1" jdbcType="INTEGER" />
+    <result column="custom2" property="custom2" jdbcType="INTEGER" />
+    <result column="custom3" property="custom3" jdbcType="VARCHAR" />
+    <result column="custom4" property="custom4" jdbcType="VARCHAR" />
+    <result column="insert_time" property="insertTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    operationlog_id, log_time, system_code, module_code, module_name, oper_type, log_type, 
+    log_info, user_id, user_name, login_add, custom1, custom2, custom3, custom4, insert_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from bim_operation_log
+    where operationlog_id = #{operationlogId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from bim_operation_log
+    where operationlog_id = #{operationlogId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.wadejerry.scms.modules.log.model.BimOperationLog" >
+    insert into bim_operation_log (operationlog_id, log_time, system_code, 
+      module_code, module_name, oper_type, 
+      log_type, log_info, user_id, 
+      user_name, login_add, custom1, 
+      custom2, custom3, custom4, 
+      insert_time)
+    values (#{operationlogId,jdbcType=INTEGER}, #{logTime,jdbcType=TIMESTAMP}, #{systemCode,jdbcType=INTEGER}, 
+      #{moduleCode,jdbcType=INTEGER}, #{moduleName,jdbcType=VARCHAR}, #{operType,jdbcType=INTEGER}, 
+      #{logType,jdbcType=INTEGER}, #{logInfo,jdbcType=VARCHAR}, #{userId,jdbcType=INTEGER}, 
+      #{userName,jdbcType=VARCHAR}, #{loginAdd,jdbcType=VARCHAR}, #{custom1,jdbcType=INTEGER}, 
+      #{custom2,jdbcType=INTEGER}, #{custom3,jdbcType=VARCHAR}, #{custom4,jdbcType=VARCHAR}, 
+      #{insertTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.wadejerry.scms.modules.log.model.BimOperationLog" >
+    insert into bim_operation_log
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="operationlogId != null" >
+        operationlog_id,
+      </if>
+      <if test="logTime != null" >
+        log_time,
+      </if>
+      <if test="systemCode != null" >
+        system_code,
+      </if>
+      <if test="moduleCode != null" >
+        module_code,
+      </if>
+      <if test="moduleName != null" >
+        module_name,
+      </if>
+      <if test="operType != null" >
+        oper_type,
+      </if>
+      <if test="logType != null" >
+        log_type,
+      </if>
+      <if test="logInfo != null" >
+        log_info,
+      </if>
+      <if test="userId != null" >
+        user_id,
+      </if>
+      <if test="userName != null" >
+        user_name,
+      </if>
+      <if test="loginAdd != null" >
+        login_add,
+      </if>
+      <if test="custom1 != null" >
+        custom1,
+      </if>
+      <if test="custom2 != null" >
+        custom2,
+      </if>
+      <if test="custom3 != null" >
+        custom3,
+      </if>
+      <if test="custom4 != null" >
+        custom4,
+      </if>
+      <if test="insertTime != null" >
+        insert_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="operationlogId != null" >
+        #{operationlogId,jdbcType=INTEGER},
+      </if>
+      <if test="logTime != null" >
+        #{logTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="systemCode != null" >
+        #{systemCode,jdbcType=INTEGER},
+      </if>
+      <if test="moduleCode != null" >
+        #{moduleCode,jdbcType=INTEGER},
+      </if>
+      <if test="moduleName != null" >
+        #{moduleName,jdbcType=VARCHAR},
+      </if>
+      <if test="operType != null" >
+        #{operType,jdbcType=INTEGER},
+      </if>
+      <if test="logType != null" >
+        #{logType,jdbcType=INTEGER},
+      </if>
+      <if test="logInfo != null" >
+        #{logInfo,jdbcType=VARCHAR},
+      </if>
+      <if test="userId != null" >
+        #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="userName != null" >
+        #{userName,jdbcType=VARCHAR},
+      </if>
+      <if test="loginAdd != null" >
+        #{loginAdd,jdbcType=VARCHAR},
+      </if>
+      <if test="custom1 != null" >
+        #{custom1,jdbcType=INTEGER},
+      </if>
+      <if test="custom2 != null" >
+        #{custom2,jdbcType=INTEGER},
+      </if>
+      <if test="custom3 != null" >
+        #{custom3,jdbcType=VARCHAR},
+      </if>
+      <if test="custom4 != null" >
+        #{custom4,jdbcType=VARCHAR},
+      </if>
+      <if test="insertTime != null" >
+        #{insertTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.wadejerry.scms.modules.log.model.BimOperationLog" >
+    update bim_operation_log
+    <set >
+      <if test="logTime != null" >
+        log_time = #{logTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="systemCode != null" >
+        system_code = #{systemCode,jdbcType=INTEGER},
+      </if>
+      <if test="moduleCode != null" >
+        module_code = #{moduleCode,jdbcType=INTEGER},
+      </if>
+      <if test="moduleName != null" >
+        module_name = #{moduleName,jdbcType=VARCHAR},
+      </if>
+      <if test="operType != null" >
+        oper_type = #{operType,jdbcType=INTEGER},
+      </if>
+      <if test="logType != null" >
+        log_type = #{logType,jdbcType=INTEGER},
+      </if>
+      <if test="logInfo != null" >
+        log_info = #{logInfo,jdbcType=VARCHAR},
+      </if>
+      <if test="userId != null" >
+        user_id = #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="userName != null" >
+        user_name = #{userName,jdbcType=VARCHAR},
+      </if>
+      <if test="loginAdd != null" >
+        login_add = #{loginAdd,jdbcType=VARCHAR},
+      </if>
+      <if test="custom1 != null" >
+        custom1 = #{custom1,jdbcType=INTEGER},
+      </if>
+      <if test="custom2 != null" >
+        custom2 = #{custom2,jdbcType=INTEGER},
+      </if>
+      <if test="custom3 != null" >
+        custom3 = #{custom3,jdbcType=VARCHAR},
+      </if>
+      <if test="custom4 != null" >
+        custom4 = #{custom4,jdbcType=VARCHAR},
+      </if>
+      <if test="insertTime != null" >
+        insert_time = #{insertTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where operationlog_id = #{operationlogId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.wadejerry.scms.modules.log.model.BimOperationLog" >
+    update bim_operation_log
+    set log_time = #{logTime,jdbcType=TIMESTAMP},
+      system_code = #{systemCode,jdbcType=INTEGER},
+      module_code = #{moduleCode,jdbcType=INTEGER},
+      module_name = #{moduleName,jdbcType=VARCHAR},
+      oper_type = #{operType,jdbcType=INTEGER},
+      log_type = #{logType,jdbcType=INTEGER},
+      log_info = #{logInfo,jdbcType=VARCHAR},
+      user_id = #{userId,jdbcType=INTEGER},
+      user_name = #{userName,jdbcType=VARCHAR},
+      login_add = #{loginAdd,jdbcType=VARCHAR},
+      custom1 = #{custom1,jdbcType=INTEGER},
+      custom2 = #{custom2,jdbcType=INTEGER},
+      custom3 = #{custom3,jdbcType=VARCHAR},
+      custom4 = #{custom4,jdbcType=VARCHAR},
+      insert_time = #{insertTime,jdbcType=TIMESTAMP}
+    where operationlog_id = #{operationlogId,jdbcType=INTEGER}
+  </update>
+</mapper>

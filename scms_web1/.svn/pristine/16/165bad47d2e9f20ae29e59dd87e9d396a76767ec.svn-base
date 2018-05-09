@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="  
+           http://www.springframework.org/schema/beans  
+           http://www.springframework.org/schema/beans/spring-beans-4.3.xsd  
+           http://www.springframework.org/schema/aop  
+           http://www.springframework.org/schema/aop/spring-aop-4.3.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context-4.3.xsd
+           http://www.springframework.org/schema/tx
+           http://www.springframework.org/schema/tx/spring-tx-4.3.xsd">
+
+
+	<!-- ======================== 调度工厂 ======================== -->
+	<bean name="schedulerFactory"
+		class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+		<!-- 通过applicationContextSchedulerContextKey属性配置spring上下文 -->
+		<property name="applicationContextSchedulerContextKey">
+			<value>applicationContext</value>
+		</property>
+		<property name="triggers">
+			<list>
+				<ref bean="partitionTaskTrigger"/>
+				<ref bean="delPfmPhotoTaskTrigger"/>
+			</list>
+		</property>
+	</bean>
+	<bean name="quartzSchedulerTask" class="com.wadejerry.scms.task.QuartzSchedulerTask" />
+	<!-- ======================== 启动线程 ======================== -->
+	<bean name="initTask" class="com.wadejerry.scms.utils.quartz.QuartzInitThread"
+		init-method="start"></bean>
+
+	<!-- ======================== tasks ======================== -->
+	
+	<!-- ======================== 表分区Task ======================== -->
+	<bean id="partitionTask"
+		class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+		<property name="name" value="partitionTask" />
+		<property name="jobClass" value="com.wadejerry.scms.task.PartitionTask" />
+	</bean>
+	<bean id="partitionTaskTrigger"
+		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail" ref="partitionTask" />
+		<property name="cronExpression" value="0 0 23 * * ?" /><!-- 每天23点执行 -->
+	</bean>
+	<!-- ======================== 删除车场图片 ======================== -->
+	<bean id="delPfmPhotoTask"
+		class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+		<property name="name" value="delPfmPhotoTask" />
+		<property name="jobClass" value="com.wadejerry.scms.task.DelPfmPhotoTask" />
+	</bean>
+	<bean id="delPfmPhotoTaskTrigger"
+		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail" ref="delPfmPhotoTask" />
+		<property name="cronExpression" value="0 0 3 * * ?" /> <!-- 每天三点删除 -->
+	</bean>
+
+</beans>
+           
+           

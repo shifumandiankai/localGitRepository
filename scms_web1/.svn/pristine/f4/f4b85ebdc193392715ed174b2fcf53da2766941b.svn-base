@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper  namespace="com.wadejerry.scms.modules.onecard.dao.BimPersonPhotoMapper">
+<resultMap id="BaseResultMap" type="com.wadejerry.scms.modules.onecard.model.BimPersonPhoto" >
+ <id column="person_photo_id" property="personPhotoId" jdbcType="INTEGER" />
+    <result column="person_id" property="personId" jdbcType="INTEGER" />
+    <result column="photo1" property="photo1" jdbcType="VARCHAR" />
+    <result column="photo2" property="photo2" jdbcType="VARCHAR" />
+    <result column="photo3" property="photo3" jdbcType="VARCHAR" />
+    <result column="photo4" property="photo4" jdbcType="VARCHAR" />
+    <result column="fingerprint1" property="fingerprint1" jdbcType="VARCHAR" />
+    <result column="fingerprint1_num" property="fingerprint1Num" jdbcType="INTEGER" />
+    <result column="fingerprint2_num" property="fingerprint2Num" jdbcType="INTEGER" />
+    <result column="fingerprint2" property="fingerprint2" jdbcType="VARCHAR" />
+    <result column="facefeature1" property="facefeature1" jdbcType="VARCHAR" />
+    <result column="facefeature2" property="facefeature2" jdbcType="VARCHAR" />
+    <result column="fingerprint_guid" property="fingerprintGuid" jdbcType="VARCHAR" />
+    
+  
+</resultMap>
+ <!-- 插入信息 -->
+ <insert id="insertInfo" parameterType="com.wadejerry.scms.modules.onecard.model.BimPersonPhoto" >
+ insert into bim_person_photo(person_id,photo1,fingerprint1,fingerprint_guid,fingerprint1_num) values(#{personId,jdbcType=INTEGER},#{photo1,jdbcType=VARCHAR},#{fingerprint1,jdbcType=VARCHAR},#{fingerprintGuid,jdbcType=VARCHAR},#{fingerprint1Num,jdbcType=INTEGER})
+ </insert>
+ 
+ <update id="updateFinger">
+ update bim_person_photo set fingerprint1_num=null where fingerprint1_num=#{0}
+ </update>
+ 
+ <update id="updateAllFinger">
+ update bim_person_photo set fingerprint1_num=null 
+ </update>
+ 
+ 
+ <delete id="updateInfo"  parameterType="int">
+ delete from  bim_person_photo where  person_id=#{0}
+ </delete>
+ 
+</mapper>

@@ -1,0 +1,203 @@
+package com.wadejerry.scms.modules.log.controller;
+
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.wadejerry.scms.frame.constant.ConstParamLog;
+import com.wadejerry.scms.frame.entity.DataTableDto;
+import com.wadejerry.scms.frame.entity.ExTemplate;
+import com.wadejerry.scms.frame.entity.PageParamsDto;
+import com.wadejerry.scms.frame.entity.SelectDataDto;
+import com.wadejerry.scms.frame.log.LogRecord;
+import com.wadejerry.scms.modules.auth.dto.UserDto;
+import com.wadejerry.scms.modules.auth.service.BimUserService;
+import com.wadejerry.scms.modules.log.dto.ConfigurationLogDto;
+import com.wadejerry.scms.modules.log.model.ConfigurationLog;
+import com.wadejerry.scms.modules.log.service.ConfigurationLogService;
+import com.wadejerry.scms.modules.pfm.dto.ParkingLotDto;
+import com.wadejerry.scms.utils.AjaxUtil;
+import com.wadejerry.scms.utils.date.DateUtil;
+import com.wadejerry.scms.utils.json.JacksonUtil;
+
+@Controller
+public class ConfigurationLogController {
+	@Autowired
+	private HttpServletResponse response;
+	@Autowired
+	private HttpServletRequest request;
+	@Autowired 
+	private ConfigurationLogService ConfigurationService;
+	@Autowired
+	private BimUserService bimUserService; // 用户Service
+	@Autowired
+	private ExTemplate exTemplate;
+	@Autowired
+	private LogRecord logRecord;
+	
+	@RequestMapping("/log/selectAllInfo.do")
+	@ResponseBody
+	public void GetConfigurationLogInfo() throws JSONException, ParseException{
+		PageParamsDto paramsDto = new PageParamsDto(request); // 获取分 页参数
+		Date startTime=null;
+		Date endTime=null;
+		String systemCode=null;
+		//String user=null;
+		String val=request.getParameter("columns[0][search][value]");
+		if(!val.equals("")){
+			//查询
+			JSONObject json=new JSONObject(val);
+			if(json.has("startTime")&&!json.getString("startTime").equals("")){
+				startTime=DateUtil.df.parse(json.getString("startTime").toString());
+				paramsDto.setDateValue1(startTime);
+			}
+			if(json.has("endTime")&&!json.getString("endTime").equals("")){
+				endTime=DateUtil.df.parse(json.getString("endTime").toString());
+				paramsDto.setDateValue2(endTime);
+			}
+			if(json.has("systemCode")&&!json.getString("systemCode").equals("0")){
+				paramsDto.setIntValue4(Integer.valueOf(json.getString("systemCode").toString()));
+				switch(json.getString("systemCode").toString()){
+				case "0":systemCode="全部";
+				break;
+				case "1":systemCode="用户管理配置";
+				break;
+				case "2":systemCode="设备管理配置";
+				break;
+				case "3":systemCode="系统配置	";
+				break;
+				case "4":systemCode="日志查询";
+				break;
+				case "5":systemCode="停车场配置";
+				break;
+				}
+			}
+			if(json.has("user")&&!json.getString("user").equals("0")){
+				paramsDto.setIntValue5(Integer.valueOf(json.getString("user").toString()));
+				
+			}
+			logRecord.recordLog(ConstParamLog.LOG_MODULE_BASIC_CONFIG_LOG, ConstParamLog.LOG_OPER_QUERY,  ConstParamLog.LOG_TYPE_CONFIG,systemCode);
+		}
+		int iTotal =0;
+		List<ConfigurationLog> listDto=null;
+		iTotal=ConfigurationService.getRecordTotal(paramsDto);
+		if (iTotal > 0) {
+			//有数据存在
+			if (paramsDto.getLength() == -1) { // 查询所有记录
+				paramsDto.setLength(iTotal);
+			}
+			listDto = ConfigurationService.getConfigurationLogByPage(paramsDto); // 获取分页记录
+			
+		}
+		
+		DataTableDto data = new DataTableDto(); // 返回数据封装
+		data.setDataList(listDto);
+		data.setDraw(paramsDto.getDraw());
+		data.setRecordsFiltered(iTotal);
+		data.setRecordsTotal(iTotal);
+		AjaxUtil.ajaxWriteDataTable(data, response);
+	}
+	
+	/*
+	 *  配置类型
+	 */
+	@RequestMapping("/log/ConfigSystemCode.do")
+	@ResponseBody
+	public void ConfigSystemCode(){
+		 Map<Integer,String> map=ConstParamLog.systemIdAndStrNameMap;
+		 List<SelectDataDto> list = new ArrayList<SelectDataDto>();
+		 SelectDataDto selectInit= new SelectDataDto();
+		 selectInit.setId(0);
+		 selectInit.setText("全部");
+		 list.add(selectInit);
+		 SelectDataDto select= null;
+		 if(map.size()>0){
+			 //select=new SelectDataDto();
+			for(Entry<Integer,String> entry:map.entrySet()){
+				select=new SelectDataDto();
+				select.setId(entry.getKey());
+				select.setText(entry.getValue());
+				list.add(select);
+			}
+		 }
+		 AjaxUtil.ajaxWriteObject(list, response);
+	}
+	
+	/*
+	 * 用户
+	 */
+	@RequestMapping("/log/ConfigUser.do")
+	@ResponseBody
+	public void ConfigUser(){
+		 List<UserDto> listUser=bimUserService.selectInfo();
+		 List<SelectDataDto> list = new ArrayList<SelectDataDto>();
+		 SelectDataDto selectInit= new SelectDataDto();
+		 selectInit.setId(0);
+		 selectInit.setText("全部");
+		 list.add(selectInit);
+		 SelectDataDto select= null;
+		 if(listUser.size()>0){
+			 //select=new SelectDataDto();
+			for(UserDto temp:listUser){
+				select=new SelectDataDto();
+				select.setId(temp.getBimUserId());
+				select.setText(temp.getUserName());
+				list.add(select);
+			}
+		 }
+		 AjaxUtil.ajaxWriteObject(list, response);
+	}
+	
+	/*
+	 * 导出功能
+	 */
+	@RequestMapping("/log/export/{formdata}.do")
+	@ResponseBody
+	public void Export(@PathVariable("formdata") String formdata){
+		ConfigurationLogDto configurationLogDto=JacksonUtil.toObject(formdata,ConfigurationLogDto.class);
+		if(String.valueOf(configurationLogDto.getSystemCode()).equals("0")){
+			configurationLogDto.setSystemCode(null);;
+		}
+		if(String.valueOf(configurationLogDto.getUser()).equals("0")){
+			configurationLogDto.setUser(null);
+		}
+		List<Map<String,Object>> data=ConfigurationService.export(configurationLogDto);
+		for(Map<String,Object> map:data){
+		
+			for(Map.Entry<String,Object> temp:map.entrySet()){
+				if(temp.getKey().equals("system_code")){
+					Integer sysKey=(Integer) temp.getValue();
+					map.put("system_code", ConstParamLog.systemIdAndStrNameMap.get(sysKey));
+				}
+				if(temp.getKey().equals("module_code")){
+					Integer modKey=(Integer) temp.getValue();
+					map.put("module_code", ConstParamLog.moduleIdAndStrNameMap.get(modKey));
+				}  
+				if(temp.getKey().equals("oper_type")){
+					Integer operKey=(Integer) temp.getValue();
+					map.put("oper_type", ConstParamLog.logOperIdAndStrNameMap.get(operKey));
+				}  
+				
+				
+			}
+		}
+		String[] head = {"编号","配置类型","系统模块","操作类型","用户","IP地址","时间","内容"};
+		String[] column={"operationlog_id","system_code","module_code","oper_type","user_name","login_add","insert_time","log_info"};
+		exTemplate.Export(data, head, column);
+		logRecord.recordLog(ConstParamLog.LOG_MODULE_BASIC_CONFIG_LOG, ConstParamLog.LOG_OPER_EXPORT,  ConstParamLog.LOG_TYPE_CONFIG);
+	}
+}

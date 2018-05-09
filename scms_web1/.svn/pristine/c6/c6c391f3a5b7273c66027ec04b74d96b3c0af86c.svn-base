@@ -1,0 +1,292 @@
+package com.wadejerry.scms.modules.onecard.controller;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.codehaus.jettison.json.JSONArray;
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.wadejerry.scms.frame.entity.LoginInfo;
+import com.wadejerry.scms.frame.entity.OperateResult;
+import com.wadejerry.scms.modules.onecard.dto.BimCardDto;
+import com.wadejerry.scms.modules.onecard.model.BimCard;
+import com.wadejerry.scms.modules.onecard.model.BimCate;
+import com.wadejerry.scms.modules.onecard.service.BimCardService;
+import com.wadejerry.scms.modules.onecard.service.BimCateService;
+import com.wadejerry.scms.utils.AjaxUtil;
+import com.wadejerry.scms.utils.json.JacksonUtil;
+
+@Controller
+public class BimCardController {
+	@Autowired
+	private HttpServletResponse response;
+	@Autowired
+	private HttpServletRequest request;
+	@Autowired
+	private BimCardService bimCardService;
+	@Autowired
+	private BimCateService bimCateService;
+	
+	@RequestMapping("/Card/cardInfo.do")
+	@ResponseBody
+	private void GetCardInfoByPage() {
+		String personId=request.getParameter("personId");
+		List<BimCard> list=bimCardService.selectCardInfoByPage(Integer.valueOf(personId));
+		AjaxUtil.ajaxWriteObject(list, response);
+	}
+	
+	/*
+	 * 开卡
+	 */
+	@RequestMapping("/Card/bindCardInfo.do")
+	@ResponseBody
+	private void BindCardInfo()  {
+		OperateResult operateResult=new OperateResult();
+		BimCardDto bimCardDto=new BimCardDto();
+		StringBuffer sb=new StringBuffer(); 
+		String formdata=request.getParameter("formdata");
+		JSONObject jsonobj;
+		try {
+			jsonobj = new JSONObject(formdata);
+			if(jsonobj.has("subSystem")){
+				List<String> usesystemlist=new ArrayList<String>();
+				if(!(jsonobj.get("subSystem") instanceof JSONArray)){
+					usesystemlist.add((String)jsonobj.get("subSystem"));
+					jsonobj.put("subSystem", usesystemlist);
+				}
+			}
+			formdata=jsonobj.toString();
+			BimCardDto bimCarddata = JacksonUtil.toObject(formdata, BimCardDto.class);
+			if(bimCarddata.getSubSystem()!=null){
+				
+				int count=1;
+				for(String temp:bimCarddata.getSubSystem()){
+					sb.append(temp);
+					if(count<bimCarddata.getSubSystem().size()){
+						sb.append(",");
+						count++;
+					}
+				}
+				bimCardDto.setSubSystemStr(sb.toString());
+		}
+			bimCardDto.setCardStatus(0);
+			bimCardDto.setBimCompanyId(LoginInfo.getCompanyId());
+			bimCardDto.setCardId(bimCarddata.getCardId());
+	    	bimCardDto.setPersonId(bimCarddata.getPersonId());
+	    	bimCardService.insertCardInfo(bimCardDto);
+	    	operateResult.setResult(true);
+			operateResult.setMsg("开卡成功");
+			AjaxUtil.ajaxWriteObject(operateResult,bimCardDto,response);
+		} catch (JSONException e) {
+			
+			e.printStackTrace();
+			operateResult.setResult(false);
+			operateResult.setMsg("开卡失败");
+			
+		}
+		
+	}
+	
+	/*
+	 * 换卡
+	 */
+	@RequestMapping("/Card/updateswapCardInfo.do")
+	@ResponseBody
+	private void UpdateCardInfo() {
+		OperateResult operateResult=new OperateResult();
+		try{
+			String cardId=request.getParameter("cardId");
+			String bimCardId=request.getParameter("bimCardId");
+			bimCardService.updateCardInfo(Integer.valueOf(bimCardId),cardId);
+			operateResult.setResult(true);
+			operateResult.setMsg("换卡成功");
+		}catch (Exception e) {
+			e.printStackTrace();
+			operateResult.setResult(false);
+			operateResult.setMsg("换卡失败");
+		}
+		AjaxUtil.ajaxWrite(operateResult,response);
+		
+	}
+	/*
+	 * 挂失
+	 */
+	@RequestMapping("/Card/updatelossCardInfo.do")
+	@ResponseBody
+	private void UpdatelossCardInfo() {
+		OperateResult operateResult=new OperateResult();
+		Integer type=0;
+		try{
+			String bimCardId=request.getParameter("bimCardId");
+			bimCardService.updateStatusCardInfo(Integer.valueOf(bimCardId),type);
+			operateResult.setResult(true);
+			operateResult.setMsg("挂失成功");
+		}catch (Exception e) {
+			
+			e.printStackTrace();
+			operateResult.setResult(false);
+			operateResult.setMsg("挂失失败");
+		}
+		AjaxUtil.ajaxWrite(operateResult,response);
+		
+	}
+	
+	/*
+	 * 解挂
+	 */
+	@RequestMapping("/Card/updateunlossCardInfo.do")
+	@ResponseBody
+	private void UpdateunlossCardInfo() {
+		OperateResult operateResult=new OperateResult();
+		Integer type=1;
+		try{
+			String bimCardId=request.getParameter("bimCardId");
+			bimCardService.updateStatusCardInfo(Integer.valueOf(bimCardId),type);
+			operateResult.setResult(true);
+			operateResult.setMsg("解挂成功");
+		}catch (Exception e) {
+			
+			e.printStackTrace();
+			operateResult.setResult(false);
+			operateResult.setMsg("解挂失败");
+		}
+		AjaxUtil.ajaxWrite(operateResult,response);
+		
+	}
+	
+	/*
+	 * 退卡
+	 */
+	@RequestMapping("/Card/returnCardInfo.do")
+	@ResponseBody
+	private void ReturnCardInfo() {
+		OperateResult operateResult=new OperateResult();
+		//Integer type=1;
+		List<BimCard> list=null;
+		try{
+			String bimCardId=request.getParameter("bimCardId");
+			String personId=request.getParameter("personId");
+			bimCardService.deleteCardInfo(Integer.valueOf(bimCardId));
+			list=bimCardService.selectCardInfoByPage(Integer.valueOf(personId));
+			operateResult.setResult(true);
+			operateResult.setMsg("退卡成功");
+			
+		}catch (Exception e) {
+			
+			e.printStackTrace();
+			operateResult.setResult(false);
+			operateResult.setMsg("退卡失败");
+		}
+		AjaxUtil.ajaxWriteObject(operateResult,list, response);
+		
+	}
+	
+	/*
+	 * 身份管理
+	 */
+	@RequestMapping("/personnel/bimcate.do")
+	@ResponseBody
+	private void BimCateInfo() {
+		List<BimCate> bimCate=bimCateService.selectAllInfo(0);
+		AjaxUtil.ajaxWriteObject(bimCate,response);
+	}
+	
+	
+	/*
+	 * 添加身份管理		
+	 */
+	@RequestMapping("/personnel/addcate.do")
+	@ResponseBody
+	private void AddCate() {
+		OperateResult operateResult=new OperateResult();
+		BimCate bimCate=new BimCate();
+		try {
+			int count=bimCateService.selectRandom();//随机出来的身份信息custom1是0
+			bimCate.setCateName("新增身份"+(count+1));
+			bimCate.setCateType(0);
+			bimCate.setNote("无");
+			bimCate.setCustom1(0);
+			bimCate.setCreateTime(new Date());
+			bimCateService.insertCateInfo(bimCate);
+			operateResult.setResult(true);
+		} catch (Exception e) {
+			// TODO: handle exception
+			operateResult.setResult(false);
+			operateResult.setMsg("新增身份失败");
+		}
+		
+		AjaxUtil.ajaxWriteObject(operateResult,bimCate,response);
+		
+		
+		
+	}
+	/*
+	 * 修改身份管理信息
+	 */
+	@RequestMapping("/personnel/updatecate.do")
+	@ResponseBody
+	private void UpdateCate() {
+		OperateResult operateResult=new OperateResult();
+		try {
+			String bimCateId=request.getParameter("bimCateId");
+			String cateName=request.getParameter("cateName");
+			String note=request.getParameter("note");
+			BimCate bimCate=bimCateService.selectByCateName(cateName);
+			if(bimCate!=null&&bimCate.getBimCateId()!=Integer.valueOf(bimCateId)){
+				operateResult.setMsg("身份类型名称不能重复");
+				operateResult.setResult(false);
+				AjaxUtil.ajaxWrite(operateResult,response);
+				return ;
+			}
+			bimCateService.updateCateInfo(Integer.valueOf(bimCateId),cateName,note,new Date());
+			operateResult.setResult(true);
+			operateResult.setMsg("修改成功");
+			
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+			operateResult.setResult(false);
+			operateResult.setMsg("修改失败");
+		}
+		
+		AjaxUtil.ajaxWrite(operateResult,response);
+		
+	}
+	
+	/*
+	 * 删除身份信息 custom1=0 代表删除的信息
+	 */
+	@RequestMapping("/personnel/delcate.do")
+	@ResponseBody
+	private void DeleteCate() {
+		OperateResult operateResult=new OperateResult();
+		List<BimCate> bimCate=null;
+		try {
+			String bimCateId=request.getParameter("bimCateId");
+			List<Integer> list=bimCateService.selectByPersonId(Integer.valueOf(bimCateId));
+			bimCateService.deleteInfo(Integer.valueOf(bimCateId),list);
+			bimCate=bimCateService.selectAllInfo(0);
+			operateResult.setResult(true);
+			operateResult.setMsg("删除身份类型成功");
+			
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+			operateResult.setResult(false);
+			operateResult.setMsg("删除身份类型失败");
+		}
+		AjaxUtil.ajaxWriteObject(operateResult,bimCate,response);
+		
+	}
+	
+	
+}

@@ -1,0 +1,34 @@
+<%@ page contentType="text/html; charset=UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>ASSAS综合管理平台</title>
+  <!-- Tell the browser to be responsive to screen width -->
+  <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+  <!-- 加载一些公共的css文件 -->
+  <%@ include file="../../common/jsp/common_css.jsp"%>
+</head>
+<body class="hold-transition skin-blue-light  sidebar-mini layout-boxed">
+<div class="wrapper">
+	<%@ include file="../../common/jsp/top.jsp"%>
+	<%@ include file="basic_menu.jsp"%>
+	<!-- Content Wrapper. Contains page content -->
+	<div class="content-wrapper">
+	  <!-- Content Header (Page header) -->
+	  <section class="content-header">
+	    <h1>
+	  	    基础信息界面
+	    </h1>
+	    <ol class="breadcrumb">
+	      <li><a href="#"><i class="fa fa-home"></i> 基础信息主页</a></li>
+	    </ol>
+	  </section>
+	  </div>
+	<%@ include file="../../common/jsp/footer.jsp"%>
+	<%@ include file="../../common/jsp/sidebar.jsp"%>				  
+ </div>
+	<%@ include file="../../common/jsp/common_js.jsp"%> 
+</body>
+</html>

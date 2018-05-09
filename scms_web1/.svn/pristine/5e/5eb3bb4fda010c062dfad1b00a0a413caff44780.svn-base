@@ -1,0 +1,15 @@
+package com.wadejerry.scms.webservice.server.support.weixin;
+
+import com.wadejerry.scms.webservice.server.support.CommonResult;
+
+/**
+* 扫码支付返回结果 
+* @ClassName: ScanCodePayResult
+* @Description: TODO
+* @author zhanying
+* @date 2017年6月19日 上午8:51:08
+*
+ */
+public class ScanCodePayResult extends CommonResult {
+
+}

@@ -1,0 +1,81 @@
+package com.wadejerry.scms.webservice.server;
+
+import org.springframework.stereotype.Component;
+
+import com.wadejerry.scms.webservice.server.support.weixin.ParkInfoResult;
+import com.wadejerry.scms.webservice.server.support.weixin.PayInfoResult;
+import com.wadejerry.scms.webservice.server.support.weixin.QRCodePayResult;
+import com.wadejerry.scms.webservice.server.support.weixin.QRCodeResult;
+import com.wadejerry.scms.webservice.server.support.weixin.ScanCodePayResult;
+import com.wadejerry.scms.webservice.server.support.weixin.dto.ParkInfoDto;
+
+/**
+* 
+* @ClassName: WeixinService
+* @Description: 关于微信的webService接口
+* @author zhanying
+* @date 2017年6月16日 下午3:58:23
+*
+ */
+@Component("weixinService")
+public class WeixinService {
+
+	/** 
+	* 获取车辆停车信息
+	* @author zhanying 2017年6月16日 下午4:03:46
+	* @param  @param carNum
+	* @param  @param clientName
+	* @param  @return 
+	* @modificationHistory=========================逻辑或功能性重大变更记录
+	* @modify by user: 
+	* @modify by reason:
+	 */
+	public ParkInfoResult GetParkInfoByCarNum (String carNum,String clientName) {
+		
+		return  null;
+	}
+	
+	/**
+	* 获取支付二维码
+	* @author zhanying 2017年6月16日 下午4:08:31
+	* @param  @param carNum
+	* @param  @param clientName
+	* @param  @return 
+	* @modificationHistory=========================逻辑或功能性重大变更记录
+	* @modify by user: 33333333
+	* @modify by reason:
+	 */
+	public QRCodeResult GetPayQRCodeByCarNum(String carNum, String clientName){
+		return null;		
+	}
+	
+	/**
+	* 扫码支付
+	* @author zhanying 2017年6月16日 下午4:37:57
+	* @param  @param sessionId
+	* @param  @param boothId
+	* @param  @param parkInfoDto
+	* @param  @return 
+	* @modificationHistory=========================逻辑或功能性重大变更记录
+	* @modify by user: 
+	* @modify by reason:
+	 */
+	public ScanCodePayResult ScanCodePay(String sessionId,int boothId,ParkInfoDto parkInfoDto){
+		 return null;
+	}
+	
+	/**
+	* 查询二维码支付结果
+	* @author zhanying 2017年6月16日 下午4:43:08
+	* @param  @param orderId  订单号
+	* @param  @return 
+	* @modificationHistory=========================逻辑或功能性重大变更记录
+	* @modify by user: 
+	* @modify by reason:
+	 */
+	public QRCodePayResult QueryQRCodePayResult(int orderId) {
+		return null;
+	}
+	
+	
+}

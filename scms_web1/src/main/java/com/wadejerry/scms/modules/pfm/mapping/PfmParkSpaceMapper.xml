@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.wadejerry.scms.modules.pfm.dao.PfmParkSpaceMapper">
+	<resultMap id="BaseResultMap"
+		type="com.wadejerry.scms.modules.pfm.model.PfmParkSpace">
+		<id column="pfm_park_space" property="pfmParkSpace" jdbcType="INTEGER" />
+		<result column="pfm_parking_lot_id" property="pfmParkingLotId"
+			jdbcType="INTEGER" />
+		<result column="park_space_code" property="parkSpaceCode"
+			jdbcType="VARCHAR" />
+		<result column="status" property="status" jdbcType="SMALLINT" />
+		<result column="note" property="note" jdbcType="VARCHAR" />
+		<result column="last_use_time" property="lastUseTime" jdbcType="TIMESTAMP" />
+		<result column="last_use_car" property="lastUseCar" jdbcType="INTEGER" />
+		<result column="inset_time" property="insetTime" jdbcType="TIMESTAMP" />
+		<result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+		<result column="user_name" property="userName" jdbcType="VARCHAR" />
+	</resultMap>
+	<sql id="Base_Column_List">
+		pfm_park_space, pfm_parking_lot_id, park_space_code, status, note, last_use_time,
+		last_use_car, inset_time, update_time, user_name
+	</sql>
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap"
+		parameterType="java.lang.Integer">
+		select
+		<include refid="Base_Column_List" />
+		from pfm_park_space
+		where pfm_park_space = #{pfmParkSpace,jdbcType=INTEGER}
+	</select>
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+		delete from pfm_park_space
+		where pfm_park_space = #{pfmParkSpace,jdbcType=INTEGER}
+	</delete>
+	<insert id="insert" parameterType="com.wadejerry.scms.modules.pfm.model.PfmParkSpace">
+		insert into pfm_park_space (pfm_park_space, pfm_parking_lot_id,
+		park_space_code,
+		status, note, last_use_time,
+		last_use_car, inset_time, update_time,
+		user_name)
+		values (#{pfmParkSpace,jdbcType=INTEGER},
+		#{pfmParkingLotId,jdbcType=INTEGER},
+		#{parkSpaceCode,jdbcType=VARCHAR},
+		#{status,jdbcType=SMALLINT}, #{note,jdbcType=VARCHAR}, #{lastUseTime,jdbcType=TIMESTAMP},
+		#{lastUseCar,jdbcType=INTEGER}, #{insetTime,jdbcType=TIMESTAMP},
+		#{updateTime,jdbcType=TIMESTAMP},
+		#{userName,jdbcType=VARCHAR})
+	</insert>
+	<insert id="insertSelective" parameterType="com.wadejerry.scms.modules.pfm.model.PfmParkSpace">
+		insert into pfm_park_space
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="pfmParkSpace != null">
+				pfm_park_space,
+			</if>
+			<if test="pfmParkingLotId != null">
+				pfm_parking_lot_id,
+			</if>
+			<if test="parkSpaceCode != null">
+				park_space_code,
+			</if>
+			<if test="status != null">
+				status,
+			</if>
+			<if test="note != null">
+				note,
+			</if>
+			<if test="lastUseTime != null">
+				last_use_time,
+			</if>
+			<if test="lastUseCar != null">
+				last_use_car,
+			</if>
+			<if test="insetTime != null">
+				inset_time,
+			</if>
+			<if test="updateTime != null">
+				update_time,
+			</if>
+			<if test="userName != null">
+				user_name,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="pfmParkSpace != null">
+				#{pfmParkSpace,jdbcType=INTEGER},
+			</if>
+			<if test="pfmParkingLotId != null">
+				#{pfmParkingLotId,jdbcType=INTEGER},
+			</if>
+			<if test="parkSpaceCode != null">
+				#{parkSpaceCode,jdbcType=VARCHAR},
+			</if>
+			<if test="status != null">
+				#{status,jdbcType=SMALLINT},
+			</if>
+			<if test="note != null">
+				#{note,jdbcType=VARCHAR},
+			</if>
+			<if test="lastUseTime != null">
+				#{lastUseTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="lastUseCar != null">
+				#{lastUseCar,jdbcType=INTEGER},
+			</if>
+			<if test="insetTime != null">
+				#{insetTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="updateTime != null">
+				#{updateTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="userName != null">
+				#{userName,jdbcType=VARCHAR},
+			</if>
+		</trim>
+	</insert>
+	<update id="updateByPrimaryKeySelective" parameterType="com.wadejerry.scms.modules.pfm.model.PfmParkSpace">
+		update pfm_park_space
+		<set>
+			<if test="pfmParkingLotId != null">
+				pfm_parking_lot_id = #{pfmParkingLotId,jdbcType=INTEGER},
+			</if>
+			<if test="parkSpaceCode != null">
+				park_space_code = #{parkSpaceCode,jdbcType=VARCHAR},
+			</if>
+			<if test="status != null">
+				status = #{status,jdbcType=SMALLINT},
+			</if>
+			<if test="note != null">
+				note = #{note,jdbcType=VARCHAR},
+			</if>
+			<if test="lastUseTime != null">
+				last_use_time = #{lastUseTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="lastUseCar != null">
+				last_use_car = #{lastUseCar,jdbcType=INTEGER},
+			</if>
+			<if test="insetTime != null">
+				inset_time = #{insetTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="updateTime != null">
+				update_time = #{updateTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="userName != null">
+				user_name = #{userName,jdbcType=VARCHAR},
+			</if>
+		</set>
+		where pfm_park_space = #{pfmParkSpace,jdbcType=INTEGER}
+	</update>
+	<update id="updateByPrimaryKey" parameterType="com.wadejerry.scms.modules.pfm.model.PfmParkSpace">
+		update pfm_park_space
+		set pfm_parking_lot_id = #{pfmParkingLotId,jdbcType=INTEGER},
+		park_space_code = #{parkSpaceCode,jdbcType=VARCHAR},
+		status = #{status,jdbcType=SMALLINT},
+		note = #{note,jdbcType=VARCHAR},
+		last_use_time = #{lastUseTime,jdbcType=TIMESTAMP},
+		last_use_car = #{lastUseCar,jdbcType=INTEGER},
+		inset_time = #{insetTime,jdbcType=TIMESTAMP},
+		update_time = #{updateTime,jdbcType=TIMESTAMP},
+		user_name = #{userName,jdbcType=VARCHAR}
+		where pfm_park_space = #{pfmParkSpace,jdbcType=INTEGER}
+	</update>
+
+
+	<select id="selectParkSpacelistByparkinglotid" resultMap="BaseResultMap"
+		parameterType="int">
+
+		select *
+		from pfm_park_space
+		where pfm_parking_lot_id=#{pfmParkingLotId,jdbcType=INTEGER}
+		order by park_space_code asc;
+
+
+	</select>
+
+	<select id="selectBycarInfoId" resultType="com.wadejerry.scms.modules.pfm.model.PfmParkSpace"
+		parameterType="int">
+
+		select b.pfm_park_space pfmParkSpace,b.park_space_code parkSpaceCode
+		from pfm_park_space_car_rel a ,pfm_park_space b
+		where a.pfm_park_space=b.pfm_park_space
+		And a.car_info_id=#{carinfoid,jdbcType=INTEGER}
+
+	</select>
+	
+	<select id="selectCountByLotNameAndCode" resultType="int">
+
+		select count(pfm_park_space)
+		from pfm_park_space a
+		left join pfm_parking_lot b on a.pfm_parking_lot_id=b.pfm_parking_lot_id
+		where a.park_space_code=#{code}
+		and b.parking_lot_name=#{lotname}
+		and b.bim_company_id=#{companyid}
+		
+	</select>
+	<select id="selectIdBYLotNameAndCode" resultType="int">
+
+		select pfm_park_space
+		from pfm_park_space a
+		left join pfm_parking_lot b on a.pfm_parking_lot_id=b.pfm_parking_lot_id
+		where a.park_space_code=#{code}
+		and b.parking_lot_name=#{lotname}
+		and b.bim_company_id=#{companyid}
+		
+	</select>
+</mapper>

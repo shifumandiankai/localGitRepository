@@ -1,0 +1,531 @@
+var wade = wade || {};
+wade.role = wade.role || {};
+var config1 = new Object();//充值对象
+var config2 = new Object();//退款对象
+//存信息的数组
+var arr=new Array(7);
+
+//用于储存模糊查询的数组
+var arrdata=new Array();
+
+
+window.onload = function(){
+	typeahead();
+};
+
+//判断是否查询过
+if($("#record:has(li)").length==0){
+	
+	$("#charge").attr("disabled",true);
+	$("#return").attr("disabled",true);
+	$("#errorreturn").attr("disabled",true);
+
+}
+
+
+
+
+//充值成功信息
+function ChargeSuccess(){
+	var moneyval=$('#cmoney').val();//操作金额
+	var devClone = $("#successModal");
+	if($('#valuediv').is(':hidden')){
+    	devClone.find('#sucbeforet').show();
+    	devClone.find('#sucaftert').show();
+    	devClone.find('#sucbeforem').hide();
+    	devClone.find('#sucafterm').hide();
+    		
+	}else{
+		devClone.find('#sucbeforet').hide();
+    	devClone.find('#sucaftert').hide();
+    	devClone.find('#sucbeforem').show();
+    	devClone.find('#sucafterm').show();
+
+	}
+	devClone.modal('show');
+	$("#exampleModal").modal('hide');
+	$("#peoplecsuccess").text(arr[0]);
+	//充值
+	$.ajax({
+		url:'/account/chargeMoney.do',
+		data:{money:moneyval,cardid:arr[4],carInfoId:arr[5],beforemoney:arr[1],bqmoney:arr[2],beforedistime:arr[6]},
+		dataType:'json',
+		type:'post',
+		async : false,//设置为同步操作就可以给全局变量赋值成功 
+		success:function(data){
+		var result = eval(data);
+		$('#chargebeforemoney').text(arr[1]);
+		//$('#chargebeforemoney').text(result.fee);
+		$('#chargetime').text(result.strTime);
+		$('#chargeaftermoney').text(result.lastFee);
+		$('#chargemoney').text(moneyval);
+		$('#strDisableTime').text(result.disableTime);
+		$('#bdvalue1').text(result.lastFee);
+		$('#beforedistime').text(arr[6]);    
+		$('#afterdistime').text(result.strDisableTime);
+		//清空arr数据元素
+		if(arr.length!=0){
+			arr.length=0;
+		}
+		
+		arr.push(result.personName);
+		arr.push(result.lastFee);
+		arr.push(result.bqmoney);
+		arr.push(result.cardCode);
+		arr.push(result.cardId);
+		arr.push(result.carId);
+		arr.push(result.disableTime);
+		//AppandInfo();
+		}
+		
+	});
+	AppandInfo();
+	selectInfo();
+}
+//充值信息
+$("#charge").click(function(){
+	var val=$("#cmoney").val();
+	var devClone = $("#exampleModal");
+	devClone.find('#people').text(arr[0]);
+	devClone.find('#chargeMoneyNotice').hide();
+	devClone.find('#cmoney').attr('style','');
+    if($('#valuediv').is(':hidden')){
+    	devClone.find('#devdisabled').show();
+    	devClone.find('#devvalue').hide();
+    	devClone.find('#distime').text(arr[6]);
+    	if(val==""){
+    		$("#cmoney").attr('placeholder','请输入值为'+arr[2]+'的倍数');
+    	}
+    	else{ 
+    		$("#cmoney").val("");
+    		$("#cmoney").removeAttr('placeholder');
+    		$("#cmoney").attr('placeholder','请输入值为'+arr[2]+'的倍数');
+    	}
+    	
+	}else{
+		$("#cmoney").val("");
+		devClone.find('#devdisabled').hide();
+    	devClone.find('#devvalue').show();
+    	devClone.find('#chargelf').text(arr[1]);
+    	$("#cmoney").attr('placeholder','请输入要充值的金额');
+	}
+	
+	
+	devClone.modal('show');
+	
+});
+
+//退款信息
+$("#return").click(function(){
+	
+	var val=$("#tmoney").val();
+	var devClone = $("#exampleReturnModal");
+	devClone.find('#ReturnMoneyNotice').hide();
+	devClone.find('#tmoney').attr('style','');
+	devClone.find('#people').text(arr[0]);
+	devClone.find('#chargelf').text(arr[1]);
+	if(val=''){
+		$("#tmoney").attr('placeholder','请输入要退款的金额');
+	}
+	else{
+		$("#tmoney").val("");
+		$("#tmoney").attr('placeholder','请输入要退款的金额');
+	}
+	//$("#tmoney").attr('placeholder','请输入要退款的金额');
+	devClone.modal('show');
+});
+
+
+//退款成功后信息
+function ReturnSuccess(){
+	var moneyval=$('#tmoney').val();
+	
+	//var idval=arr[3];
+	var devClone = $("#returnsuccessModal");
+	//
+	//$("#exampleReturnModal").modal('hide');
+	$("#peoplesuccess").text(arr[0]);
+	$("#returnbeforemoney").text(arr[1]);
+	//退款
+	$.ajax({
+		url:'/account/returnMoney.do',
+		data:{money:moneyval,cardcode:arr[4],carInfoId:arr[5],beforemoney:arr[1]},
+		dataType:'json',
+		type:'post',
+		async : false,//设置为同步操作就可以给全局变量赋值成功 
+		success:function(data){
+			
+		var result = eval(data);
+		//console.log(result);
+		if(result.success!=undefined){
+			$("#ReturnMoneyNotice").html('<span class="point-box errorbgTop dropdown" id="chargeerror"><i class="sprite icon_arrow_up2 pa"></i>'+result.msg+'</span>').show();
+			$("#cmoney").css('border','1px solid red');
+			return;
+		}else{
+			$("#exampleReturnModal").modal('hide');
+			devClone.modal('show');
+			$("#returntime").text(result.strTime);//退款后时间
+			$('#returnaftermoney').text(result.lastFee);//退款后金额
+			$("#returnmoney").text(result.fee);//本次退款金额
+			$('#bdvalue1').text(result.lastFee);//余额(显示)
+			//清空arr数据元素
+			if(arr.length!=0){
+				arr.length=0;
+			}
+
+			arr.push(result.personName);
+			arr.push(result.lastFee);//余额
+			arr.push(0);//包起金额为0
+			arr.push(result.cardCode);
+			arr.push(result.cardId);
+			arr.push(result.carId);
+			AppandInfo();
+		}
+		
+		
+		}
+		
+	});
+}
+
+//追加账户记录
+function AppandInfo(){
+	//查询账户信息
+	//把账户记录里面的元素删除
+	var selectRecord=$("[name='accountLog']");
+	selectRecord.html('');
+	$.ajax({
+		url:'/account/selectrecording.do',
+		data:{cardid:arr[5]},
+		dataType:'json',
+		type:'post',
+		//async : false,//设置为同步操作就可以给全局变量赋值成功 
+		success:function(data){
+		var result = eval(data);
+			
+			if(result!=null){
+				$.each(result,function(index,value){
+					
+					if(value.typeId=='0'){
+						//alert(arr[4]);
+						//selectRecord.append('<div class="account-log-unit"><div class="log-title"><label class="log-date">'+value.strTime+'</label><label class="log-amount" text-align:right>+'+value.sfee+'</label></div><div class="log-remark">账户卡号('+arr[4]+') 充值  [备注：无]</div></div>');
+						selectRecord.append('<div class="account-log-unit"><div class="log-title"><label class="log-date">'+value.strTime+'</label><label class="log-amount" text-align:right>+'+value.fee+'</label></div><div class="log-remark">账户卡号('+arr[4]+') 充值    [备注:无]</div></div>');
+					}
+					else{
+						selectRecord.append('<div class="account-log-unit"><div class="log-title"><label class="log-date">'+value.strTime+'</label><label class="log-amount" text-align:right>-'+value.fee+'</label></div><div class="log-remark">账户卡号('+arr[4]+') 退款    [备注:无]</div></div>');
+						//selectRecord.append('<div class="account-log-unit"><div class="log-title"><label class="log-date">'+value.strTime+'</label><label class="log-amount" text-align:right>-'+value.sfee+'</label></div><div class="log-remark">账户卡号('+arr[4]+') 退款  [备注：无]</div></div>');
+					}
+					
+					
+				});	
+					
+			}
+		}
+		
+	});
+}
+
+
+//查询所有记录
+function selectInfo(){
+	
+	if(arr.length!=0){
+		arr.length=0;
+	}
+	var selectinfo=$.trim($("#selectinfo option:selected").val());
+	var selectval=$.trim($("#select").val());
+	$.ajax({
+		url:'/account/selectaccountid.do',
+		data:{selectinfo:selectinfo,selectval:selectval},
+		dataType:'json',
+		type:'post',
+		async : false,//设置为同步操作就可以给全局变量赋值成功 
+		success:function(data){
+			
+			 var result = eval(data);
+			//var result = JSON.parse(data);
+		   
+			if(result.success){
+				
+				if(result.object.baoqiType=='储值用户'){
+					$('#valuediv').show();
+					$('#disableddiv').hide();
+					$("#return").attr("disabled",false);
+				}
+				else{
+					$('#valuediv').hide();
+					$('#disableddiv').show();
+					$("#return").attr("disabled",true);
+				}
+				
+				arr[0]=result.object.personName;//姓名
+				arr[1]=result.object.bdvalue1;//余额
+				arr[2]=result.object.intbqMoney;//保期金额
+				arr[3]=result.object.cardCode;
+				arr[4]=result.object.cardId;				
+				arr[5]=result.object.carInfoId;//carid
+				arr[6]=result.object.strDisableTime;//到期时间
+				//显示被隐藏的按钮
+				$("#charge").attr("disabled",false);
+				//$("#return").attr("disabled",false);
+				$("#errorreturn").attr("disabled",false);
+				$.each(result.object,function(index,value){
+					
+					$("#"+index).text(value);
+				});
+			}
+			else{
+				//alert(0);
+				msg=result.msg;
+				$("#cardIdNotice").html('<span class="point-box errorbgTop dropdown"  ><i class="sprite icon_arrow_up2 pa"></i>' + msg + '</span>').show();
+				
+				$("#charge").attr("disabled",true);
+				$("#return").attr("disabled",true);
+				$("#errorreturn").attr("disabled",true);
+				$("#select").val("");//搜索框
+				$("#personName").text("");//姓名
+				$("#cardId").text("");//卡号
+				$("#carNumber").text("");//车牌号
+				$("#bdvalue1").text("");//余额
+				$("#typeName").text("");//类别名称
+				$("#strDisableTime").text("");//到期日期
+				$("#note").text("");//备注
+				$("#baoqiType").text("");//包期类型
+				
+				
+			}
+			
+			
+		}
+	});
+	 
+}
+
+
+//点击查询按钮
+function selectButton(){
+		selectInfo();
+       if(arr[5]!=null){
+			
+			AppandInfo();
+		}
+		else{
+			
+			var selectRecord=$("[name='accountLog']");
+			selectRecord.html('');
+		}
+		
+		
+		
+	
+}
+
+
+
+
+//账户ID验证
+$("#select").on('focus',function(){
+	 $("#cardIdNotice").hide();
+});
+
+//改变option时text为空
+$("#selectinfo").on('change',function(){
+	$("#select").val("");
+});
+
+$('#select').bind('input propertychange',function(){
+	typeahead();
+});
+//加载typeahead插件并且赋值
+function typeahead(){
+	//alert(0);
+	if(arrdata.length!=0){
+		arrdata.length=0;
+	}
+	var selectinfo=$("#selectinfo option:selected").val();
+	var selectvalue=$('#select').val();
+	 //alert(selectinfo);
+	 var arr=new Array();
+	 $.ajax({  
+	    url : '/GetSelectData.do',  
+	    type : 'post',  
+	    dataType : 'json',  
+	    data : {selectinfo:selectinfo,selectvalue:selectvalue},  
+	      
+	   success: function( data ) {  
+		   var result = eval(data);
+		   $.each(result,function(index,value){
+			   arrdata[index]=value;
+		   });
+	       $('#select').typeahead({source: arrdata,matcher:function(){return true;}}) ;
+	   }
+	});
+};
+
+
+//获取焦点
+$("#tmoney").on('focus',function(){
+	$("#ReturnMoneyNotice").hide();
+	
+});
+
+$("#cmoney").on('focus',function(){
+	$("#chargeMoneyNotice").hide();
+	
+});
+
+/*$("#tmoney").blur(function(){
+	alert(0);
+});*/
+
+$("#success").click(registerCharge);//绑定充值事件
+//充值校验	
+function registerCharge(event){
+	$("#chargeMoneyNotice").html(" ");
+	var cval=$("#cmoney").val();
+	if(!$('#valuediv').is(':hidden')){
+		//储值用户
+		var re1=/^(0|[1-9]\d*)$/;
+		var re2=/^(([1-9]+)|([0-9]+\.[0-9]{1,2}))$/;
+		if(cval==''){
+			$("#chargeMoneyNotice").html('<span class="point-box errorbgTop dropdown" id="chargeerror"><i class="sprite icon_arrow_up2 pa"></i>输入金额不能为空</span>').show();
+			$("#cmoney").css('border','1px solid red');
+			event.stopImmediatePropagation(); //阻止提交数据
+			 return false;
+		}
+		if(!re1.test(cval)&&!re2.test(cval)){
+			$("#chargeMoneyNotice").html('<span class="point-box errorbgTop dropdown" id="chargeerror"><i class="sprite icon_arrow_up2 pa"></i>充值金额数最多不能超过小数点后两位</span>').show();
+			$("#cmoney").css('border','1px solid red');
+			event.stopImmediatePropagation(); //阻止提交数据
+			 return false;
+		}
+		if(!re2.test(cval)){
+			$("#chargeMoneyNotice").html('<span class="point-box errorbgTop dropdown" id="chargeerror"><i class="sprite icon_arrow_up2 pa"></i>输入正确格式,如:20.00</span>').show();
+			$("#cmoney").css('border','1px solid red');
+			event.stopImmediatePropagation(); //阻止提交数据
+			 return false;
+		}
+		if(cval>10000){
+			$("#chargeMoneyNotice").html('<span class="point-box errorbgTop dropdown" id="chargeerror"><i class="sprite icon_arrow_up2 pa"></i>充值金额最多不能超过1万</span>').show();
+			$("#cmoney").css('border','1px solid red');
+			event.stopImmediatePropagation(); //阻止提交数据
+			 return false;
+		}
+	}
+	else{
+		//包期用户
+		var re=/^[1-9]\d*$/;
+		
+		if(!re.test(cval)||cval==''||cval%arr[2]!=0){
+			
+			$("#chargeMoneyNotice").html('<span class="point-box errorbgTop dropdown" id="chargeerror"><i class="sprite icon_arrow_up2 pa"></i>请输入值是' + arr[2]+ '的正整数倍数</span>').show();
+			$("#cmoney").css('border','1px solid red');
+			  
+			event.stopImmediatePropagation(); //阻止提交数据
+			 return false;
+		}
+		
+		if(cval>10000){
+			$("#chargeMoneyNotice").html('<span class="point-box errorbgTop dropdown" id="chargeerror"><i class="sprite icon_arrow_up2 pa"></i>充值金额最多不能超过1万</span>').show();
+			$("#cmoney").css('border','1px solid red');
+			event.stopImmediatePropagation(); //阻止提交数据
+			 return false;
+		}
+	}
+	
+
+		ChargeSuccess();
+		
+	
+}
+
+
+
+
+/*$("#returnsuccess").click(function(){
+		ReturnSuccess();
+});*/
+
+
+$("#returnsuccess").click(registerReturn);//绑定退款事件
+//退款校验
+function registerReturn(event){
+	$("#ReturnMoneyNotice").html(" ");
+	var cval=$("#tmoney").val();
+		var re1=/^(0|[1-9]\d*)$/;
+	    var re2=/^(([1-9]+)|([0-9]+\.[0-9]{1,2}))$/;
+		if(cval==''){
+			$("#ReturnMoneyNotice").html('<span class="point-box errorbgTop dropdown" id="chargeerror"><i class="sprite icon_arrow_up2 pa"></i>输入金额不能为空</span>').show();
+			$("#tmoney").css('border','1px solid red');
+			event.stopImmediatePropagation(); //阻止提交数据
+			 return false;
+		}
+		if(!re1.test(cval)&&!re2.test(cval)){
+			$("#ReturnMoneyNotice").html('<span class="point-box errorbgTop dropdown" id="chargeerror"><i class="sprite icon_arrow_up2 pa"></i>退款金额数最多不能超过小数点后两位</span>').show();
+			$("#tmoney").css('border','1px solid red');
+			event.stopImmediatePropagation(); //阻止提交数据
+			 return false;
+		}
+		if(!re2.test(cval)){
+			$("#ReturnMoneyNotice").html('<span class="point-box errorbgTop dropdown" id="chargeerror"><i class="sprite icon_arrow_up2 pa"></i>输入正确格式,如:20.00</span>').show();
+			$("#tmoney").css('border','1px solid red');
+			event.stopImmediatePropagation(); //阻止提交数据
+			 return false;
+		}
+		
+		
+		if(cval>10000){
+			$("#ReturnMoneyNotice").html('<span class="point-box errorbgTop dropdown" id="chargeerror"><i class="sprite icon_arrow_up2 pa"></i>退款金额最多不能超过1万</span>').show();
+			$("#tmoney").css('border','1px solid red');
+			event.stopImmediatePropagation(); //阻止提交数据
+			 return false;
+		}
+		
+	
+	
+		ReturnSuccess();
+		
+	
+	
+}
+$("#selectphone").click(registerSelect);//绑定查询事件
+//查询校验
+function registerSelect(event){
+	
+	var val=$.trim($("#select").val());
+	var re=/^1[3|4|5|8][0-9]\d{4,8}$/;
+	if(!RegExpObj.isCarNum(val)){
+		//alert(0);
+		msg='您车牌号格式不正确';
+		$("#cardIdNotice").html('<span class="point-box errorbgTop dropdown"><i class="sprite icon_arrow_up2 pa"></i>' + msg + '</span>').show();
+		event.stopImmediatePropagation(); //阻止提交数据
+		 return false;
+	}
+		selectButton();
+	
+}
+
+//点击因错查询按钮
+$("#errorreturn").click(function(){
+	dataTable(config1);
+	dataTable(config2);
+	var devClone = $("#failreturnModal");
+	devClone.modal('show');
+	
+	
+});
+
+//关闭model层
+$("#failreturnModal").on('hide.bs.modal',function(){
+	$('#rechargeexample').dataTable().fnDestroy(); //销毁dataTable重新加载
+	$('#leaveexample').dataTable().fnDestroy(); //销毁dataTable重新加载
+});
+//
+
+//为config赋值
+//充值赋值
+config1.id="rechargeexample";
+config1.typeId=0;
+//config1.getUrl = "/account/getAccountInfo.do"; // ajax获取数据请求地址
+//需要绑定数据的列
+config1.columns = new Array("pfmFeeRecId", "personName", "carInfoCode","bdbeforefee", "bdfee", "bdlastfee", "time","userName");

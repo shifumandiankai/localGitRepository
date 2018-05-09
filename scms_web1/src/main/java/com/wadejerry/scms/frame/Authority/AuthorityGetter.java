@@ -1,0 +1,285 @@
+package com.wadejerry.scms.frame.Authority;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import com.wadejerry.scms.frame.entity.LoginInfo;
+import com.wadejerry.scms.modules.auth.dao.BimRoleDeptAuthMapper;
+import com.wadejerry.scms.modules.auth.dao.BimUserMapper;
+import com.wadejerry.scms.modules.auth.dao.BimUserRoleMapper;
+import com.wadejerry.scms.modules.auth.dto.UserRoleRelDto;
+import com.wadejerry.scms.modules.auth.model.BimUser;
+import com.wadejerry.scms.modules.pfm.dao.PfmCarTypeMapper;
+import com.wadejerry.scms.modules.pfm.dao.PfmEntranceMapper;
+import com.wadejerry.scms.modules.pfm.dao.pfmBoothMapper;
+import com.wadejerry.scms.modules.pfm.model.PfmCarType;
+import com.wadejerry.scms.modules.pfm.model.PfmEntrance;
+@Component("authorityGetter")
+public class AuthorityGetter {
+	@Autowired
+	private  BimUserRoleMapper bimUserRoleMapper;
+	@Autowired
+	private  BimUserMapper userMapper;
+	@Autowired
+	private PfmCarTypeMapper carTypeMapper;
+	@Autowired
+	private PfmEntranceMapper entranceMapper;
+	@Autowired
+	private pfmBoothMapper boothMapper;
+	@Autowired
+	private BimRoleDeptAuthMapper authMapper;
+	
+	/**
+	 * 查询车辆权限
+	 * @return
+	 * 如果是企业管理员，返回null,其他人员返回integer集合
+	 */
+	public  List<Integer> carTypeAuth(){
+		List<Integer> carTypeIds = null;
+		if(LoginInfo.isCompanyManager()){
+			
+		}else{
+			
+		List<UserRoleRelDto> userroles=	bimUserRoleMapper.selectUserRoleDtoByUserId(LoginInfo.getLoginId());
+		carTypeIds =new ArrayList<>();
+		for(UserRoleRelDto temp:userroles){
+			BimUser user = userMapper.selectByPrimaryKey(temp.getRoleId());
+			if(user!=null){
+				if(user.getCustom3()!=null&&user.getCustom3().length()!=0){
+					List<String> list=Arrays.asList(user.getCustom3().split(","));
+					for(String temp1:list){
+						carTypeIds.add(Integer.parseInt(temp1));
+					}
+				}
+			}
+
+		}
+		}
+		return carTypeIds;
+	}
+	/**
+	 * 查询出入口权限
+	 * @return
+	 * 如果是企业管理员，返回null,其他人员返回integer集合
+	 */
+
+	public  List<Integer> churuKouAuth(){
+		
+		List<Integer> entrances =  null;
+		if(LoginInfo.isCompanyManager()){
+			
+		}else{
+		 List<UserRoleRelDto> userroles=	bimUserRoleMapper.selectUserRoleDtoByUserId(LoginInfo.getLoginId());
+		 entrances =new ArrayList<>();
+			for(UserRoleRelDto temp:userroles){
+				BimUser user = userMapper.selectByPrimaryKey(temp.getRoleId());
+				if(user!=null){
+					if(user.getCustom4()!=null&&user.getCustom4().length()!=0){
+						List<String> list=Arrays.asList(user.getCustom4().split(","));
+						for(String temp1:list){
+							temp1=temp1.substring(1);
+							entrances.add(Integer.parseInt(temp1));
+						}
+					}
+				}
+
+			}
+		}
+			return entrances;
+	} 
+	/**
+	 * 查询岗亭权限
+	 * @return
+	 * 如果是企业管理员，返回null,其他人员返回integer集合
+	 */
+
+	public  List<Integer> gangtingAuth(){
+		
+		List<Integer> gangting =  null;
+		if(LoginInfo.isCompanyManager()){
+			
+		}else{
+			gangting = new ArrayList<>();
+			gangting.addAll(boothMapper.selectBoothIdByEntranceIds(churuKouAuth(), LoginInfo.getCompanyId()));
+		}
+			return gangting;
+	}
+	/**
+	 * 查询车场权限
+	 * @return
+	 * 如果是企业管理员，返回null,其他人员返回integer集合
+	 */
+	public  List<Integer> parkAuth(){
+		List<Integer> park =  null;
+		Set<Integer> set=new HashSet<Integer>();
+		PfmCarType carType=null;
+		List<PfmEntrance> entrancelist=null;
+		if(LoginInfo.isCompanyManager()){
+			
+		}else{
+			List<Integer> carTypeList=carTypeAuth();
+			List<Integer> entranceList=churuKouAuth();
+			if(!(carTypeList.size()==0&&entranceList.size()==0)){
+				for(Integer typeId:carTypeList){
+					carType=carTypeMapper.selectByPrimaryKey(typeId);
+					if(carType!=null){
+						set.add(carType.getCustom1());
+					}
+				}
+				
+				for(Integer entranceId:entranceList){
+					entrancelist=entranceMapper.selectInfoByPfmEntranceId(entranceId);
+					if(entrancelist.size()>0){
+						//entrancelist.get(0).getParkId();
+						set.add(entrancelist.get(0).getParkId());
+					}
+				}
+				
+				
+				
+			}
+			
+			park=new ArrayList<Integer>(set);
+			
+		}
+		return park;
+		
+	}
+	
+	
+	
+	////webservice中使用
+	/**
+	 * 查询车辆权限，webservice中使用
+	 * @return
+	 * 如果是企业管理员，返回null,其他人员返回integer集合
+	 */
+	public  List<Integer> carTypeAuth(boolean isManager,Integer loginId,Integer companyId){
+		List<Integer> carTypeIds = null;
+		if(isManager){
+			
+		}else{
+			
+		List<UserRoleRelDto> userroles=	bimUserRoleMapper.selectUserRoleDtoByUserId(loginId);
+		carTypeIds =new ArrayList<>();
+		for(UserRoleRelDto temp:userroles){
+			BimUser user = userMapper.selectByPrimaryKey(temp.getRoleId());
+			if(user!=null){
+				if(user.getCustom3()!=null&&user.getCustom3().length()!=0){
+					List<String> list=Arrays.asList(user.getCustom3().split(","));
+					for(String temp1:list){
+						carTypeIds.add(Integer.parseInt(temp1));
+					}
+				}
+			}
+
+		}
+		}
+		return carTypeIds;
+	}
+	/**
+	 * 查询出入口权限，webservice中使用
+	 * @return
+	 * 如果是企业管理员，返回null,其他人员返回integer集合
+	 */
+
+	public  List<Integer> churuKouAuth(boolean isManager,Integer loginId,Integer companyId){
+		
+		List<Integer> entrances =  null;
+		if(isManager){
+			
+		}else{
+		 List<UserRoleRelDto> userroles=	bimUserRoleMapper.selectUserRoleDtoByUserId(loginId);
+		 entrances =new ArrayList<>();
+			for(UserRoleRelDto temp:userroles){
+				BimUser user = userMapper.selectByPrimaryKey(temp.getRoleId());
+				if(user!=null){
+					if(user.getCustom4()!=null&&user.getCustom4().length()!=0){
+						List<String> list=Arrays.asList(user.getCustom4().split(","));
+						for(String temp1:list){
+							temp1=temp1.substring(1);
+							entrances.add(Integer.parseInt(temp1));
+						}
+					}
+				}
+
+			}
+		}
+			return entrances;
+	} 
+	/**
+	 * 查询岗亭权限，webservice中使用
+	 * @return
+	 * 如果是企业管理员，返回null,其他人员返回integer集合
+	 */
+
+	public  List<Integer> gangtingAuth(boolean isManager,Integer loginId,Integer companyId){
+		
+		List<Integer> gangting =  null;
+		if(isManager){
+			
+		}else{
+			gangting = new ArrayList<>();
+			gangting.addAll(boothMapper.selectBoothIdByEntranceIds(churuKouAuth(isManager,loginId,companyId), companyId));
+		}
+			return gangting;
+	}
+	/**
+	 * 查询车场权限，webservice中使用
+	 * @return
+	 * 如果是企业管理员，返回null,其他人员返回integer集合
+	 */
+	public  List<Integer> parkAuth(boolean isManager,Integer loginId,Integer companyId){
+		List<Integer> park =  null;
+		Set<Integer> set=new HashSet<Integer>();
+		PfmCarType carType=null;
+		List<PfmEntrance> entrancelist=null;
+		if(isManager){
+			
+		}else{
+			List<Integer> carTypeList=carTypeAuth(isManager,loginId,companyId);
+			List<Integer> entranceList=churuKouAuth(isManager,loginId,companyId);
+			if(!(carTypeList.size()==0&&entranceList.size()==0)){
+				for(Integer typeId:carTypeList){
+					carType=carTypeMapper.selectByPrimaryKey(typeId);
+					if(carType!=null){
+						set.add(carType.getCustom1());
+					}
+				}
+				
+				for(Integer entranceId:entranceList){
+					entrancelist=entranceMapper.selectInfoByPfmEntranceId(entranceId);
+					if(entrancelist.size()>0){
+						//entrancelist.get(0).getParkId();
+						set.add(entrancelist.get(0).getParkId());
+					}
+				}
+				
+				
+				
+			}
+			
+			park=new ArrayList<Integer>(set);
+			
+		}
+		return park;
+		
+	}
+	
+	/*
+	 * 查询部门权限
+	 * 如果没部门权限返回null,有部门权限返回integer集合
+	 */
+	public  List<Integer> deptAuth(){
+		List<Integer> list=null;
+		 list=authMapper.selectDeptId();
+		return list;
+		
+	}
+}

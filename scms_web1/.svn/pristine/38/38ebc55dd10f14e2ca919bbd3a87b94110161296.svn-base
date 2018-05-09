@@ -1,0 +1,538 @@
+package com.wadejerry.scms.modules.sysconfig.service;
+
+import java.io.File;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.sun.org.apache.xerces.internal.impl.xpath.regex.ParseException;
+import com.wadejerry.scms.frame.constant.user.ConstParamSysConfig;
+import com.wadejerry.scms.frame.entity.OperateResult;
+import com.wadejerry.scms.frame.entity.PageParamsDto;
+import com.wadejerry.scms.modules.sysconfig.dto.DatabaseBackUpFileDTO;
+import com.wadejerry.scms.task.DatabaseBackUpTask;
+import com.wadejerry.scms.utils.Log.LogManager;
+import com.wadejerry.scms.utils.date.DateUtil;
+import com.wadejerry.scms.utils.db.CommonFun;
+import com.wadejerry.scms.utils.db.DBTools;
+import com.wadejerry.scms.utils.quartz.QuartzTaskJob;
+
+/**
+* 数据管理Service
+* @ClassName: DBManageConfigService
+* @Description: TODO
+* @author zhanying
+* @date 2016年12月28日 上午10:51:01
+*
+ */
+@Service("dbManageConfigService")
+public class DBManageConfigService {
+
+	/** 是否允许做数据库备份或者还原操作 */
+	private static String allowOperate = "true";
+	
+	/** 限制同一时间只能对数据库做一次操作，限制时长5分钟 */
+	private static Integer LIMITOPERATETIME = 5;
+	
+	/** 获取是否允许做数据库操作 */
+	public static boolean getAllowOperate() {
+		try {
+			if (allowOperate.indexOf("true") == -1 
+					&& (System.currentTimeMillis() - Long.parseLong(allowOperate) < (long)LIMITOPERATETIME * 60 * 1000)) {
+				return false;
+			}
+		} catch (Exception e) {
+			LogManager.logException(e);
+		}
+		return true;
+	}
+	
+	/** 备份、还原之前和之后调用设置方法，限制同一时间只能对数据库做一次操作 */
+	public static void setAllowOperate(boolean operate) {
+		if (operate) {
+			allowOperate = "true";
+		} else {
+			allowOperate = System.currentTimeMillis() + "";
+		}
+	}
+	
+	@Autowired(required = false)
+	private SysConfigService sysConfigService;
+	
+	public int getDataBaseCount(PageParamsDto paramsdto){
+		int totalCount = 0;
+		List<File> fileList = DBTools.getDataBaseBackupFiles();
+		if(fileList!=null&&fileList.size()!=0){
+			totalCount=fileList.size();
+		}
+		return totalCount;
+		
+	}
+	
+	/**
+	* 分页获取数据库备份文件
+	* @author zhanying 2016年12月28日 上午10:54:08
+	* @param  @param pageNo
+	* @param  @param pageSize
+	* @param  @return 
+	* @modificationHistory=========================逻辑或功能性重大变更记录
+	* @modify by user: 
+	* @modify by reason:
+	 */
+	
+	@SuppressWarnings("unchecked")
+	public List<DatabaseBackUpFileDTO> getDatabaseBackUpFileListPage(PageParamsDto paramsdto) {
+	
+		List<DatabaseBackUpFileDTO> dtoList = new ArrayList<DatabaseBackUpFileDTO>();
+		int totalCount = 0;
+		List<File> fileList = DBTools.getDataBaseBackupFiles();
+		if (fileList != null && !fileList.isEmpty()) {
+			totalCount = fileList.size();
+			
+			for (int i=0;i<totalCount;i++) {
+				if(i>=(paramsdto.getStart())&&i<(paramsdto.getStart()+paramsdto.getLength())){
+				File file =	fileList.get(i);
+				DatabaseBackUpFileDTO backUpFileDTO = new DatabaseBackUpFileDTO();
+				backUpFileDTO.setNo(i+1);
+				backUpFileDTO.setFileName(file.getName());
+				backUpFileDTO.setBackUpTime(dateFormat(file.lastModified()));
+				backUpFileDTO.setFileSize(formetFileSize(file.length()));
+				dtoList.add(backUpFileDTO);
+				}
+			}
+			if(paramsdto.getOrder().contains("no")&&paramsdto.getOrder().contains("asc"))//按照序号升序
+			{
+			Collections.sort(dtoList,new Comparator(){
+
+				@Override
+				public int compare(Object o1, Object o2) {
+					// TODO Auto-generated method stub
+					DatabaseBackUpFileDTO a = (DatabaseBackUpFileDTO)o1;
+					DatabaseBackUpFileDTO b = (DatabaseBackUpFileDTO)o2;
+					if(a.getNo()>b.getNo())
+					return 1;
+					else 
+					return -1;
+				}});
+			}
+			if(paramsdto.getOrder().contains("no")&&paramsdto.getOrder().contains("desc"))//按照序号升序
+			{
+			Collections.sort(dtoList,new Comparator(){
+
+				@Override
+				public int compare(Object o1, Object o2) {
+					// TODO Auto-generated method stub
+					DatabaseBackUpFileDTO a = (DatabaseBackUpFileDTO)o1;
+					DatabaseBackUpFileDTO b = (DatabaseBackUpFileDTO)o2;
+					if(a.getNo()>b.getNo())
+					return -1;
+					else 
+					return 1;
+				}});
+			}
+			
+			if(paramsdto.getOrder().contains("back_Up_Time")&&paramsdto.getOrder().contains("asc")){//按照时间升序
+				Collections.sort(dtoList,new Comparator(){
+
+					@Override
+					public int compare(Object o1, Object o2) {
+						// TODO Auto-generated method stub
+						DatabaseBackUpFileDTO a = (DatabaseBackUpFileDTO)o1;
+						DatabaseBackUpFileDTO b = (DatabaseBackUpFileDTO)o2;
+						int result=0;
+						try {
+							if(DateUtil.df.parse(a.getBackUpTime()).before(DateUtil.df.parse(b.getBackUpTime())))
+								result= -1;
+							else 
+								result= 1;
+						} catch (java.text.ParseException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						return result;
+					}});
+			}
+			if(paramsdto.getOrder().contains("back_Up_Time")&&paramsdto.getOrder().contains("desc")){//按照时间升序
+				Collections.sort(dtoList,new Comparator(){
+
+					@Override
+					public int compare(Object o1, Object o2) {
+						// TODO Auto-generated method stub
+						DatabaseBackUpFileDTO a = (DatabaseBackUpFileDTO)o1;
+						DatabaseBackUpFileDTO b = (DatabaseBackUpFileDTO)o2;
+						int result=0;
+						try {
+							if(DateUtil.df.parse(a.getBackUpTime()).after(DateUtil.df.parse(b.getBackUpTime())))
+								result= -1;
+							else 
+								result= 1;
+						} catch (java.text.ParseException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						return result;
+					}});
+			}
+			if(paramsdto.getOrder().contains("file_Size")&&paramsdto.getOrder().contains("asc")){//按照大小升序
+				Collections.sort(dtoList,new Comparator(){
+
+					@Override
+					public int compare(Object o1, Object o2) {
+						// TODO Auto-generated method stub
+						DatabaseBackUpFileDTO a = (DatabaseBackUpFileDTO)o1;
+						DatabaseBackUpFileDTO b = (DatabaseBackUpFileDTO)o2;
+						if(fileList.get(a.getNo()-1).length()>fileList.get(b.getNo()-1).length())
+						return 1;
+						else 
+						return -1;
+					}});
+			}
+			if(paramsdto.getOrder().contains("file_Size")&&paramsdto.getOrder().contains("desc")){//按照大小升序
+				Collections.sort(dtoList,new Comparator(){
+
+					@Override
+					public int compare(Object o1, Object o2) {
+						// TODO Auto-generated method stub
+						DatabaseBackUpFileDTO a = (DatabaseBackUpFileDTO)o1;
+						DatabaseBackUpFileDTO b = (DatabaseBackUpFileDTO)o2;
+						if(fileList.get(a.getNo()-1).length()>fileList.get(b.getNo()-1).length())
+						return -1;
+						else 
+						return 1;
+					}});
+			}
+		}
+		return dtoList;
+	}
+	
+	/**
+	* 备份数据库
+	* @author zhanying 2016年12月28日 上午11:06:22
+	* @param  @return 
+	* @modificationHistory=========================逻辑或功能性重大变更记录
+	* @modify by user: 
+	* @modify by reason:
+	 */
+	public OperateResult backUpDataBaseFile() {
+		OperateResult result = new OperateResult(false, "数据库备份失败");
+		if (DBTools.isOracle()) {
+			result.setMsg("Oracle数据库暂不支持备份功能");
+			return result;
+		}
+		if (getAllowOperate()) {
+			setAllowOperate(false);
+			try {
+				DBTools.backupDB();
+             /*   sysConfigService.recordLog("备份数据库");*/
+				deleteOutOfRangeFiles();
+				result.setResult(true);
+				result.setMsg("数据库备份成功");
+			} catch (Exception e) {
+				LogManager.logException(e);
+			}
+			setAllowOperate(true);
+		} else {
+			result.setMsg("数据库已经在备份或还原，暂时不允许操作");
+		}
+		return result;
+	}
+	
+	/**
+	* 还原数据库
+	* @author zhanying 2016年12月28日 上午11:06:53
+	* @param  @param fileNames
+	* @param  @return 
+	* @modificationHistory=========================逻辑或功能性重大变更记录
+	* @modify by user: 
+	* @modify by reason:
+	 */
+	public OperateResult restoreDataBaseByFileName(String[] fileNames) {
+		OperateResult result = new OperateResult(false, "数据库还原失败");
+		if (getAllowOperate()) {
+			setAllowOperate(false);
+			try {
+				if (fileNames != null && fileNames.length == 1) {
+					DBTools.restoreDBByFileName(fileNames[0]);
+					//sysConfigService.recordLog("还原数据库：" + fileNames[0]);
+					result.setResult(true);
+					result.setMsg("数据库还原成功");
+				}
+			} catch (Exception e) {
+				LogManager.logException(e);
+			}
+			setAllowOperate(true);
+		} else {
+			result.setMsg("数据库已经在备份或还原，暂时不允许操作");
+		}
+		return result;
+	}
+	
+	/**
+	*  获得备份文件数量上限
+	* @author zhanying 2016年12月28日 下午3:39:50
+	* @param  @return 
+	* @modificationHistory=========================逻辑或功能性重大变更记录
+	* @modify by user: 
+	* @modify by reason:
+	 */
+	public int getMaxFileQuantity() {
+		HashMap<String, Object> paramMap = sysConfigService.findAllSysConfigParamByConfigType(ConstParamSysConfig.CONFIG_TYPE_DBMANAGE);
+		
+		return (Integer)paramMap.get("maxFileQuantity");
+	}
+	
+	/**
+	* 获得备份文件总大小限制（MB）
+	* @author zhanying 2016年12月28日 下午3:40:03
+	* @param  @return 
+	* @modificationHistory=========================逻辑或功能性重大变更记录
+	* @modify by user: 
+	* @modify by reason:
+	 */
+	public long getMaxFileTotalSize() {
+		HashMap<String, Object> paramMap = sysConfigService.findAllSysConfigParamByConfigType(ConstParamSysConfig.CONFIG_TYPE_DBMANAGE);
+		Integer maxFileTotalSize = (Integer)paramMap.get("maxFileTotalSize");
+		
+		if (maxFileTotalSize == null) {
+			maxFileTotalSize = ConstParamSysConfig.MAXFILETOTALSIZE;
+		}
+		return maxFileTotalSize.longValue() << 20;
+	}
+    
+    /**
+     * 转换时间格式
+     * @author jinbenbin 2013-9-11 下午03:32:16
+     */
+    public String dateFormat() {
+        Date date = new Date();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        return sdf.format(date);
+    }
+
+	/**
+	 * 转换时间格式
+	 * @author jinbenbin 2013-9-11 下午03:32:16
+	 */
+	public String dateFormat(long time) {
+		Date date = new Date(time);
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		return sdf.format(date);
+	}
+	
+	/**
+	 * 转换文件大小
+	 * @author jinbenbin 2013-9-11 下午03:23:08
+	 */
+	public String formetFileSize(long fileLength) {
+		DecimalFormat df = new DecimalFormat("#.00");
+		String fileSizeString = "";
+		if (fileLength < 1024) {
+			fileSizeString = df.format((double)fileLength) + "B";
+		} else if (fileLength < 1048576) {
+			fileSizeString = df.format((double)fileLength / 1024) + "KB";
+		} else if (fileLength < 1073741824) {
+			fileSizeString = df.format((double)fileLength / 1048576) + "MB";
+		} else {
+			fileSizeString = df.format((double)fileLength / 1073741824) + "GB";
+		}
+		return fileSizeString;
+	}
+	
+	
+	/**
+	 * 删除超出范围的文件
+	 * @author jinbenbin 2013-9-14 下午02:14:01
+	 */
+	public void deleteOutOfRangeFiles() throws Exception {
+		int maxNum = getMaxFileQuantity();
+		long maxSize = getMaxFileTotalSize();
+		List<File> backupFiles = DBTools.getDataBaseBackupFiles();
+		int num = backupFiles.size();
+		if (num < 1 || maxNum < 0) {
+			return;
+		}
+		long totalSize = 0;
+		boolean startDelete = false;// 用于标记开始删除
+		for (int i = 0; i < backupFiles.size(); i++) {
+			File file = backupFiles.get(i);
+			if (!startDelete) {
+				totalSize += CommonFun.getFileSize(file);
+				if (i == maxNum || maxSize >= 0 && totalSize > maxSize) {// 超出数量或大小限制
+					startDelete = true;
+				}
+			}
+			if (startDelete) {
+				CommonFun.deleteFile(file);
+				
+			}
+		}
+	}
+	
+	/**
+	* 获取数据库备份任务触发job
+	* @author zhanying 2016年12月28日 下午4:36:16
+	* @param  @return
+	* @param  @throws Exception 
+	* @modificationHistory=========================逻辑或功能性重大变更记录
+	* @modify by user: 
+	* @modify by reason:
+	 */
+	public QuartzTaskJob getQuartzTaskJob() throws Exception {
+		QuartzTaskJob quartzTaskJob = null;
+		HashMap<String, Object> paramMap = sysConfigService.findAllSysConfigParamByConfigType(ConstParamSysConfig.CONFIG_TYPE_DBMANAGE);
+		Integer planType = (Integer)paramMap.get("planType");
+		String bankUpExecuteTime = (String)paramMap.get("bankUpExecuteTime");
+		Integer dayPlanExecuteInterval = (Integer)paramMap.get("dayPlanExecuteInterval");
+		Integer intervalPlanExecuteTime = (Integer)paramMap.get("intervalPlanExecuteTime");
+		Date date = strToDate(judgeMatcher(bankUpExecuteTime) ? bankUpExecuteTime : "00:00:00");
+		if (ConstParamSysConfig.DAYPLANTYPE.equals(planType)) {// 天计划设置执行周期，表示每多少天执行一次
+			quartzTaskJob = new QuartzTaskJob("DatabaseBackUpTask", DatabaseBackUpTask.class, date, (long)dayPlanExecuteInterval * 24 * 60 * 60 * 1000);
+		} else if (ConstParamSysConfig.WEEKPLANTYPE.equals(planType) || ConstParamSysConfig.MONTHPLANTYPE.equals(planType)) {// 星期计划、月计划的执行时间额外判断
+			StringBuffer expression = new StringBuffer();
+			if (judgeMatcher(bankUpExecuteTime)){
+				String[] array = bankUpExecuteTime.split("\\:");
+				expression.append(array[2]).append(" ").append(array[1]).append(" ").append(array[0]).append(" ");
+			} else {
+				expression.append("0 0 0 ");
+			}
+			expression.append("* * ?");
+			quartzTaskJob = new QuartzTaskJob("DatabaseBackUpTask", DatabaseBackUpTask.class, expression.toString().replace("00", "0"));
+		} else if (ConstParamSysConfig.INTERVALPLANTYPE.equals(planType)) {// 间隔计划，表示间隔多少小时执行一次
+			quartzTaskJob = new QuartzTaskJob("DatabaseBackUpTask", DatabaseBackUpTask.class, date, (long)intervalPlanExecuteTime * 60 * 60 * 1000);
+		} else {
+			throw new Exception("计划类型配置错误！");
+		}
+		return quartzTaskJob;
+		
+	}
+	
+	/**
+	* 正则表达式判断格式是否匹配
+	* @author zhanying 2016年12月28日 下午4:35:41
+	* @param  @param executeTime
+	* @param  @return 
+	* @modificationHistory=========================逻辑或功能性重大变更记录
+	* @modify by user: 
+	* @modify by reason:
+	 */
+	public boolean judgeMatcher(String executeTime) {
+		boolean isMatcher = false;
+		if (executeTime != null) {
+			Pattern p = Pattern.compile("([0-9]|([0-1][0-9])|(2[0-3])):[0-5]?[0-9]:[0-5]?[0-9]", Pattern.CASE_INSENSITIVE);
+			Matcher matcher = p.matcher(executeTime);
+			if (matcher.matches()) {
+				isMatcher = true;
+			}
+		}
+		return isMatcher;
+	}
+	
+	/**
+	* 判断是否执行任务
+	* @author zhanying 2016年12月28日 上午10:57:26
+	* @param  @return
+	* @param  @throws Exception 
+	* @modificationHistory=========================逻辑或功能性重大变更记录
+	* @modify by user: 
+	* @modify by reason:
+	 */
+	public boolean judgeExecuteTask() throws Exception {
+		boolean isExecute = true;
+		HashMap<String, Object> paramMap = sysConfigService.findAllSysConfigParamByConfigType(ConstParamSysConfig.CONFIG_TYPE_DBMANAGE);
+		Integer planType = (Integer)paramMap.get("planType");
+		String bankUpStartTime = (String)paramMap.get("bankUpStartTime");
+		String bankUpEndTime = (String)paramMap.get("bankUpEndTime");
+		String weekPlanExecuteTime = (String)paramMap.get("weekPlanExecuteTime");
+		String monthPlanExecuteTime = (String)paramMap.get("monthPlanExecuteTime");
+		if (!compareDate(bankUpStartTime + " 00:00:00") || compareDate(bankUpEndTime + " 23:59:59")) {// 判断起始日期和结束日期
+			isExecute = false;
+			return isExecute;
+		}
+		if (ConstParamSysConfig.WEEKPLANTYPE.equals(planType)) {// 星期计划
+			if (weekPlanExecuteTime.indexOf(String.valueOf(getTodayOfWeek())) == -1) {
+				isExecute = false;
+			}
+		} else if (ConstParamSysConfig.MONTHPLANTYPE.equals(planType)) {// 月计划
+			Date nowdate = new Date(System.currentTimeMillis());
+			if (monthPlanExecuteTime.indexOf(Integer.parseInt(new SimpleDateFormat("dd").format(nowdate))+"") == -1) {
+				if (monthPlanExecuteTime.indexOf("32") != -1) {// 判断是否最后一天
+					SimpleDateFormat sdf = new SimpleDateFormat("MM", Locale.CHINA);
+					Date nextdate = new Date(System.currentTimeMillis() + 24 * 60 * 60 * 1000);
+					if (Integer.parseInt(sdf.format(nowdate))!=(Integer.parseInt(sdf.format(nextdate)))) {
+						return isExecute;
+					}
+				}
+				isExecute = false;
+			}
+		}
+		return isExecute;
+		
+	}
+	
+	/** 
+	* 获得今天星期几
+	* @author zhanying 2016年12月28日 上午10:57:04
+	* @param  @return 
+	* @modificationHistory=========================逻辑或功能性重大变更记录
+	* @modify by user: 
+	* @modify by reason:
+	 */
+	public int getTodayOfWeek() {
+		Calendar c = Calendar.getInstance();
+		c.setTime(new Date(System.currentTimeMillis()));
+		int dayOfWeek = c.get(Calendar.DAY_OF_WEEK);
+		return dayOfWeek == 1 ? 7 : dayOfWeek - 1;
+	}
+	
+	/**
+	* 判断是否比今天早
+	* @author zhanying 2016年12月28日 上午10:56:48
+	* @param  @param stringDate
+	* @param  @return
+	* @param  @throws ParseException 
+	 * @throws java.text.ParseException 
+	* @modificationHistory=========================逻辑或功能性重大变更记录
+	* @modify by user: 
+	* @modify by reason:
+	 */
+	public boolean compareDate(String stringDate) throws ParseException, java.text.ParseException{
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.CHINA);
+		Date date = sdf.parse(stringDate);
+		return date.before(new Date());
+	}
+	
+	/**
+	* 获取首次执行时间date，如果执行时间比当前时间早，则将首次执行时间推迟到明天
+	* @author zhanying 2016年12月28日 上午10:56:28
+	* @param  @param strDate
+	* @param  @return
+	* @param  @throws ParseException 
+	 * @throws java.text.ParseException 
+	* @modificationHistory=========================逻辑或功能性重大变更记录
+	* @modify by user: 
+	* @modify by reason:
+	 */
+	public static Date strToDate(String strDate) throws ParseException, java.text.ParseException {
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		Date nowDate = new Date();
+		Date date = sdf.parse(sdf.format(nowDate).substring(0, 11) + strDate);
+		if (date.before(nowDate)) {
+			long myTime = (date.getTime() / 1000) + 24 * 60 * 60;
+			date.setTime(myTime * 1000);
+		}
+		return date;
+	}
+
+}

@@ -1,0 +1,49 @@
+
+.pa { position:absolute}
+.icon_arrow_up2
+{
+	display:block;
+	background-position:-28px -26px;
+	width:11px;
+	height:6px;
+	top:30px;
+	left:12px;
+}
+.errorbg
+{
+	display:inline-block;
+	background-color:#e37781;
+	font-size:12px;
+	color:#fff;
+	padding:5px 10px 5px 10px;
+	-moz-border-radius:2px;
+	-webkit-border-radius:2px;
+	-khtml-border-radius:2px;
+	border-radius:2px;
+	line-height: 18px;
+	height:18px;
+	}
+.point-box
+{
+	display:inline-block;
+	background-color:#e37781;
+	font-size:12px;
+	color:#fff;
+	padding:6px 10px 6px 10px;
+	-moz-border-radius:2px;
+	-webkit-border-radius:2px;
+	-khtml-border-radius:2px;
+	border-radius:2px;
+	margin-bottom:10px;
+	background-image:none;
+	line-height: 18px;
+}
+		
+/*sprite*/
+.sprite
+{
+	display: inline-block;
+	background-image:url(/dist/img/icon.gif);
+/*	_background-image:url(../images/icon.gif);
+*/	background-repeat:no-repeat;
+}

@@ -1,0 +1,33 @@
+package com.wadejerry.scms.webservice.server.support.weixin;
+
+import com.wadejerry.scms.webservice.server.support.CommonResult;
+
+/**
+* 
+* @ClassName: QRCodeResult
+* @Description: 获取二维码返回结果
+* @author zhanying
+* @date 2017年6月19日 上午8:50:47
+*
+ */
+public class QRCodeResult extends CommonResult {
+	private byte[] qrCode; //二维码信息
+	
+	private int orderId; //
+
+	public byte[] getQrCode() {
+		return qrCode;
+	}
+
+	public void setQrCode(byte[] qrCode) {
+		this.qrCode = qrCode;
+	}
+
+	public int getOrderId() {
+		return orderId;
+	}
+
+	public void setOrderId(int orderId) {
+		this.orderId = orderId;
+	}
+}

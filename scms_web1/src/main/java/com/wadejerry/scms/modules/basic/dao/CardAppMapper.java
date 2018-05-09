@@ -1,0 +1,18 @@
+package com.wadejerry.scms.modules.basic.dao;
+
+import org.apache.ibatis.annotations.Param;
+
+import com.wadejerry.scms.modules.basic.dto.CardAppDto;
+
+public interface CardAppMapper {
+	public CardAppDto SelectCardAppInfo(Integer carInfoId);
+
+	int selectMaxTradeId(Integer cardid);
+
+	/* void updateInfo(CardAppDto appDto, @Param("carId")Integer carId); */
+	void updateInfo(@Param("appDto")CardAppDto appDto, @Param("carId") Integer carId);
+
+	public CardAppDto selectMaxTradeIdByDto(int carid);
+
+	public void updateTKInfo( @Param("appDto")CardAppDto appDto2,  @Param("carId")Integer integer);
+}

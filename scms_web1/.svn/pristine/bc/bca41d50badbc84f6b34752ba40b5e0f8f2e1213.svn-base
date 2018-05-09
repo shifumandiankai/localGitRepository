@@ -1,0 +1,100 @@
+<%@ page contentType="text/html; charset=UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+<style type="text/css">
+.form-control[readonly]{
+    background-color: rgba(238, 238, 238, 0) !important;
+</style>
+
+
+
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<title>维德杰瑞SCMS管理平台</title>
+<!-- Tell the browser to be responsive to screen width -->
+<meta
+	content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
+	name="viewport">
+<%@ include file="/common/jsp/common_css.jsp"%>
+</head>
+<%@ include file="/common/jsp/commonBody.jsp"%>
+<!-- <body class="hold-transition skin-blue sidebar-mini"> -->
+	<div class="wrapper">
+		<%@ include file="/common/jsp/top.jsp"%>
+		<%@ include file="/pages/pfm/pfm_menu.jsp"%>
+		<!-- Content Wrapper. Contains page content -->
+		<div class="content-wrapper">
+			<!-- Content Header (Page header) -->
+			<section class="content-header">
+				<h1>
+					时段管理界面
+				</h1>
+				<ol class="breadcrumb">
+					<li><a href="/index.do"><i class="fa fa-dashboard"></i> 主页</a></li>
+					<li class="active">时段管理</li>
+				</ol>
+			</section>
+			<!-- Main content -->
+
+			<section class="content">
+				<div class="box">
+
+					<div class="box-body">
+						<table id="example1" class="table table-bordered table-striped">
+							<thead>
+								<tr>	
+<!-- 								("pfmTimeId","timeCode","timeName","beginTime","endTime","dayBeginTime1","dayEndTime1","enableWeek","enableIn或者enableOut");			 -->
+									<th>时段ID</th>
+									<th>编号</th>
+									<th>时段名称</th>
+									<!-- <th>开始时间</th>
+									<th>结束时间</th>
+									<th>时段一开始</th>
+									<th>时段一结束</th>
+									<th>时段二开始</th>
+									<th>时段二结束</th>
+									<th>时段三开始</th>
+									<th>时段三结束</th>
+									<th>时段四开始</th>
+									<th>时段四结束</th> -->
+									
+									<th>启动星期</th>
+									<!-- <th>启动时间限时</th> -->
+									
+								</tr>
+							</thead>
+							<tbody>						
+							</tbody>
+							<tfoot>						
+							</tfoot>
+						</table>
+					</div>
+				</div>			
+			</section>
+		</div>
+		<%@ include file="time_dialog.jsp"%> 
+		<%@ include file="/common/jsp/footer.jsp"%>
+		<%@ include file="/common/jsp/sidebar.jsp"%>
+	</div>
+	<%@ include file="/common/jsp/common_js.jsp"%>
+	<script src="time.js"></script>
+	<script type="text/javascript">
+	
+		function Buttonpermission(){
+			<shiro:lacksPermission name="PeriodAdd">$("#example1_wrapper a[name='wade.libs.datatable_add']").remove();</shiro:lacksPermission>
+			<shiro:lacksPermission name="PeriodDelete">$("#example1_wrapper a[name='wade.libs.datatable_del']").remove();</shiro:lacksPermission>
+			<shiro:lacksPermission name="PeriodEdit">$("#example1_wrapper a[name='wade.libs.datatable_edit']").remove();</shiro:lacksPermission>
+		}
+		function Seepermission(){
+			<shiro:lacksPermission name="PeriodSee">$("#example1 tbody td").text("没有浏览权限");</shiro:lacksPermission>
+		
+		}
+	
+		
+		
+		
+	</script>
+	<script src="/plugins/My97DatePicker/WdatePicker.js"></script>
+</body>
+</html>

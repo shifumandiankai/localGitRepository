@@ -1,0 +1,27 @@
+package com.wadejerry.scms.modules.pfm.dao;
+
+import java.util.List;
+
+import com.wadejerry.scms.frame.entity.PageParamsDto;
+import com.wadejerry.scms.modules.pfm.dto.TimeDto;
+import com.wadejerry.scms.modules.pfm.model.PfmTime;
+
+public interface pfmTimeMapper {
+
+	int getRecordTotal(PageParamsDto paramsDto);
+
+	List<TimeDto> getTimeListByPage(PageParamsDto paramsDto);
+
+	PfmTime findByTimeName(String string, int i);
+
+	void insertTimeDto(PfmTime inserttime);
+
+	void updateTimeDto(PfmTime inserttime);
+
+	void deleteTimeById(Integer pfmTimeId);
+
+	PfmTime selectByTimeName(String timeName,int i);
+
+	List<TimeDto> configTime(int commpanyId);
+
+}

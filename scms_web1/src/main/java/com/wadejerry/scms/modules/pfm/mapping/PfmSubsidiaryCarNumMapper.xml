@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.wadejerry.scms.modules.pfm.dao.PfmSubsidiaryCarNumMapper" >
+  <resultMap id="BaseResultMap" type="com.wadejerry.scms.modules.pfm.model.PfmSubsidiaryCarNum" >
+    <id column="pfm_subsidiary_car_num_id" property="pfmSubsidiaryCarNumId" jdbcType="INTEGER" />
+    <result column="car_id" property="carId" jdbcType="INTEGER" />
+    <result column="car_number" property="carNumber" jdbcType="VARCHAR" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="user_name" property="userName" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    pfm_subsidiary_car_num_id, car_id, car_number, update_time, user_name
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from pfm_subsidiary_car_num
+    where pfm_subsidiary_car_num_id = #{pfmSubsidiaryCarNumId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from pfm_subsidiary_car_num
+    where pfm_subsidiary_car_num_id = #{pfmSubsidiaryCarNumId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.wadejerry.scms.modules.pfm.model.PfmSubsidiaryCarNum" >
+    insert into pfm_subsidiary_car_num (pfm_subsidiary_car_num_id, car_id, car_number, 
+      update_time, user_name)
+    values (#{pfmSubsidiaryCarNumId,jdbcType=INTEGER}, #{carId,jdbcType=INTEGER}, #{carNumber,jdbcType=VARCHAR}, 
+      #{updateTime,jdbcType=TIMESTAMP}, #{userName,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.wadejerry.scms.modules.pfm.model.PfmSubsidiaryCarNum" >
+    insert into pfm_subsidiary_car_num
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="pfmSubsidiaryCarNumId != null" >
+        pfm_subsidiary_car_num_id,
+      </if>
+      <if test="carId != null" >
+        car_id,
+      </if>
+      <if test="carNumber != null" >
+        car_number,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+      <if test="userName != null" >
+        user_name,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="pfmSubsidiaryCarNumId != null" >
+        #{pfmSubsidiaryCarNumId,jdbcType=INTEGER},
+      </if>
+      <if test="carId != null" >
+        #{carId,jdbcType=INTEGER},
+      </if>
+      <if test="carNumber != null" >
+        #{carNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="userName != null" >
+        #{userName,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.wadejerry.scms.modules.pfm.model.PfmSubsidiaryCarNum" >
+    update pfm_subsidiary_car_num
+    <set >
+      <if test="carId != null" >
+        car_id = #{carId,jdbcType=INTEGER},
+      </if>
+      <if test="carNumber != null" >
+        car_number = #{carNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="userName != null" >
+        user_name = #{userName,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where pfm_subsidiary_car_num_id = #{pfmSubsidiaryCarNumId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.wadejerry.scms.modules.pfm.model.PfmSubsidiaryCarNum" >
+    update pfm_subsidiary_car_num
+    set car_id = #{carId,jdbcType=INTEGER},
+      car_number = #{carNumber,jdbcType=VARCHAR},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      user_name = #{userName,jdbcType=VARCHAR}
+    where pfm_subsidiary_car_num_id = #{pfmSubsidiaryCarNumId,jdbcType=INTEGER}
+  </update>
+  <select id="selectByCarId" parameterType="int" resultMap="BaseResultMap">
+  	select * from pfm_subsidiary_car_num where car_id=#{id}
+  </select>
+  
+  <delete id="deleByCarId" parameterType="int">
+  delete  from pfm_subsidiary_car_num where car_id=#{id}
+  </delete>
+</mapper>

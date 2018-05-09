@@ -1,0 +1,788 @@
+package com.wadejerry.scms.modules.pfm.controller;
+
+import java.math.BigDecimal;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.ibatis.annotations.Case;
+import org.apache.ibatis.annotations.Param;
+import org.codehaus.jettison.json.JSONException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.wadejerry.scms.frame.Authority.AuthorityGetter;
+import com.wadejerry.scms.frame.entity.DataTableDto;
+import com.wadejerry.scms.frame.entity.ExTemplate;
+import com.wadejerry.scms.frame.entity.ReportPageParamsDto;
+import com.wadejerry.scms.frame.entity.SelectDataDto;
+import com.wadejerry.scms.modules.pfm.dto.CzReportDto;
+import com.wadejerry.scms.modules.pfm.model.PfmChargeRecord;
+import com.wadejerry.scms.modules.pfm.model.PfmCarType;
+import com.wadejerry.scms.modules.pfm.service.PfmCarTypeService;
+import com.wadejerry.scms.modules.pfm.service.pfmCzReportService;
+import com.wadejerry.scms.utils.AjaxUtil;
+import com.wadejerry.scms.utils.date.DateUtil;
+@Controller
+public class CzReportController {
+	@Autowired
+	private HttpServletResponse response;
+	@Autowired
+	private HttpServletRequest request;
+	@Autowired
+	private pfmCzReportService czReportService;
+	@Autowired
+	private AuthorityGetter authorityGetter;
+	@Autowired
+	private ExTemplate exTemplate;
+	@Autowired
+	private PfmCarTypeService PfmCarTypeService;
+	
+	@RequestMapping("/report/Czreport/selectDayAllListByPage.do")
+	@ResponseBody
+	public void GetChargeRecordInfoByPage() throws ParseException, JSONException{
+		List<Integer> listtype=authorityGetter.carTypeAuth();
+		ReportPageParamsDto paramsDto=ReportPageParamsDto.GetParamsDtoByRequest(request);
+		int iTotal=0;
+		Date startTime=null;
+		Date endTime=null;
+		String carNumber=null;
+	    List<Integer> listtypeId=null;
+	    List<Integer> listcarType=null;
+	    String size=null;
+	    List<CzReportDto> dtolist=null;
+	    //String result=null;//查询信息中是否有查询结果，null则为没有结果
+	    Calendar cal=Calendar.getInstance();
+	    Integer typeId=null;
+	    Date insertTime=null;
+		//String hasPermission=null;
+	    List<CzReportDto> list=new ArrayList<CzReportDto>();
+	    if(paramsDto.getSearchValue2()!=null&&!paramsDto.getSearchValue2().equals("")){
+			carNumber=paramsDto.getSearchValue2();
+		}
+		if(paramsDto.getListType()!=null&&!paramsDto.getListType().equals("")){
+			listcarType=paramsDto.getListType();
+		}
+		if(paramsDto.getSearchValue0()==null&&paramsDto.getSearchValue1()==null){
+			//页面刷新的时候
+			startTime=new Date();
+			String str=DateUtil.YMDsdf.format(startTime);
+			startTime=DateUtil.YMDsdf.parse(str);
+			String strend=str+" 23:59:59";
+			endTime=DateUtil.df.parse(strend);
+				
+		}
+			//只有开始或者结束时间，有一个为null
+			if(paramsDto.getSearchValue0()!=null&&paramsDto.getSearchValue1()==null){
+				startTime=paramsDto.getSearchValue0();
+				String str=DateUtil.YMDsdf.format(startTime);
+				String strend=str+" 23:59:59";
+				endTime=DateUtil.df.parse(strend);
+			}
+			if(paramsDto.getSearchValue1()!=null&&paramsDto.getSearchValue0()==null){
+				endTime=paramsDto.getSearchValue1();
+				String str=DateUtil.YMDsdf.format(endTime);
+				String strstart=str+" 00:00:00";
+				startTime=DateUtil.df.parse(strstart);
+			}
+			if(paramsDto.getSearchValue0()!=null&&paramsDto.getSearchValue1()!=null){
+				//如果开始时间和结束时间都不为空
+				startTime=paramsDto.getSearchValue0();//输入的开始时间
+				String str=DateUtil.YMDsdf.format(paramsDto.getSearchValue1())+" 23:59:59";
+				endTime=paramsDto.getSearchValue1();//输入的结束时间
+				endTime=DateUtil.df.parse(str);
+				
+		}
+			
+			if(listtype!=null){//不是企业管理员，需要权限
+				
+				/*if(paramsDto.getIntValue3()!=0){
+					
+					//点击节点查询信息
+					if(listtype.contains(paramsDto.getIntValue3())){
+						//点击的节点被赋予了权限
+						typeId=paramsDto.getIntValue3();
+					}else{
+						//没被赋予权限
+						size="0";
+					}
+					iTotal=czReportService.selectDoubleRecordTotal(startTime,endTime,carNumber,typeId,size);
+					if(iTotal>0){
+						//当天有数据查到
+						if(paramsDto.getLength()==-1){
+							paramsDto.setLength(iTotal);  //查询所有记录
+						}
+						 //insertTime=czReportService.selectCarTypeName(listtypeId.get(i));
+						insertTime=czReportService.selectInserttime(startTime,endTime,carNumber,typeId,size);
+					}
+					dtolist=czReportService.selectDoubleListByPage(startTime,endTime,carNumber,typeId,size,paramsDto.getLength(),paramsDto.getStart(),result);
+					for(CzReportDto temp:dtolist){
+						if(insertTime!=null){
+							temp.setInsertTime(insertTime,0,null);
+							list.add(temp);
+						}
+						
+						
+					}
+					
+				}else{*/
+					//
+					
+					if(listtype.size()>0){
+						//有多个权限
+						listtypeId=listtype;
+						paramsDto.setListType(listtype);
+						for(int i=0;i<listtypeId.size();i++){
+							//遍历每一个权限
+							
+								typeId=listtypeId.get(i);
+							
+							
+							List<CzReportDto> listdto=czReportService.selectDoubleRecordTotal(startTime,endTime,carNumber,typeId,size,listcarType);
+							iTotal=listdto.size();
+							if(iTotal>0){
+								//当天有数据查到
+								if(paramsDto.getLength()==-1){
+									paramsDto.setLength(iTotal);  //查询所有记录
+								}
+								 //insertTime=czReportService.selectCarTypeName(listtypeId.get(i));
+								insertTime=czReportService.selectInserttime(startTime,endTime,carNumber,listtypeId.get(i),size,listcarType);
+							}
+							dtolist=czReportService.selectDoubleListByPage(startTime,endTime,carNumber,typeId,size,paramsDto.getLength(),paramsDto.getStart(),listcarType);
+							for(CzReportDto temp:dtolist){
+								if(insertTime!=null){
+									temp.setInsertTime(insertTime,0,null);
+									list.add(temp);
+								}
+								
+								
+							}
+							
+						}
+						
+					}
+					else{
+						//无任何权限
+						size="1";
+						dtolist=czReportService.selectDoubleListByPage(startTime,endTime,carNumber,null,size,paramsDto.getLength(),paramsDto.getStart(),listcarType);
+					}
+				//}
+				
+				
+				
+			}else{
+				//是管理员
+				/*if(paramsDto.getIntValue3()!=0){
+				
+			    		typeId=paramsDto.getIntValue3();
+			    		//paramsDto.setIntValue3(0);
+			    
+				}*/
+				List<CzReportDto> listdto=czReportService.selectDoubleRecordTotal(startTime,endTime,carNumber,null,size,listcarType);
+				iTotal=listdto.size();
+				if(iTotal>0){
+					//当天有数据查到
+					if(paramsDto.getLength()==-1){
+						paramsDto.setLength(iTotal);  //查询所有记录
+					}
+					
+				}else{
+					size="1";
+				}
+				
+				dtolist=czReportService.selectDoubleListByPage(startTime,endTime,carNumber,null,size,paramsDto.getLength(),paramsDto.getStart(),listcarType);
+				for(CzReportDto temp:dtolist){
+					temp.setInsertTime(startTime,0,null);
+					list.add(temp);
+				}
+				
+			}
+			
+			
+		
+		DataTableDto data = new DataTableDto(); // 返回数据封装
+		data.setDataList(list);
+		data.setDraw(paramsDto.getDraw());
+		data.setRecordsFiltered(iTotal);
+		data.setRecordsTotal(iTotal);
+		AjaxUtil.ajaxWriteDataTable(data, response);
+	}
+	/*
+	 * 日报表导出
+	 */
+	@RequestMapping("/report/Czreport/exportDay.do")
+	@ResponseBody
+	public void ExportDay() throws ParseException{
+		List<Integer> listtype=authorityGetter.carTypeAuth();
+		List<Integer> listTypeId=null;
+		String size=null;
+		Date startTime=new Date();
+		String str=DateUtil.YMDsdf.format(startTime)+" 00:00:00";
+		startTime=DateUtil.YMDsdf.parse(str);
+		String strend=DateUtil.YMDsdf.format(startTime)+" 23:59:59";
+		Date endTime=DateUtil.df.parse(strend);
+		if(listtype!=null){//不是企业管理员，需要权限
+			if(listtype.size()>0){
+				listTypeId=listtype;
+			}else{
+				size="1";
+			}
+		}
+		//ExTemplate exTemplate=new ExTemplate();
+		List<Map<String,Object>> data=czReportService.exportDay(startTime,endTime,listTypeId,size);
+		if(data.size()!=0){
+			for(int i=0;i<data.size();i++){
+				data.get(i).put("insert_time", startTime);
+			}
+		}
+		
+		String[] head = {"时间","车辆类型","记录数量","总计金额"};
+		String[] column={"insert_time","car_type_name","countnum","czfee"};
+		exTemplate.Export(data, head, column);
+		
+	}
+	/*
+	 * 月报表查询
+	 */
+	@RequestMapping("/report/Czreport/selectMonthAllListByPage.do")
+	@ResponseBody
+	public void selectMonthAllListByPage() throws ParseException, JSONException{
+		
+		List<Integer> listtype=authorityGetter.carTypeAuth();
+		ReportPageParamsDto paramsDto=ReportPageParamsDto.GetParamsDtoByRequest(request);
+		int iTotal=0;
+		Date startTime=null;
+		Date endTime=null;
+		String carNumber=null;
+	    List<Integer> listtypeId=null;
+	    String size=null;
+	    List<CzReportDto> dtolist=null;
+	    //String result=null;//查询信息中是否有查询结果，null则为没有结果
+	    Calendar cal=Calendar.getInstance();
+	    Integer typeId=null;
+	    Date insertTime=null;
+	    List<CzReportDto> Alldto=null;
+	    List<Integer> listcarType=null;//选择的车辆类型
+	    Integer month=null;//开始时间月份
+	    Integer endmonth=null;//结束时间月份
+	    Integer year=null;//年份
+	    Integer nowMonth=null;//本月份
+	    String strmonth=null;//当两个时间都不为空时拼接时间
+		//String hasPermission=null;
+	    List<CzReportDto> list=new ArrayList<CzReportDto>();
+	    if(paramsDto.getSearchValue2()!=null&&!paramsDto.getSearchValue2().equals("")){
+			carNumber=paramsDto.getSearchValue2();
+		}
+	    if(paramsDto.getListType()!=null&&!paramsDto.getListType().equals("")){
+			listcarType=paramsDto.getListType();
+		}
+		if(paramsDto.getSearchValue0()==null&&paramsDto.getSearchValue1()==null){
+			//页面刷新的时候
+			nowMonth=1;
+			Date curcent=new Date();
+			cal.setTime(curcent);
+			month=cal.get(Calendar.MONTH)+1;//当前月份
+			year=cal.get(Calendar.YEAR);//当前年份
+		    
+			
+				
+		}
+			//只有开始时间
+			if(paramsDto.getSearchValue0()!=null&&paramsDto.getSearchValue1()==null){
+				startTime=paramsDto.getSearchValue0();
+				cal.setTime(startTime);
+				month=cal.get(Calendar.MONTH)+1;//当前月份
+				year=cal.get(Calendar.YEAR);//当前年份
+			}
+			//只有结束时间
+			if(paramsDto.getSearchValue1()!=null&&paramsDto.getSearchValue0()==null){
+				endTime=paramsDto.getSearchValue1();
+				cal.setTime(endTime);
+				month=cal.get(Calendar.MONTH)+1;//当前月份
+				year=cal.get(Calendar.YEAR);//当前年份
+			}
+			if(paramsDto.getSearchValue0()!=null&&paramsDto.getSearchValue1()!=null){
+				//如果开始时间和结束时间都不为空
+				startTime=paramsDto.getSearchValue0();//输入的开始时间
+				endTime=paramsDto.getSearchValue1();//输入的结束时间
+				cal.setTime(startTime);
+				month=cal.get(Calendar.MONTH)+1;//当前月份
+				year=cal.get(Calendar.YEAR);//当前年份
+				cal.setTime(endTime);
+				endmonth=cal.get(Calendar.MONTH)+1;
+			    
+				
+		}
+			
+			if(listtype!=null){//不是企业管理员，需要权限
+				/*if(paramsDto.getIntValue3()!=0){
+					
+					//点击节点查询信息
+					if(listtype.contains(paramsDto.getIntValue3())){
+						//点击的节点被赋予了权限
+						typeId=paramsDto.getIntValue3();
+					}else{
+						//没被赋予权限
+						size="0";
+					}
+					iTotal=czReportService.selectMonthRecordTotal(year,month,carNumber,typeId,size,startTime,endTime,nowMonth,endmonth);
+					if(iTotal>0){
+						//当天有数据查到
+						if(paramsDto.getLength()==-1){
+							paramsDto.setLength(iTotal);  //查询所有记录
+						}
+						 //insertTime=czReportService.selectCarTypeName(listtypeId.get(i));
+						//insertTime=czReportService.selectInserttime(startTime,endTime,carNumber,typeId,size);
+						if(startTime!=null&&endTime==null){
+						   insertTime=startTime;	
+						}
+						if(startTime==null&&endTime!=null){
+							insertTime=endTime;
+						}
+						if(startTime==null&&endTime==null){
+							insertTime=new Date();
+						}
+						if(startTime!=null&&endTime!=null){
+							SimpleDateFormat sdf=new SimpleDateFormat("yyyy年MM月份");
+							strmonth=sdf.format(startTime)+"-"+sdf.format(endTime);
+							insertTime=new Date();
+						}
+					}
+					dtolist=czReportService.selectMonthListByPage(year,month,carNumber,typeId,size,paramsDto.getLength(),paramsDto.getStart(),startTime,endTime,nowMonth,endmonth);
+					for(CzReportDto temp:dtolist){
+						if(insertTime!=null){
+							temp.setInsertTime(insertTime,1,strmonth);
+							list.add(temp);
+						}
+						
+						
+					}
+					
+					//paramsDto.setIntValue3(0);
+				}else{*/
+					//没有点击树节点
+					
+					if(listtype.size()>0){
+						//有多个权限
+						listtypeId=listtype;
+						paramsDto.setListType(listtype);
+						for(int i=0;i<listtypeId.size();i++){
+							//遍历每一个权限
+							
+								typeId=listtypeId.get(i);
+								/*for(Integer temp:listcarType){
+									if(temp==listtypeId.get(i)){
+										
+										typeId=temp;
+									}
+								}*/
+						
+							
+							//iTotal=czReportService.selectDoubleRecordTotal(startTime,endTime,carNumber,typeId,size);
+						    List<CzReportDto> listdto =czReportService.selectMonthRecordTotal(year,month,carNumber,typeId,size,startTime,endTime,nowMonth,endmonth,listcarType);
+						    iTotal=listdto.size();
+						    if(iTotal>0){
+								//当天有数据查到
+								if(paramsDto.getLength()==-1){
+									paramsDto.setLength(iTotal);  //查询所有记录
+								}
+								 //insertTime=czReportService.selectCarTypeName(listtypeId.get(i));
+								//insertTime=czReportService.selectInserttime(startTime,endTime,carNumber,listtypeId.get(i),size);
+								if(startTime!=null&&endTime==null){
+									   insertTime=startTime;	
+									}
+									if(startTime==null&&endTime!=null){
+										insertTime=endTime;
+									}
+									if(startTime==null&&endTime==null){
+										insertTime=new Date();
+									}
+									if(startTime!=null&&endTime!=null){
+										SimpleDateFormat sdf=new SimpleDateFormat("yyyy年MM月份");
+										strmonth=sdf.format(startTime)+"-"+sdf.format(endTime);
+										insertTime=new Date();
+									}
+								
+							}
+							dtolist=czReportService.selectMonthListByPage(year,month,carNumber,typeId,size,paramsDto.getLength(),paramsDto.getStart(),startTime,endTime,nowMonth,endmonth,listcarType);
+							//dtolist=czReportService.selectDoubleListByPage(startTime,endTime,carNumber,typeId,size,paramsDto.getLength(),paramsDto.getStart(),result);
+							for(CzReportDto temp:dtolist){
+								if(insertTime!=null){
+									temp.setInsertTime(insertTime,1,strmonth);
+									list.add(temp);
+								}
+								
+								
+							}
+							
+						}
+						
+					}
+					else{
+						//无任何权限
+						size="1";
+						//dtolist=czReportService.selectDoubleListByPage(startTime,endTime,carNumber,null,size,paramsDto.getLength(),paramsDto.getStart(),result);
+						dtolist=czReportService.selectMonthListByPage(year,month,carNumber,null,size,paramsDto.getLength(),paramsDto.getStart(),startTime,endTime,nowMonth,endmonth,listcarType);
+					}
+				//}
+				
+				
+				
+			}else{
+				//是管理员
+				/*if(paramsDto.getIntValue3()!=0){
+				
+			    		typeId=paramsDto.getIntValue3();
+			    		//paramsDto.setIntValue3(0);
+			    
+				}*/
+				//iTotal=czReportService.selectDoubleRecordTotal(startTime,endTime,carNumber,typeId,size);
+				List<CzReportDto> listdto=czReportService.selectMonthRecordTotal(year,month,carNumber,null,size,startTime,endTime,nowMonth,endmonth,listcarType);
+				iTotal=listdto.size();
+				if(iTotal>0){
+					//当天有数据查到
+					if(paramsDto.getLength()==-1){
+						paramsDto.setLength(iTotal);  //查询所有记录
+					}
+					
+					if(startTime!=null&&endTime==null){
+						   insertTime=startTime;	
+						}
+						if(startTime==null&&endTime!=null){
+							insertTime=endTime;
+						}
+						if(startTime==null&&endTime==null){
+							insertTime=new Date();
+						}
+						if(startTime!=null&&endTime!=null){
+							SimpleDateFormat sdf=new SimpleDateFormat("yyyy年MM月份");
+							strmonth=sdf.format(startTime)+"-"+sdf.format(endTime);
+							insertTime=new Date();
+						}
+					
+				}else{
+					size="1";
+				}
+				
+				//dtolist=czReportService.selectDoubleListByPage(startTime,endTime,carNumber,null,size,paramsDto.getLength(),paramsDto.getStart(),result);
+				dtolist=czReportService.selectMonthListByPage(year,month,carNumber,null,size,paramsDto.getLength(),paramsDto.getStart(),startTime,endTime,nowMonth,endmonth,listcarType);
+				for(CzReportDto temp:dtolist){
+					if(insertTime!=null){
+						temp.setInsertTime(insertTime,1,strmonth);
+						list.add(temp);
+					}
+					
+				}
+				
+			}
+			
+			
+		
+		DataTableDto data = new DataTableDto(); // 返回数据封装
+		data.setDataList(list);
+		data.setDraw(paramsDto.getDraw());
+		data.setRecordsFiltered(iTotal);
+		data.setRecordsTotal(iTotal);
+		AjaxUtil.ajaxWriteDataTable(data, response);
+		
+	}
+	/*
+	 * 绑定车辆类型
+	 */
+	@RequestMapping("/report/Czreport/configCarType.do")
+	@ResponseBody
+	public void configCarType(){
+		List<PfmCarType> carTypelist=PfmCarTypeService.configParkReport();
+		SelectDataDto selectDto=null;
+		List<SelectDataDto> list=new ArrayList<SelectDataDto>();
+		/*SelectDataDto dataDto=new SelectDataDto();
+		dataDto.setId(0);
+		dataDto.setText("全部");
+		list.add(dataDto);*/
+		if(carTypelist.size()!=0){
+			for(PfmCarType temp:carTypelist){
+				selectDto=new SelectDataDto();
+				selectDto.setId(temp.getCarTypeId());
+				selectDto.setText(temp.getTypeName());
+				list.add(selectDto);
+			}
+			AjaxUtil.ajaxWriteObject(list, response);
+			return;
+		}
+	}
+	/*
+	 * 月报表导出
+	 */
+	@RequestMapping("/report/Czreport/exportMonth.do")
+	@ResponseBody
+	public void ExportMonth() throws ParseException{
+		List<Integer> listtype=authorityGetter.carTypeAuth();
+		List<Integer> listTypeId=null;
+		String size=null;
+		Date startTime=new Date();
+		String str=DateUtil.YMDsdf.format(startTime)+" 00:00:00";
+		startTime=DateUtil.YMDsdf.parse(str);
+		Calendar cal=Calendar.getInstance();
+		cal.setTime(startTime);
+		cal.add(Calendar.MONTH, +1);
+		Date endTime=cal.getTime();
+		String strend=DateUtil.YMDsdf.format(endTime)+" 23:59:59";
+		endTime=DateUtil.df.parse(strend);
+		if(listtype!=null){//不是企业管理员，需要权限
+			if(listtype.size()>0){
+				listTypeId=listtype;
+			}else{
+				size="1";
+			}
+		}
+		//ExTemplate exTemplate=new ExTemplate();
+		List<Map<String,Object>> data=czReportService.exportDay(startTime,endTime,listTypeId,size);
+		if(data.size()!=0){
+			for(int i=0;i<data.size();i++){
+				SimpleDateFormat sdf=new SimpleDateFormat("yyyy年MM月份");
+				data.get(i).put("insert_time",sdf.format(startTime));
+				
+			}
+		}
+		
+		String[] head = {"时间","车辆类型","记录数量","总计金额"};
+		String[] column={"insert_time","car_type_name","countnum","czfee"};
+		exTemplate.Export(data, head, column);
+		
+	}
+	
+	/*
+	 * 年报表查询
+	 */
+	@RequestMapping("/report/Czreport/selectYearAllListByPage.do")
+	@ResponseBody
+	public void selectYearAllListByPage() throws ParseException, JSONException{
+		
+		List<Integer> listtype=authorityGetter.carTypeAuth();
+		ReportPageParamsDto paramsDto=ReportPageParamsDto.GetParamsDtoByRequest(request);
+		int iTotal=0;
+		Date startTime=null;
+		Date endTime=null;
+		String carNumber=null;
+	    List<Integer> listtypeId=null;
+	    String size=null;
+	    List<CzReportDto> dtolist=null;
+	    //String result=null;//查询信息中是否有查询结果，null则为没有结果
+	    Calendar cal=Calendar.getInstance();
+	    Integer typeId=null;
+	    Date insertTime=null;
+	    List<CzReportDto> Alldto=null;
+	    List<Integer> listcarType=null;//选择的车辆类型
+	   // Integer month=null;//开始时间月份
+	    //Integer endmonth=null;//结束时间月份
+	    Integer startyear=null;//开始年份
+	    Integer endyear=null;//结束年份
+	    Integer nowYear=null;//本年(当时间都为空是使用)
+	    String strmonth=null;//当两个时间都不为空时拼接时间
+		//String hasPermission=null;
+	    List<CzReportDto> list=new ArrayList<CzReportDto>();
+	    if(paramsDto.getSearchValue2()!=null&&!paramsDto.getSearchValue2().equals("")){
+			carNumber=paramsDto.getSearchValue2();
+		}
+	    if(paramsDto.getListType()!=null&&!paramsDto.getListType().equals("")){
+			listcarType=paramsDto.getListType();
+		}
+		if(paramsDto.getSearchValue0()==null&&paramsDto.getSearchValue1()==null){
+			//页面刷新的时候
+			//nowYear=1;
+			Date curcent=new Date();
+			cal.setTime(curcent);
+			nowYear=cal.get(Calendar.YEAR);//当前年份
+		    
+			
+				
+		}
+			//只有开始时间
+			if(paramsDto.getSearchValue0()!=null&&paramsDto.getSearchValue1()==null){
+				startTime=paramsDto.getSearchValue0();
+				cal.setTime(startTime);
+				nowYear=cal.get(Calendar.YEAR);//当前年份
+			}
+			//只有结束时间
+			if(paramsDto.getSearchValue1()!=null&&paramsDto.getSearchValue0()==null){
+				endTime=paramsDto.getSearchValue1();
+				cal.setTime(endTime);
+				nowYear=cal.get(Calendar.YEAR);//当前年份
+			}
+			if(paramsDto.getSearchValue0()!=null&&paramsDto.getSearchValue1()!=null){
+				//如果开始时间和结束时间都不为空
+				startTime=paramsDto.getSearchValue0();//输入的开始时间
+				endTime=paramsDto.getSearchValue1();//输入的结束时间
+				cal.setTime(startTime);
+				startyear=cal.get(Calendar.YEAR);//当前年份
+				cal.setTime(endTime);
+				endyear=cal.get(Calendar.YEAR);//结束年份
+			
+			    
+				
+		}
+			
+			if(listtype!=null){//不是企业管理员，需要权限
+					
+					if(listtype.size()>0){
+						//有多个权限
+						listtypeId=listtype;
+						paramsDto.setListType(listtype);
+						for(int i=0;i<listtypeId.size();i++){
+							//遍历每一个权限
+								typeId=listtypeId.get(i);
+						    List<CzReportDto> listdto =czReportService.selectYearRecordTotal(startyear,carNumber,typeId,size,startTime,endTime,endyear,listcarType,nowYear);
+						    iTotal=listdto.size();
+						    if(iTotal>0){
+								//当天有数据查到
+								if(paramsDto.getLength()==-1){
+									paramsDto.setLength(iTotal);  //查询所有记录
+								}
+								 //insertTime=czReportService.selectCarTypeName(listtypeId.get(i));
+								//insertTime=czReportService.selectInserttime(startTime,endTime,carNumber,listtypeId.get(i),size);
+								if(startTime!=null&&endTime==null){
+									   insertTime=startTime;	
+									}
+									if(startTime==null&&endTime!=null){
+										insertTime=endTime;
+									}
+									if(startTime==null&&endTime==null){
+										insertTime=new Date();
+									}
+									if(startTime!=null&&endTime!=null){
+										SimpleDateFormat sdf=new SimpleDateFormat("yyyy年");
+										strmonth=sdf.format(startTime)+"-"+sdf.format(endTime);
+										insertTime=new Date();
+									}
+								
+							}
+							dtolist=czReportService.selectYearListByPage(startyear,endyear,carNumber,typeId,size,paramsDto.getLength(),paramsDto.getStart(),startTime,endTime,nowYear,listcarType);
+							//dtolist=czReportService.selectDoubleListByPage(startTime,endTime,carNumber,typeId,size,paramsDto.getLength(),paramsDto.getStart(),result);
+							for(CzReportDto temp:dtolist){
+								if(insertTime!=null){
+									temp.setInsertTime(insertTime,2,strmonth);
+									list.add(temp);
+								}
+								
+								
+							}
+							
+						}
+						
+					}
+					else{
+						//无任何权限
+						size="1";
+						//dtolist=czReportService.selectMonthListByPage(year,month,carNumber,null,size,paramsDto.getLength(),paramsDto.getStart(),startTime,endTime,nowMonth,endmonth,listcarType);
+					}
+				//}
+				
+				
+				
+			}else{
+				//是管理员
+				/*if(paramsDto.getIntValue3()!=0){
+				
+			    		typeId=paramsDto.getIntValue3();
+			    		//paramsDto.setIntValue3(0);
+			    
+				}*/
+				//iTotal=czReportService.selectDoubleRecordTotal(startTime,endTime,carNumber,typeId,size);
+			    dtolist=czReportService.selectYearListByPage(startyear,endyear,carNumber,typeId,size,paramsDto.getLength(),paramsDto.getStart(),startTime,endTime,nowYear,listcarType);
+				iTotal=dtolist.size();
+				if(iTotal>0){
+					//当天有数据查到
+					if(paramsDto.getLength()==-1){
+						paramsDto.setLength(iTotal);  //查询所有记录
+					}
+					
+					if(startTime!=null&&endTime==null){
+						   insertTime=startTime;	
+						}
+						if(startTime==null&&endTime!=null){
+							insertTime=endTime;
+						}
+						if(startTime==null&&endTime==null){
+							insertTime=new Date();
+						}
+						if(startTime!=null&&endTime!=null){
+							SimpleDateFormat sdf=new SimpleDateFormat("yyyy年");
+							strmonth=sdf.format(startTime)+"-"+sdf.format(endTime);
+							insertTime=new Date();
+						}
+					
+				}else{
+					size="1";
+				}
+				
+				//dtolist=czReportService.selectDoubleListByPage(startTime,endTime,carNumber,null,size,paramsDto.getLength(),paramsDto.getStart(),result);
+				//dtolist=czReportService.selectMonthListByPage(year,month,carNumber,null,size,paramsDto.getLength(),paramsDto.getStart(),startTime,endTime,nowMonth,endmonth,listcarType);
+				for(CzReportDto temp:dtolist){
+					if(insertTime!=null){
+						temp.setInsertTime(insertTime,2,strmonth);
+						list.add(temp);
+					}
+					
+				}
+				
+			}
+			
+			
+		
+		DataTableDto data = new DataTableDto(); // 返回数据封装
+		data.setDataList(list);
+		data.setDraw(paramsDto.getDraw());
+		data.setRecordsFiltered(iTotal);
+		data.setRecordsTotal(iTotal);
+		AjaxUtil.ajaxWriteDataTable(data, response);
+		
+	}
+	
+	/*
+	 * 年报表导出
+	 */
+	@RequestMapping("/report/Czreport/exportYear.do")
+	@ResponseBody
+	public void ExportYear() throws ParseException{
+		List<Integer> listtype=authorityGetter.carTypeAuth();
+		List<Integer> listTypeId=null;
+		String size=null;
+		Date startTime=new Date();
+		Calendar cal=Calendar.getInstance();
+		cal.setTime(startTime);
+		int year=cal.get(Calendar.YEAR);
+		if(listtype!=null){//不是企业管理员，需要权限
+			if(listtype.size()>0){
+				listTypeId=listtype;
+			}else{
+				size="1";
+			}
+		}
+		//ExTemplate exTemplate=new ExTemplate();
+		List<Map<String,Object>> data=czReportService.exportYear(year,listTypeId,size);
+		if(data.size()!=0){
+			for(int i=0;i<data.size();i++){
+				SimpleDateFormat sdf=new SimpleDateFormat("yyyy年");
+				data.get(i).put("insert_time",sdf.format(startTime));
+				
+			}
+		}
+		
+		String[] head = {"时间","车辆类型","记录数量","总计金额"};
+		String[] column={"insert_time","car_type_name","countnum","czfee"};
+		exTemplate.Export(data, head, column);
+		
+	}
+}

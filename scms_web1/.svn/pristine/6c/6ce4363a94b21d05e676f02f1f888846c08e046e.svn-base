@@ -1,0 +1,695 @@
+package com.wadejerry.scms.modules.pfm.serviceImpl;
+
+import java.math.BigDecimal;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.wadejerry.scms.frame.Authority.AuthorityGetter;
+import com.wadejerry.scms.frame.entity.LoginInfo;
+import com.wadejerry.scms.frame.entity.OperateResult;
+import com.wadejerry.scms.frame.entity.PageParamsDto;
+import com.wadejerry.scms.modules.auth.dao.BimUserMapper;
+import com.wadejerry.scms.modules.auth.dao.BimUserRoleMapper;
+import com.wadejerry.scms.modules.auth.dto.UserRoleRelDto;
+import com.wadejerry.scms.modules.auth.model.BimUser;
+import com.wadejerry.scms.modules.basic.dao.BimAppInfoMapper;
+import com.wadejerry.scms.modules.basic.dao.BimCardAppMapper;
+import com.wadejerry.scms.modules.basic.model.BimAppInfo;
+import com.wadejerry.scms.modules.basic.model.BimCardApp;
+import com.wadejerry.scms.modules.pfm.dao.PfmCarInfoMapper;
+import com.wadejerry.scms.modules.pfm.dao.PfmChargeRuleMapper;
+import com.wadejerry.scms.modules.pfm.dao.PfmCarTypeMapper;
+import com.wadejerry.scms.modules.pfm.dao.PfmCarTypeRelMapper;
+import com.wadejerry.scms.modules.pfm.dao.PfmParkSpaceCarRelMapper;
+import com.wadejerry.scms.modules.pfm.dao.PfmParkSpaceMapper;
+import com.wadejerry.scms.modules.pfm.dao.PfmParkingLotMapper;
+import com.wadejerry.scms.modules.pfm.dao.PfmSubsidiaryCarNumMapper;
+import com.wadejerry.scms.modules.pfm.dto.AddCarinfoDto;
+import com.wadejerry.scms.modules.pfm.dto.CarInfoDto;
+import com.wadejerry.scms.modules.pfm.model.PfmCarInfo;
+import com.wadejerry.scms.modules.pfm.model.PfmChargeRule;
+import com.wadejerry.scms.modules.pfm.model.PfmCarTypeRel;
+import com.wadejerry.scms.modules.pfm.model.PfmParkSpace;
+import com.wadejerry.scms.modules.pfm.model.PfmParkSpaceCarRel;
+import com.wadejerry.scms.modules.pfm.model.PfmParkingLot;
+import com.wadejerry.scms.modules.pfm.model.PfmSubsidiaryCarNum;
+import com.wadejerry.scms.modules.pfm.service.PfmCarInfoService;
+import com.wadejerry.scms.utils.Validator;
+import com.wadejerry.scms.utils.date.DateUtil;
+
+@Service("pfmCarInfoService")
+public class PfmCarInfoServiceImpl implements PfmCarInfoService {
+
+	@Autowired
+	private PfmCarInfoMapper pcim;
+	@Autowired
+	private PfmCarTypeRelMapper pctr;
+	@Autowired
+	private PfmParkSpaceCarRelMapper ppscr;
+	@Autowired
+	private PfmCarTypeMapper pctm;
+	@Autowired
+	private PfmParkingLotMapper pplm;
+	@Autowired
+	private PfmParkSpaceMapper ppsm;
+	@Autowired
+	private PfmSubsidiaryCarNumMapper pscm;
+	@Autowired
+	private BimAppInfoMapper bimAppInfoMapper;
+	@Autowired
+	private BimCardAppMapper bimCardAppMapper;
+	@Autowired
+	private PfmChargeRuleMapper pfmChargeRuleMapper;
+	@Autowired
+	private BimUserRoleMapper bimUserRoleMapper;
+	@Autowired
+	private BimUserMapper userMapper;
+	@Autowired
+	private AuthorityGetter authority;
+	public List<CarInfoDto> getCarInfoListByPage(PageParamsDto ppd) {
+	List<UserRoleRelDto> userroles=	bimUserRoleMapper.selectUserRoleDtoByUserId(LoginInfo.getLoginId());
+		
+		List<Integer> carTypeIds =new ArrayList();
+		
+		for(UserRoleRelDto temp:userroles){
+			BimUser user = userMapper.selectByPrimaryKey(temp.getRoleId());
+			if(user!=null){
+				if(user.getCustom3()!=null&&user.getCustom3().length()!=0){
+					List<String> list=Arrays.asList(user.getCustom3().split(","));
+					for(String temp1:list){
+						carTypeIds.add(Integer.parseInt(temp1));
+					}
+				}
+			}
+
+		}
+
+		return pcim.selectAllDataBypage(ppd,LoginInfo.getCompanyId(),carTypeIds);
+	}
+
+	public int getCarInfoCount(PageParamsDto ppd) {
+		
+	
+		
+		List<UserRoleRelDto> userroles=	bimUserRoleMapper.selectUserRoleDtoByUserId(LoginInfo.getLoginId());
+		
+		List<Integer> carTypeIds =new ArrayList();
+		
+		for(UserRoleRelDto temp:userroles){
+			BimUser user = userMapper.selectByPrimaryKey(temp.getRoleId());
+			if(user!=null){
+				if(user.getCustom3()!=null&&user.getCustom3().length()!=0){
+					List<String> list=Arrays.asList(user.getCustom3().split(","));
+					for(String temp1:list){
+						carTypeIds.add(Integer.parseInt(temp1));
+					}
+				}
+			}
+
+		}
+		
+		return pcim.selectAllCount(ppd,LoginInfo.getCompanyId(),carTypeIds);
+		
+	}
+	@Transactional
+	public int deleteCarInfo(CarInfoDto dt) {
+		// TODO Auto-generated method stub
+		pctr.deleteByPrimaryKey(dt.getCarTypeRelId());
+
+
+		ppscr.deleteByPrimaryKey(dt.getParkSpaceCarRelId());
+
+
+		pcim.deleteByPrimaryKey(dt.getCarInfoId());
+		return 0;
+	}
+
+
+	//	@Override
+	//	public List<CarTypeDto> getCarTypeList(int companyid) {
+	//		// TODO Auto-generated method stub
+	//
+	//		return pctm.selectCarTypeList(companyid);
+	//	}
+
+
+	public List<PfmParkingLot> getParkingLots(int companyid) {
+		// TODO Auto-generated method stub
+		return pplm.selectAllbyCompanyId(companyid);
+	}
+
+	public List<PfmParkSpace> getParkSpaceList(int parkinglotid) {
+		// TODO Auto-generated method stub
+		return ppsm.selectParkSpacelistByparkinglotid(parkinglotid);
+	}
+	@Transactional
+	public OperateResult addCarInfo(AddCarinfoDto carinfo) throws ParseException {
+
+
+		String carNumber = carinfo.getCarNumber();
+		int companyId = LoginInfo.getCompanyId();
+		if("".equals(carinfo.getCarInfoId())){//做新增操作
+			//查无记录 继续添加
+			if(pcim.selectifExistbyCarNumber(carNumber, companyId)==0){
+				PfmCarInfo pfmCarInfo = new PfmCarInfo();
+
+				pfmCarInfo.setSex(Short.valueOf(carinfo.getSex()));
+				pfmCarInfo.setBimCompanyId(LoginInfo.getCompanyId());
+				pfmCarInfo.setPhone(carinfo.getPhone());
+				pfmCarInfo.setStatus(Integer.valueOf(carinfo.getStatus()));
+				pfmCarInfo.setPersonName(carinfo.getPersonName());
+				pfmCarInfo.setCarNumber(carinfo.getCarNumber());
+				pfmCarInfo.setInsertTime(new Date());
+				pfmCarInfo.setUpdateTime(new Date());
+				pfmCarInfo.setUserName(LoginInfo.getLoginName());
+				pfmCarInfo.setAddres(carinfo.getAddres());
+				pfmCarInfo.setCertId(carinfo.getCertId());
+				pfmCarInfo.setEnableTime(DateUtil.YMDsdf.parse(carinfo.getEnableTime()));
+				pfmCarInfo.setDisableTime(DateUtil.YMDsdf.parse(carinfo.getDisableTime()));
+				pfmCarInfo.setNote(carinfo.getNote());
+				pfmCarInfo.setIsDel(0);
+				if(!carinfo.getCardId().equals(""))
+					pfmCarInfo.setCardId(carinfo.getCardId());
+
+				pcim.insertSelective(pfmCarInfo);
+				//System.out.println(pfmCarInfo);
+				//System.err.println(pfmCarInfo.getCarInfoId());
+
+				PfmCarTypeRel pfmcartyperel = new PfmCarTypeRel();
+				pfmcartyperel.setCarInfoId(pfmCarInfo.getCarInfoId());
+				pfmcartyperel.setCarTypeId(Integer.valueOf(carinfo.getCarTypeId()));
+				pfmcartyperel.setInsertTime(new Date());
+				pfmcartyperel.setUpdateTime(new Date());
+				pfmcartyperel.setUserName(LoginInfo.getLoginName());
+				pctr.insertSelective(pfmcartyperel);
+				//-1 -> 不绑定车位 则无需插入关联数据
+				if((Integer.parseInt(carinfo.getCarSpaceId()))!=-1){
+					PfmParkSpaceCarRel pfmparkspacerel = new PfmParkSpaceCarRel();
+					pfmparkspacerel.setCarInfoId(pfmCarInfo.getCarInfoId());
+					pfmparkspacerel.setPfmParkSpace(Integer.valueOf(carinfo.getCarSpaceId()));
+					pfmparkspacerel.setInsertTime(new Date());
+					pfmparkspacerel.setUpdateTime(new Date());
+					pfmparkspacerel.setUserName(LoginInfo.getLoginName());
+					ppscr.insertSelective(pfmparkspacerel);
+
+				}
+				//绑定附属车牌处理
+				if(!"".equals(carinfo.getSubsidiaryCarNum())){
+					String[] arr=carinfo.getSubsidiaryCarNum().split(";");
+					for(int i=0;i<arr.length;i++){
+					PfmSubsidiaryCarNum obj = new PfmSubsidiaryCarNum();
+					obj.setCarNumber(arr[i]);
+					obj.setUpdateTime(new Date());
+					obj.setCarId(pfmCarInfo.getCarInfoId());
+					obj.setUserName(LoginInfo.getLoginName());
+					pscm.insertSelective(obj);
+					}
+				}
+				//添加账户信息bim_card_app
+				BimCardApp account = new BimCardApp();
+				account.setCarId(pfmCarInfo.getCarInfoId());
+				account.setCreateTime(new Date());
+				account.setUpdateTime(new Date());
+				account.setAppId(1);
+				account.setValue1(new BigDecimal(0));
+				account.setTotalDeposit(new BigDecimal(0));
+				BimAppInfo appInfo = bimAppInfoMapper.selectByPrimaryKey(1);
+				account.setAppCode(appInfo.getAppCode());
+				account.setAppName(appInfo.getAppName());
+				account.setCardId(0);
+				bimCardAppMapper.insertSelective(account);
+				OperateResult result = new OperateResult();
+				result.setResult(true);
+				result.setMsg("保存成功");
+				return result;
+
+			}
+			else{
+				OperateResult result = new OperateResult();
+				result.setResult(false);
+				result.setMsg("已存在车牌号为"+carinfo.getCarNumber()+"的数据");
+				return result;
+
+			}
+		}
+		//做修改操作
+		else{
+			if(pcim.selectifExistbyCarNumberExcepself(carNumber, companyId,Integer.parseInt(carinfo.getCarInfoId()))!=0){
+
+				OperateResult result = new OperateResult();
+				result.setResult(false);
+				result.setMsg("修改失败，已存在车牌");
+				return result;
+
+			}
+
+			else{
+				PfmCarInfo pfmcarinfo = new PfmCarInfo();
+				if("".equals(carinfo.getPersonId())){
+
+					pfmcarinfo.setCarInfoId(Integer.parseInt(carinfo.getCarInfoId()));
+					pfmcarinfo.setCarNumber(carinfo.getCarNumber());
+					pfmcarinfo.setSex((short)Integer.parseInt(carinfo.getSex()));
+					pfmcarinfo.setPersonName(carinfo.getPersonName());
+					pfmcarinfo.setPhone(carinfo.getPhone());
+					pfmcarinfo.setStatus(Integer.parseInt(carinfo.getStatus()));
+					pfmcarinfo.setUpdateTime(new Date());
+					pfmcarinfo.setAddres(carinfo.getAddres());
+					pfmcarinfo.setCardId(carinfo.getCardId());
+					pfmcarinfo.setCertId(carinfo.getCertId());
+					pfmcarinfo.setEnableTime(DateUtil.YMDsdf.parse(carinfo.getEnableTime()));
+					pfmcarinfo.setDisableTime(DateUtil.YMDsdf.parse(carinfo.getDisableTime()));
+					pfmcarinfo.setNote(carinfo.getNote());}
+				else{
+					pfmcarinfo.setCarInfoId(Integer.parseInt(carinfo.getCarInfoId()));
+					pfmcarinfo.setCarNumber(carinfo.getCarNumber());
+					pfmcarinfo.setStatus(Integer.parseInt(carinfo.getStatus()));
+					pfmcarinfo.setCardId(carinfo.getCardId());
+					pfmcarinfo.setUpdateTime(new Date());
+					pfmcarinfo.setEnableTime(DateUtil.YMDsdf.parse(carinfo.getEnableTime()));
+					pfmcarinfo.setDisableTime(DateUtil.YMDsdf.parse(carinfo.getDisableTime()));
+					pfmcarinfo.setNote(carinfo.getNote());
+
+				}
+				pcim.updateByPrimaryKeySelective(pfmcarinfo);
+
+				PfmCarTypeRel pfmcartp = new PfmCarTypeRel();
+				pfmcartp.setCarTypeRelId(Integer.parseInt(carinfo.getCarTypeRelId()));
+				pfmcartp.setCarTypeId(Integer.parseInt(carinfo.getCarTypeId()));
+				pfmcartp.setUpdateTime(new Date());
+				pctr.updateByPrimaryKeySelective(pfmcartp);
+
+				if(	!"".equals(carinfo.getParkSpaceCarRelId())){//已绑定车位车辆更换车位
+					if(carinfo.getCarSpaceId()==null||Integer.parseInt(carinfo.getCarSpaceId())==-1)//取消绑定，删除
+					{
+						ppscr.deleteByPrimaryKey(Integer.parseInt(carinfo.getParkSpaceCarRelId()));
+					}
+					else{//修改绑定
+						PfmParkSpaceCarRel pp = new PfmParkSpaceCarRel();
+						pp.setPfmParkSpaceCarRelId(Integer.parseInt(carinfo.getParkSpaceCarRelId()));
+						pp.setPfmParkSpace(Integer.parseInt(carinfo.getCarSpaceId()));
+						pp.setUpdateTime(new Date());
+						ppscr.updateByPrimaryKeySelective(pp);
+					}
+
+
+				}else{//原先未绑定车位车辆，绑定车位
+					if(carinfo.getCarSpaceId()!=null&&Integer.parseInt(carinfo.getCarSpaceId())!=-1){
+
+						PfmParkSpaceCarRel pp = new PfmParkSpaceCarRel();
+
+						pp.setPfmParkSpace(Integer.parseInt(carinfo.getCarSpaceId()));
+						pp.setUpdateTime(new Date());
+						pp.setInsertTime(new Date());
+						pp.setUserName(LoginInfo.getLoginName());
+						pp.setCarInfoId(Integer.parseInt(carinfo.getCarInfoId()));
+						ppscr.insertSelective(pp);
+					}
+
+
+				}
+				pscm.deleByCarId(Integer.parseInt(carinfo.getCarInfoId()));
+				if(!"".equals(carinfo.getSubsidiaryCarNum())){
+					String[] arr=carinfo.getSubsidiaryCarNum().split(";");
+					for(int i=0;i<arr.length;i++){
+					PfmSubsidiaryCarNum obj = new PfmSubsidiaryCarNum();
+					obj.setCarNumber(arr[i]);
+					obj.setUpdateTime(new Date());
+					obj.setCarId(Integer.parseInt(carinfo.getCarInfoId()));
+					obj.setUserName(LoginInfo.getLoginName());
+					pscm.insertSelective(obj);
+					}
+				}
+				OperateResult result = new OperateResult();
+				result.setResult(true);
+				result.setMsg("修改成功");
+				return result;
+
+			
+
+
+
+			}
+			
+		}
+
+	
+	}
+
+	public PfmParkSpace getParkSpace(int carinfoid) {
+		// TODO Auto-generated method stub
+		return ppsm.selectBycarInfoId(carinfoid);
+	}
+
+	@Transactional
+	public OperateResult changtCarType(List<Integer> carinfoids/*cartyperel的主键id*/, Integer carTypeId/*将要转换的类型id*/) {
+		OperateResult result = new OperateResult();
+		List<Integer> toChange = new ArrayList<>();
+		String error = "";
+		PfmChargeRule toRule = pfmChargeRuleMapper.selectByCarType(carTypeId) ;
+		for(Integer carInfoId:carinfoids){
+			Integer carId = pctr.selectByPrimaryKey(carInfoId).getCarInfoId();
+		/*PfmChargeRule rule = 	pfmChargeRuleMapper.selectByCarId(carId);
+		if(toRule!=null&&toRule.getRuleType()==5){
+		if(rule!=null){
+		if(!(rule.getRuleType()==5||rule.getRuleType()==6||rule.getRuleType()==8)){
+			BimCardApp card = bimCardAppMapper.selectByCarID(carId);
+			
+				if(card.getValue1().compareTo(new BigDecimal(0))==0){
+					toChange.add(carInfoId);
+				}
+				else{
+					error+=pcim.selectByPrimaryKey(carId).getCarNumber()+" 账户尚存余额，请先退款；";
+				}
+			
+		}
+		else{
+			toChange.add(carInfoId);
+		}
+		}
+		else{
+			toChange.add(carInfoId);
+		}
+		}
+		else{
+			toChange.add(carInfoId);
+		}*/
+			toChange.add(carInfoId);
+		}
+	
+		for(Integer carInfoId:toChange){
+			PfmCarTypeRel pfmcartyperel = pctr.selectByPrimaryKey(carInfoId);
+			pfmcartyperel.setCarTypeId(carTypeId);
+			pfmcartyperel.setUpdateTime(new Date());
+			pfmcartyperel.setUserName(LoginInfo.getLoginName());
+			pctr.updateByPrimaryKey(pfmcartyperel);
+
+		}
+		if(error.equals("")){
+		result.setResult(true);
+		result.setMsg("修改成功");}
+		else{
+			result.setResult(false);
+			result.setMsg(error);
+		}
+		
+		return result;
+
+	}
+	
+	@Override
+	@Transactional
+	public OperateResult validateAndInsert(List<Map<String, String>> list) throws Exception {
+		//基本验证
+		OperateResult result = new OperateResult();
+		int index=1;
+		//标识数据是否有错误
+		boolean b = true;
+		String error="";
+		for(Map<String,String> map:list){
+			if(index==1){
+				if(map.get("车牌号*")==null
+				||map.get("手机号")==null
+				||map.get("姓名*")==null
+				||map.get("性别*")==null
+				||map.get("状态*")==null
+				||map.get("启用时间*")==null
+				||map.get("停用时间*")==null
+				||map.get("车辆类型*")==null
+				||map.get("备注")==null
+				||map.get("地址")==null
+				||map.get("卡号")==null
+				||map.get("证件ID")==null){
+					throw new RuntimeException("请使用模板！您的模板存在列名不正确的情况，请仔细核对！");
+				}
+			}
+			index+=1;
+			if(!Validator.isCarNum(map.get("车牌号*").trim()))//车牌号
+
+			{
+				b=false;
+				error+="第"+index+"行车牌格式错误；\\n";
+			}
+			if(!map.get("手机号").trim().equals("")&&!Validator.isMobile(map.get("手机号").trim())){//手机号
+
+				b=false;
+				error+="第"+index+"行手机号格式错误；\\n";
+
+			}
+			if(!Validator.isName(map.get("姓名*").trim())){//性别
+				b=false;
+				error+="第"+index+"行姓名格式错误；\\n";
+			}
+			if(!(map.get("性别*").trim().equals("男")||map.get("性别*").trim().equals("女"))){//性别
+				b=false;
+				error+="第"+index+"行性别格式错误，请输入男或女；\\n";
+			}
+			if(!(map.get("状态*").trim().equals("黑名单")||map.get("状态*").trim().equals("白名单")||map.get("状态*").trim().equals("正常")))//状态
+			{
+
+				b=false;
+				error+="第"+index+"行状态格式错误，只允许为正常，黑名单，白名单；\\n";
+			}
+
+			if(!Validator.isDate(map.get("启用时间*").trim()))//启用时间
+			{
+				b=false;
+				error+="第"+index+"行启用日期格式错误，格式应如2008-08-08；\\n";
+			}
+			if(!Validator.isDate(map.get("停用时间*").trim()))//停用时间
+			{
+				b=false;
+				error+="第"+index+"行停用日期格式错误，格式应如2008-08-08；\\n";
+			}
+			if(Validator.isDate(map.get("启用时间*").trim())&&Validator.isDate(map.get("停用时间*").trim())){
+			if(DateUtil.YMDsdf.parse(map.get("停用时间*").trim()).getTime()<DateUtil.YMDsdf.parse(map.get("启用时间*").trim()).getTime())
+			{
+				b=false;
+			error+="第"+index+"行停用时间应大于启用时间；\\n";	
+			}
+			}
+			if(pctm.selectCountByCartypeName(map.get("车辆类型*").trim(),LoginInfo.getCompanyId())==0){
+				b=false;
+				error+="第"+index+"行请确认是否存在此车辆类型；\\n";
+			}
+//			if((!map.get("车位绑定").trim().equals("")||!map.get("车场").trim().equals(""))&&ppsm.selectCountByLotNameAndCode(map.get("车位绑定").trim(), map.get("车场").trim(), LoginInfo.getCompanyId())==0)
+//			{
+//				b=false;
+//				error+="第"+index+"行请确认是否存在此车位；\\n";
+//			}
+		}
+		if(!b){
+			result.setResult(false);
+			result.setMsg(error);
+			return result;
+		}
+		else{
+			for(Map<String,String> map:list){
+				PfmCarInfo carInfo = new PfmCarInfo();
+				carInfo.setBimCompanyId(LoginInfo.getCompanyId());
+				carInfo.setCarNumber(map.get("车牌号*").trim());
+				if(pcim.selectifExistByCarnum(map.get("车牌号*").trim(), LoginInfo.getCompanyId())>0){
+					throw new RuntimeException("已存在车牌号为 "+map.get("车牌号*").trim()+" 的车辆信息！");
+				}
+				carInfo.setAddres(map.get("地址").trim());
+				carInfo.setCertId(map.get("证件ID").trim());
+				carInfo.setPhone(map.get("手机号"));
+				carInfo.setCardId(map.get("卡号"));
+				carInfo.setNote(map.get("备注"));
+				carInfo.setPersonName(map.get("姓名*").trim());
+				carInfo.setIsDel(0);
+				if(map.get("性别*").trim().equals("男")){
+					carInfo.setSex((short) 0);
+				}
+				else{
+					carInfo.setSex((short) 1);
+				}
+				switch(map.get("状态*").trim()){
+				case "黑名单":carInfo.setStatus(3);break;
+				case "白名单":carInfo.setStatus(2);break;
+				case "正常":carInfo.setStatus(0);break;
+				case "挂失":carInfo.setStatus(1);break;
+
+				}
+				carInfo.setInsertTime(new Date());
+				carInfo.setUpdateTime(new Date());
+				try {
+					carInfo.setEnableTime(DateUtil.YMDsdf.parse(map.get("启用时间*").trim()));
+					carInfo.setDisableTime(DateUtil.YMDsdf.parse(map.get("停用时间*").trim()));
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				carInfo.setUserName(LoginInfo.getLoginName());
+				pcim.insertSelective(carInfo);
+				BimCardApp account = new BimCardApp();
+				account.setCarId(carInfo.getCarInfoId());
+				account.setCreateTime(new Date());
+				account.setUpdateTime(new Date());
+				account.setAppId(1);
+				account.setValue1(new BigDecimal(0));
+				account.setTotalDeposit(new BigDecimal(0));
+				BimAppInfo appInfo = bimAppInfoMapper.selectByPrimaryKey(1);
+				account.setAppCode(appInfo.getAppCode());
+				account.setAppName(appInfo.getAppName());
+				account.setCardId(0);
+				bimCardAppMapper.insertSelective(account);
+
+				PfmCarTypeRel cartypeRel = new PfmCarTypeRel();
+				cartypeRel.setCarInfoId(carInfo.getCarInfoId());
+				cartypeRel.setInsertTime(new Date());
+				cartypeRel.setUpdateTime(new Date());
+				cartypeRel.setUserName(LoginInfo.getLoginName());
+				cartypeRel.setCarTypeId(pctm.selectIdBYName(map.get("车辆类型*").trim(), LoginInfo.getCompanyId()));
+				pctr.insertSelective(cartypeRel);
+
+//				pfmParkSpaceCarRel spaceRel = new pfmParkSpaceCarRel();
+//				spaceRel.setCarInfoId(carInfo.getCarInfoId());
+//				spaceRel.setInsertTime(new Date());
+//				spaceRel.setUpdateTime(new Date());
+//				spaceRel.setUserName(LoginInfo.getLoginName());
+//				if(!(map.get("车位绑定").trim().equals("")&& map.get("车场").trim().equals(""))){
+//				spaceRel.setPfmParkSpace(ppsm.selectIdBYLotNameAndCode(map.get("车位绑定").trim(), map.get("车场").trim(), LoginInfo.getCompanyId()));
+//				ppscr.insertSelective(spaceRel);
+//				}
+				
+			}
+			result.setResult(true);
+			return result;
+		}
+
+
+	}
+
+	public OperateResult validateCardId(String cardId,int companyId,int flag,String carInfoId) {
+		// TODO Auto-generated method stub
+		OperateResult r = new OperateResult();
+		if(flag==0)
+		{
+			if(pcim.selectifExistByCardId(cardId, companyId)>0){
+
+				r.setResult(false);
+				r.setMsg("存在卡号");
+			}
+			else{
+
+				r.setResult(true);
+			}
+		}
+		else{
+
+			if(pcim.selectifExistbyCardIdExcepself(cardId, companyId, Integer.parseInt(carInfoId))>0){
+
+				r.setResult(false);
+				r.setMsg("存在卡号");
+			}
+			else{
+
+				r.setResult(true);
+			}
+
+		}
+
+		return r;
+	}
+
+	public OperateResult validateCarnum(String carnum, int companyId,int flag,String carInfoId) {
+		OperateResult r = new OperateResult();
+		if(flag==0)//添加车辆时的验证操作，查询数据库中是否存在相同车牌
+		{
+			if(pcim.selectifExistByCarnum(carnum, companyId)>0){
+
+				r.setResult(false);
+				r.setMsg("已存在车牌号为"+carnum+"的车辆");
+			}
+			else{
+
+				r.setResult(true);
+			}
+		}
+		else {
+			if(pcim.selectifExistbyCarNumberExcepself(carnum, companyId, Integer.parseInt(carInfoId))>0){
+
+				r.setResult(false);
+				r.setMsg("已存在车牌号为"+carnum+"的车辆");
+			}
+			else{
+
+				r.setResult(true);
+			}
+
+		}		 
+		return r;
+
+	}
+
+	@Override
+	public List<Map<String, Object>> download(int companyid,String carTypeId) {
+		// TODO Auto-generated method stub
+		Integer carType = null;
+		if(!"".equals(carTypeId)){
+			carType=Integer.parseInt(carTypeId);
+		}
+		List<Integer> cartypeids = authority.carTypeAuth();
+		return  pcim.selectExcel(companyid,carType,cartypeids);
+	
+	}
+
+	@Override
+	@Transactional
+	public OperateResult deleteCarInfobyIsDel(List<CarInfoDto> dtos) {
+		// TODO Auto-generated method stub
+		OperateResult result =new OperateResult();
+		List<CarInfoDto> toDel= new ArrayList<>();
+		result.setResult(true);
+		for(CarInfoDto dto:dtos){
+			PfmChargeRule rule = pfmChargeRuleMapper.selectByCarType(dto.getCarTypeId());
+			if(rule==null||rule.getRuleType()==5||rule.getRuleType()==6||rule.getRuleType()==8){
+				toDel.add(dto);
+			}
+			else{
+				BimCardApp card = bimCardAppMapper.selectByCarID(dto.getCarInfoId());
+				
+				if(card==null){
+					toDel.add(dto);
+					
+				}else{
+		
+				if(!(card.getValue1().compareTo(new BigDecimal(0))==0)){
+					result.setResult(false);
+					result.setMsg("删除失败，存在车辆账户存有余额");
+				}
+				else{
+					toDel.add(dto);
+				}
+				}
+			}
+		
+		}
+		for(CarInfoDto dto:toDel){
+		
+			pcim.deleteCarinfo(dto.getCarInfoId());
+			PfmCarInfo carinfo = pcim.selectByPrimaryKey(dto.getCarInfoId());
+			carinfo.setUpdateTime(new Date());
+			pcim.updateByPrimaryKeySelective(carinfo);
+			bimCardAppMapper.deleteByCarId(dto.getCarInfoId());
+			
+		}
+		return result;
+	}
+
+	@Override
+	public List<PfmSubsidiaryCarNum> selectSubsidiaryCarNumByCarInfoId(int carInfoId) {
+		// TODO Auto-generated method stub
+		return pscm.selectByCarId(carInfoId);
+	}
+
+}

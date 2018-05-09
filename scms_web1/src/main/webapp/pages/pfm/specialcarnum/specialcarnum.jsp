@@ -1,0 +1,32 @@
+
+<%@ page contentType="text/html; charset=UTF-8"%>
+<div class="tab-pane fade in" id="specialNumber">
+	<table id="special" class="table table-bordered table-striped">
+		<thead>
+			<tr>
+				<th>特殊车牌</th>
+				<th>创建时间</th>
+				<th>更新时间</th>
+				<th>创建用户</th>
+				<th>备注</th>
+				<th></th>
+			</tr>
+		</thead>
+		<tbody>						
+		</tbody>
+		<tfoot>						
+		</tfoot>
+	</table>
+</div>
+<%@ include file="addspecial.jsp"%>
+<script type="text/javascript">
+	function Buttonpermission(){
+		<shiro:lacksPermission name="SpecialAdd">$("#special_wrapper a[name='wade.libs.datatable_add']").remove();</shiro:lacksPermission>//添加
+		<shiro:lacksPermission name="SpecialDelete">$("#special_wrapper a[name='wade.libs.datatable_del']").remove();</shiro:lacksPermission>//删除
+		<shiro:lacksPermission name="SpecialEdit">$("#special_wrapper a[name='wade.libs.datatable_edit']").remove();</shiro:lacksPermission>//修改
+	}
+	function Seepermission(){
+		<shiro:lacksPermission name="SpecialSee">$("#special tbody td").text("没有浏览权限");</shiro:lacksPermission>//浏览
+	}
+</script>
+<script src="/pages/pfm/specialcarnum/special.js" type="text/javascript"></script>

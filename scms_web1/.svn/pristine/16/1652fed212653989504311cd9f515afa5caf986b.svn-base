@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.wadejerry.scms.modules.pfm.dao.pfmBoothMapper">
+<resultMap type="com.wadejerry.scms.modules.pfm.dto.BoothDto" id="DtoResultMap">
+<id column="pfm_booth_id" property="pfmBoothId" jdbcType="INTEGER"/>
+<result column="booth_code" property="boothCode" jdbcType="VARCHAR"/>
+<result column="booth_name" property="boothName" jdbcType="VARCHAR"/>
+<result column="phone" property="phone" jdbcType="VARCHAR" />
+<result column="parking_lot_name" property="parkingLotName" jdbcType="VARCHAR" />
+<result column="time_name" property="timeName" jdbcType="VARCHAR" />
+<result column="consume_confirm" property="consumeConfirm" jdbcType="SMALLINT"  />
+<result column="center_charge" property="centerCharge" jdbcType="SMALLINT"/>
+<result column="client_ip" property="clientIp" jdbcType="VARCHAR"/>
+<result column="note" property="note" jdbcType="VARCHAR"/>
+<result column="pfm_entrance_id" property="pfmEntranceId" jdbcType="INTEGER"/>
+</resultMap>
+<resultMap type="com.wadejerry.scms.modules.pfm.model.PfmBooth" id="BaseMap">
+<id column="pfm_booth_id" property="pfmBoothId" jdbcType="INTEGER"/>
+<result column="booth_code" property="boothCode" jdbcType="VARCHAR"/>
+<result column="booth_name" property="boothName" jdbcType="VARCHAR"/>
+<result column="phone" property="phone" jdbcType="VARCHAR" />
+<result column="parking_Lot_name" property="parkingLotName" jdbcType="VARCHAR" />
+<result column="time_name" property="timeName" jdbcType="VARCHAR" />
+<result column="consume_confirm" property="consumeConfirm" jdbcType="SMALLINT"  />
+<result column="center_charge" property="centerCharge" jdbcType="SMALLINT"/>
+<result column="client_ip" property="clientIp" jdbcType="VARCHAR"/>
+<result column="note" property="note" jdbcType="VARCHAR"/>
+<result column="pfm_parking_lot_id" property="pfmParkLotId" jdbcType="INTEGER"/>
+<result column="pfm_time_id" property="pfmTimeId" jdbcType="INTEGER"/>
+<result column="int_channel1" property="intChannel1" jdbcType="INTEGER"/>
+<result column="int_channel2" property="intChannel2" jdbcType="INTEGER"/>
+<result column="int_channel3" property="intChannel3" jdbcType="INTEGER"/>
+<result column="int_channel4" property="intChannel4" jdbcType="INTEGER"/>
+<result column="out_channel1" property="outChannel1" jdbcType="INTEGER"/>
+<result column="out_channel2" property="outChannel2" jdbcType="INTEGER"/>
+<result column="out_channel3" property="outChannel3" jdbcType="INTEGER"/>
+<result column="out_channel4" property="outChannel4" jdbcType="INTEGER"/>
+<result column="pfm_entranc_id" property="pfmEntranceId" jdbcType="INTEGER"/>
+<result column="insert_time" property="insertTime" jdbcType="TIMESTAMP"/>
+<result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+</resultMap>
+<!-- 获取记录总数 -->
+<select id="getRecordTotal" parameterType="com.wadejerry.scms.frame.entity.PageParamsDto" resultType="java.lang.Integer">
+select count(pfm_booth_id) from pfm_booth where
+  <!-- 如果不是企业操作员，就只有当前用户创建的操作员权限  -->
+  (#{pageParam.loginUserLevel,jdbcType=INTEGER}=1 or pfm_entrance_id is null <if test="entrances!=null and entrances.size()!=0">or pfm_entrance_id in <foreach collection="entrances" open="(" close=")" separator="," item="item">#{item}</foreach></if>) and 
+  <!--用户或角色名称模糊查询-->
+  	(#{pageParam.searchValue0,jdbcType=VARCHAR}='' or booth_name like CONCAT('%',#{pageParam.searchValue0,jdbcType=VARCHAR},'%' ))
+  	<!-- 过滤企业 -->
+  	and bim_company_id = #{pageParam.companyId,jdbcType=INTEGER}
+</select>
+<!-- 分页获取信息 -->
+  <select id="getBoothListByPage" parameterType="com.wadejerry.scms.frame.entity.PageParamsDto" resultMap="DtoResultMap" >
+  <!-- select b.booth_code,b.booth_name,b.phone,p.parking_lot_name,t.time_name,b.center_charge,b.client_ip,b.note from pfm_booth as b,pfm_time as t,pfm_parking_lot as p where  b.pfm_time_id=t.pfm_time_id
+   
+	  and 
+		如果不是企业操作员，就只有当前用户创建的操作员权限 
+	  	(#{loginUserLevel,jdbcType=INTEGER} = 1) and
+	  	用户或角色名称模糊查询
+	  	(#{searchValue0,jdbcType=VARCHAR}='' or b.booth_name like CONCAT('%',#{searchValue0,jdbcType=VARCHAR},'%' )) 
+	  	
+	  	过滤企业
+	  	and (b.bim_company_id = #{companyId,jdbcType=INTEGER}) ${order} 
+	  	LIMIT  #{length,jdbcType=INTEGER} OFFSET  #{start,jdbcType=INTEGER} --> 
+	  	
+	  	select * from pfm_booth  where 
+		<!-- 如果不是企业操作员，就只有当前用户创建的操作员权限  -->
+  (#{pageParam.loginUserLevel,jdbcType=INTEGER}=1 or pfm_entrance_id is null <if test="entrances!=null and entrances.size()!=0">or pfm_entrance_id in <foreach collection="entrances" open="(" close=")" separator="," item="item">#{item}</foreach></if>) and 	  	<!--用户或角色名称模糊查询-->
+	  	(#{pageParam.searchValue0,jdbcType=VARCHAR}='' or booth_name like CONCAT('%',#{pageParam.searchValue0,jdbcType=VARCHAR},'%' )) 
+	  	
+	  	<!-- 过滤企业 -->
+	  	and (bim_company_id = #{pageParam.companyId,jdbcType=INTEGER}) ${pageParam.order} 
+	  	LIMIT  #{pageParam.length,jdbcType=INTEGER} OFFSET  #{pageParam.start,jdbcType=INTEGER}
+  </select>
+  <!-- 查询岗亭名称是否存在 -->
+  <select id="findByBoothName"  resultMap="BaseMap">
+  select booth_name,pfm_booth_id from pfm_booth where booth_name=#{0} and bim_company_id=#{1}
+  </select>
+  <!-- 查询岗亭编号是否存在 -->
+  <select id="findByCodeName"  resultMap="BaseMap">
+  select booth_code,pfm_booth_id from pfm_booth where booth_code=#{0} and bim_company_id=#{1}
+  </select>
+  <!--根据出入口id和公司id查询 -->
+  <select id="selectByPfmEntranceId"  resultMap="BaseMap">
+  select * from pfm_booth where pfm_entrance_id=#{0} and bim_company_id=#{1}
+  </select>
+  <!-- 添加信息 -->
+  <insert id="insertBoothDto" parameterType="com.wadejerry.scms.modules.pfm.model.PfmBooth">
+  insert into pfm_booth(booth_name,phone,client_ip,note,center_charge,bim_company_id, booth_code,pfm_entrance_id,insert_time) values (#{boothName,jdbcType=VARCHAR},#{phone,jdbcType=VARCHAR},#{clientIp,jdbcType=VARCHAR},#{note,jdbcType=VARCHAR},#{centerCharge,jdbcType=SMALLINT},1,#{boothCode,jdbcType=VARCHAR},#{pfmEntranceId,jdbcType=INTEGER},#{insertTime,jdbcType=TIMESTAMP})
+  </insert>
+  <!-- 查找车场和时段ID -->
+ <select id="selectID"  resultMap="BaseMap">
+ select t.pfm_time_id,p.pfm_parking_lot_id from pfm_parking_lot p,pfm_time t where t.time_name=#{1} and p.parking_lot_name=#{0} 
+ </select>
+ <!-- 修改信息 -->
+ <update id="updateBoothDto" parameterType="com.wadejerry.scms.modules.pfm.model.PfmBooth">
+ update pfm_booth  set booth_name=#{boothName,jdbcType=VARCHAR},phone=#{phone,jdbcType=VARCHAR},client_ip=#{clientIp,jdbcType=VARCHAR},note=#{note,jdbcType=VARCHAR},center_charge=#{centerCharge,jdbcType=SMALLINT},booth_code=#{boothCode,jdbcType=VARCHAR},update_time=#{updateTime,jdbcType=TIMESTAMP},pfm_entrance_id=#{pfmEntranceId,jdbcType=INTEGER}
+ where pfm_booth_id=#{pfmBoothId,jdbcType=INTEGER} 
+ </update>
+ <!-- 删除信息 -->
+ <delete id="deleteBoothById" parameterType="java.lang.Integer">
+  delete from pfm_booth where pfm_booth_id=#{pfmBoothId,jdbcType=INTEGER}
+ </delete>
+  <!-- 查询lpr设备 -->
+  <select id="selectAllLpr"  resultMap="BaseMap">
+ select int_channel1,int_channel2,int_channel3,int_channel4,out_channel1,out_channel2,out_channel3,out_channel4 from pfm_booth where pfm_booth_id=#{0}
+ </select> 
+</mapper>

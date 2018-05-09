@@ -1,0 +1,1041 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.wadejerry.scms.modules.pfm.dao.WebServiceMapper">
+
+	<!-- webservice -->
+
+	<resultMap
+		type="com.wadejerry.scms.webservice.server.support.pfm.dto.BoothDto" id="selectAllBoothDtoMap">
+		<id column="pfm_booth_id" property="boothId" jdbcType="INTEGER" />
+		<result column="booth_code" property="boothCode" jdbcType="VARCHAR" />
+		<result column="booth_name" property="boothName" jdbcType="VARCHAR" />
+		<result column="consume_confirm" property="consumeConfirm" jdbcType="SMALLINT" />
+		<result column="center_charge" property="centerCharge" jdbcType="SMALLINT" />
+		<result column="client_ip" property="clientIp" jdbcType="VARCHAR" />
+		<result column="recognise_mode" property="recogniseMode" jdbcType="INTEGER" />
+		<result column="pfm_time_id" property="pfmTimeId" jdbcType="INTEGER" />
+		<result column="int_channel1" property="intChannel1" jdbcType="INTEGER" />
+		<result column="int_channel2" property="intChannel2" jdbcType="INTEGER" />
+		<result column="int_channel3" property="intChannel3" jdbcType="INTEGER" />
+		<result column="int_channel4" property="intChannel4" jdbcType="INTEGER" />
+		<result column="out_channel1" property="outChannel1" jdbcType="INTEGER" />
+		<result column="out_channel2" property="outChannel2" jdbcType="INTEGER" />
+		<result column="out_channel3" property="outChannel3" jdbcType="INTEGER" />
+		<result column="out_channel4" property="outChannel4" jdbcType="INTEGER" />
+		<result column="pfm_entrance_id" property="pfmEntranceId" jdbcType="INTEGER" />
+		<result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+	</resultMap>
+
+	<resultMap
+		type="com.wadejerry.scms.webservice.server.support.pfm.dto.LPRDto" id="selectAllLPRDtoMap">
+		<id column="pfm_device_lpr_id" property="lprId" jdbcType="INTEGER" />
+		<result column="device_code" property="lprCode" jdbcType="VARCHAR" />
+		<result column="device_name" property="lprName" jdbcType="VARCHAR" />
+		<result column="ip" property="ip" jdbcType="VARCHAR" />
+		<result column="port" property="port" jdbcType="INTEGER" />
+		<result column="login_id" property="loginId" jdbcType="VARCHAR" />
+		<result column="login_password" property="password" jdbcType="VARCHAR" />
+		<result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+	</resultMap>
+
+	<resultMap id="selectAllCarInfoDtoMap"
+		type="com.wadejerry.scms.webservice.server.support.pfm.dto.CarInfoDto">
+		<id column="car_info_id" property="carId" jdbcType="INTEGER" />
+		<result column="car_number" property="carNumber" jdbcType="VARCHAR" />
+		<result column="card_id" property="cardId" jdbcType="VARCHAR" />
+		<result column="addres" property="address" jdbcType="VARCHAR" />
+		<result column="phone" property="phone" jdbcType="VARCHAR" />
+		<result column="cert_id" property="certId" jdbcType="VARCHAR" />
+		<result column="person_name" property="personName" jdbcType="VARCHAR" />
+		<result column="sex" property="sex" jdbcType="SMALLINT" />
+		<result column="photo" property="photo" jdbcType="VARCHAR" />
+		<result column="enable_time" property="enableTime" jdbcType="TIMESTAMP" />
+		<result column="disable_time" property="disableTime" jdbcType="TIMESTAMP" />
+		<result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+		<result column="status" property="status" jdbcType="INTEGER" />
+		<result column="is_del" property="isDel" jdbcType="INTEGER" />
+
+	</resultMap>
+
+	<resultMap id="selectAllCarTypeDtoMap"
+		type="com.wadejerry.scms.webservice.server.support.pfm.dto.CarTypeDto">
+		<id column="car_type_id" property="carTypeId" jdbcType="INTEGER" />
+		<result column="type_code" property="typeCode" jdbcType="VARCHAR" />
+		<result column="type_name" property="typeName" jdbcType="VARCHAR" />
+		<result column="in_id" property="inId" jdbcType="INTEGER" />
+		<result column="note" property="note" jdbcType="VARCHAR" />
+		<result column="status" property="status" jdbcType="SMALLINT" />
+		<result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+		<result column="car_full" property="carFull" jdbcType="INTEGER" />
+
+	</resultMap>
+
+	<resultMap id="selectAllChargeRuleDtoMap"
+		type="com.wadejerry.scms.webservice.server.support.pfm.dto.ChargeRuleDto">
+		<id column="rule_id" property="chargeRuleId" jdbcType="INTEGER"></id>
+		<result column="rule_name" property="ruleName" jdbcType="VARCHAR" />
+		<result column="rule_type" property="ruleType" jdbcType="VARCHAR" />
+		<result column="car_type_id" property="carTypeId" jdbcType="INTEGER" />
+		<result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+		<result column="temp_match" property="tempMatch" jdbcType="INTEGER" />
+	</resultMap>
+
+	<resultMap id="selectAllBaoqiDtoMap"
+		type="com.wadejerry.scms.webservice.server.support.pfm.dto.BaoqiDto">
+		<id column="baoqi_id" property="baoqiId" jdbcType="INTEGER" />
+		<result column="type" property="type" jdbcType="SMALLINT" />
+		<result column="money" property="money" jdbcType="NUMERIC" />
+		<result column="rule_id" property="ruleId" jdbcType="INTEGER" />
+		<result column="custom1" property="custom1" jdbcType="INTEGER" />
+		<result column="custom2" property="custom2" jdbcType="INTEGER" />
+		<result column="custom3" property="custom3" jdbcType="VARCHAR" />
+		<result column="custom4" property="custom4" jdbcType="VARCHAR" />
+	</resultMap>
+
+	<resultMap id="selectAllAnshiDtoMap"
+		type="com.wadejerry.scms.webservice.server.support.pfm.dto.AnshiDto">
+		<id column="anshi_charge_id" property="anshiChargeId" jdbcType="INTEGER" />
+		<result column="free_time" property="freeTime" jdbcType="INTEGER" />
+		<result column="first_part_charge_time" property="firstPartChargeTime"
+			jdbcType="INTEGER" />
+		<result column="first_part_charge_money" property="firstPartChargeMoney"
+			jdbcType="NUMERIC" />
+		<result column="separate_charge_time" property="separateChargeTime"
+			jdbcType="INTEGER" />
+		<result column="separate_charge_money" property="separateChargeMoney"
+			jdbcType="NUMERIC" />
+		<result column="use_top_money" property="useTopMoney" jdbcType="SMALLINT" />
+		<result column="rule_id" property="ruleId" jdbcType="INTEGER" />
+		<result column="custom1" property="custom1" jdbcType="INTEGER" />
+		<result column="custom2" property="custom2" jdbcType="INTEGER" />
+		<result column="custom3" property="custom3" jdbcType="VARCHAR" />
+		<result column="custom4" property="custom4" jdbcType="VARCHAR" />
+		<result column="top_money" property="topMoney" jdbcType="NUMERIC" />
+	</resultMap>
+
+	<resultMap id="selectAllDaynightDtoMap"
+		type="com.wadejerry.scms.webservice.server.support.pfm.dto.DaynightDto">
+		<id column="daynight_id" property="daynightId" jdbcType="INTEGER" />
+		<result column="period_start_time" property="periodStartTime"
+			jdbcType="TIME" />
+		<result column="first_time" property="firstTime" jdbcType="INTEGER" />
+		<result column="first_time_charge" property="firstTimeCharge"
+			jdbcType="NUMERIC" />
+		<result column="unit_time" property="unitTime" jdbcType="SMALLINT" />
+		<result column="unit_time_charge" property="unitTimeCharge"
+			jdbcType="NUMERIC" />
+		<result column="pertime_start_time" property="pertimeStartTime"
+			jdbcType="TIME" />
+		<result column="pertime_charge" property="pertimeCharge"
+			jdbcType="NUMERIC" />
+		<result column="free_time" property="freeTime" jdbcType="SMALLINT" />
+		<result column="if_charge_over_free_time" property="ifChargeOverFreeTime"
+			jdbcType="SMALLINT" />
+		<result column="use_top momey_in24" property="useTopMomeyIn24"
+			jdbcType="SMALLINT" />
+		<result column="one_one" property="oneOne" jdbcType="SMALLINT" />
+		<result column="by_time_period" property="byTimePeriod"
+			jdbcType="SMALLINT" />
+		<result column="rule_id" property="ruleId" jdbcType="INTEGER" />
+		<result column="custom1" property="custom2" jdbcType="INTEGER" />
+		<result column="custom2" property="custom2" jdbcType="INTEGER" />
+		<result column="custom3" property="custom3" jdbcType="VARCHAR" />
+		<result column="custom4" property="custom4" jdbcType="VARCHAR" />
+		<result column="top_money" property="topMoney" jdbcType="NUMERIC" />
+	</resultMap>
+	<resultMap id="selectAllJianmianReleaseDtoMap"
+		type="com.wadejerry.scms.webservice.server.support.pfm.dto.JianmianReleaseDto">
+		<id column="abnormal_release_id" property="jianmianReleaseId"
+			jdbcType="INTEGER" />
+		<result column="rule_name" property="ruleName" jdbcType="VARCHAR" />
+		<result column="start_time" property="startTime" jdbcType="TIMESTAMP" />
+		<result column="end_time" property="endTime" jdbcType="TIMESTAMP" />
+		<result column="note" property="note" jdbcType="VARCHAR" />
+		<result column="custom1" property="custom1" jdbcType="INTEGER" />
+		<result column="custom2" property="custom2" jdbcType="INTEGER" />
+		<result column="custom3" property="custom3" jdbcType="VARCHAR" />
+		<result column="custom4" property="custom4" jdbcType="VARCHAR" />
+		<result column="money" property="money" jdbcType="NUMERIC" />
+		<result column="type" property="type" jdbcType="SMALLINT" />
+		<result column="car_type_id" property="carTypeId" jdbcType="INTEGER" />
+	</resultMap>
+
+	<resultMap id="selectAllPeriodDtoMap"
+		type="com.wadejerry.scms.webservice.server.support.pfm.dto.PeriodDto">
+		<id column="period_id" property="periodId" jdbcType="INTEGER" />
+		<result column="free_time" property="freeTime" jdbcType="INTEGER" />
+		<result column="rule_id" property="ruleId" jdbcType="INTEGER" />
+		<result column="park_over_max_period_money" property="parkOverMaxPeriodMoney"
+			jdbcType="NUMERIC" />
+		<result column="use_top_money" property="useTopMoney" jdbcType="SMALLINT" />
+		<result column="custom1" property="custom1" jdbcType="INTEGER" />
+		<result column="custom2" property="custom2" jdbcType="INTEGER" />
+		<result column="custom3" property="custom3" jdbcType="VARCHAR" />
+		<result column="custom4" property="custom4" jdbcType="VARCHAR" />
+		<result column="top_money" property="topMoney" jdbcType="NUMERIC" />
+	</resultMap>
+
+	<resultMap id="selectAllPeriodTimeDtoMap"
+		type="com.wadejerry.scms.webservice.server.support.pfm.dto.PeriodTimeDto">
+		<id column="period_time_id" property="periodTimeId" jdbcType="INTEGER" />
+		<result column="start_period" property="startPeriod" jdbcType="SMALLINT" />
+		<result column="end_period" property="endPeriod" jdbcType="SMALLINT" />
+		<result column="charge_money" property="chargeMoney" jdbcType="NUMERIC" />
+		<result column="custom1" property="custom1" jdbcType="INTEGER" />
+		<result column="custom2" property="custom2" jdbcType="INTEGER" />
+		<result column="custom3" property="custom3" jdbcType="VARCHAR" />
+		<result column="custom4" property="custom4" jdbcType="VARCHAR" />
+		<result column="period_id" property="periodId" jdbcType="INTEGER" />
+	</resultMap>
+
+	<resultMap id="selectAllPertimeDtoMap"
+		type="com.wadejerry.scms.webservice.server.support.pfm.dto.PertimeDto">
+		<id column="pertime_id" property="pertimeId" jdbcType="INTEGER" />
+		<result column="charge_money" property="chargeMoney" jdbcType="NUMERIC" />
+		<result column="custom1" property="custom1" jdbcType="INTEGER" />
+		<result column="custom2" property="custom2" jdbcType="INTEGER" />
+		<result column="custom3" property="custom3" jdbcType="VARCHAR" />
+		<result column="custom4" property="custom4" jdbcType="VARCHAR" />
+		<result column="rule_id" property="ruleId" jdbcType="INTEGER" />
+	</resultMap>
+
+	<resultMap id="selectAllTimeChargeDtoMap"
+		type="com.wadejerry.scms.webservice.server.support.pfm.dto.TimeChargeDto">
+		<id column="time_charge_id" property="timeChargeId" jdbcType="INTEGER" />
+		<result column="free_time" property="freeTime" jdbcType="INTEGER" />
+		<result column="use_top_money" property="useTopMoney" jdbcType="SMALLINT" />
+		<result column="rule_id" property="ruleId" jdbcType="INTEGER" />
+		<result column="custom1" property="custom1" jdbcType="INTEGER" />
+		<result column="custom2" property="custom2" jdbcType="INTEGER" />
+		<result column="custom3" property="custom3" jdbcType="VARCHAR" />
+		<result column="custom4" property="custom4" jdbcType="VARCHAR" />
+		<result column="top_money" property="topMoney" jdbcType="NUMERIC" />
+	</resultMap>
+	<resultMap id="selectAllTimeChargeTimeDtoMap"
+		type="com.wadejerry.scms.webservice.server.support.pfm.dto.TimeChargeTimeDto">
+		<id column="time_charge_time_id" property="timeChargeTimeId"
+			jdbcType="INTEGER" />
+		<result column="start_time" property="startTime" jdbcType="TIME" />
+		<result column="end_time" property="endTime" jdbcType="TIME" />
+		<result column="charge_money" property="chargeMoney" jdbcType="NUMERIC" />
+		<result column="time_charge_id" property="timeChargeId"
+			jdbcType="INTEGER" />
+		<result column="custom1" property="custom1" jdbcType="INTEGER" />
+		<result column="custom2" property="custom2" jdbcType="INTEGER" />
+		<result column="custom3" property="custom3" jdbcType="VARCHAR" />
+		<result column="custom4" property="custom4" jdbcType="VARCHAR" />
+	</resultMap>
+	<resultMap id="selectAllUnitPeriodDtoMap"
+		type="com.wadejerry.scms.webservice.server.support.pfm.dto.UnitPeriodDto">
+		<id column="unit_period_id" property="unitPeriodId" jdbcType="INTEGER" />
+		<result column="free_time" property="freeTime" jdbcType="SMALLINT" />
+		<result column="use_top_money" property="useTopMoney" jdbcType="SMALLINT" />
+		<result column="include_free_time" property="includeFreeTime"
+			jdbcType="SMALLINT" />
+		<result column="custom1" property="custom1" jdbcType="INTEGER" />
+		<result column="custom2" property="custom2" jdbcType="INTEGER" />
+		<result column="custom3" property="custom3" jdbcType="VARCHAR" />
+		<result column="custom4" property="custom4" jdbcType="VARCHAR" />
+		<result column="rule_id" property="ruleId" jdbcType="INTEGER" />
+		<result column="top_money" property="topMoney" jdbcType="NUMERIC" />
+	</resultMap>
+	<resultMap id="selectAllUnitPeriodTimeDtoMap"
+		type="com.wadejerry.scms.webservice.server.support.pfm.dto.UnitPeriodTimeDto">
+		<id column="unit_period_time_id" property="unitPeriodTimeId"
+			jdbcType="INTEGER" />
+		<result column="unit_period_id" property="unitPeriodId"
+			jdbcType="INTEGER" />
+		<result column="start_time" property="startTime" jdbcType="TIME" />
+		<result column="end_time" property="endTime" jdbcType="TIME" />
+		<result column="unit" property="unit" jdbcType="INTEGER" />
+		<result column="charge_money" property="chargeMoney" jdbcType="NUMERIC" />
+		<result column="top_money" property="topMoney" jdbcType="NUMERIC" />
+		<result column="least_over_period_time" property="leastOverPeriodTime"
+			jdbcType="INTEGER" />
+		<result column="custom1" property="custom1" jdbcType="INTEGER" />
+		<result column="custom2" property="custom2" jdbcType="INTEGER" />
+		<result column="custom3" property="custom3" jdbcType="VARCHAR" />
+		<result column="custom4" property="custom4" jdbcType="VARCHAR" />
+	</resultMap>
+	<resultMap id="selectAllCarTypeRelDtoMap" type="com.wadejerry.scms.webservice.server.support.pfm.dto.CarTypeRelDto" >
+    <id column="car_type_rel_id" property="carTypeRelId" jdbcType="INTEGER" />
+    <result column="car_info_id" property="carInfoId" jdbcType="INTEGER" />
+    <result column="car_type_id" property="carTypeId" jdbcType="INTEGER" />
+    <result column="insert_time" property="insertTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="user_name" property="userName" jdbcType="VARCHAR" />
+  </resultMap>
+	<resultMap id="selectAllAccountDtoMap"
+		type="com.wadejerry.scms.webservice.server.support.pfm.dto.AccountDto">
+		<id column="bim_card_app_id" property="bimCardAppId" jdbcType="INTEGER" />
+		<result column="app_id" property="appId" jdbcType="INTEGER" />
+		<result column="app_code" property="appCode" jdbcType="VARCHAR" />
+		<result column="app_name" property="appName" jdbcType="VARCHAR" />
+		<result column="value1" property="value1" jdbcType="NUMERIC" />
+		<result column="card_id" property="cardId" jdbcType="VARCHAR" />
+		<result column="car_id" property="carId" jdbcType="INTEGER" />
+		<result column="disable_time" property="disableTime" jdbcType="TIMESTAMP" />
+		<result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+	</resultMap>
+	<resultMap id="selectAllPfmTimeDtoMap"
+		type="com.wadejerry.scms.webservice.server.support.pfm.dto.PfmTimeDto">
+		<id column="pfm_time_id" property="pfmTimeId" jdbcType="INTEGER" />
+		<result column="bim_company_id" property="bimCompanyId"
+			jdbcType="INTEGER" />
+		<result column="time_code" property="timeCode" jdbcType="VARCHAR" />
+		<result column="time_name" property="timeName" jdbcType="VARCHAR" />
+		<result column="day_limit" property="dayLimit" jdbcType="SMALLINT" />
+		<result column="begin_time" property="beginTime" jdbcType="TIMESTAMP" />
+		<result column="end_time" property="endTime" jdbcType="TIMESTAMP" />
+		<result column="day_begin_time1" property="dayBeginTime1"
+			jdbcType="TIME" />
+		<result column="day_end_time1" property="dayEndTime1" jdbcType="TIME" />
+		<result column="day_begin_time2" property="dayBeginTime2"
+			jdbcType="TIME" javaType="java.sql.Time" />
+		<result column="day_end_time2" property="dayEndTime2" jdbcType="TIME"
+			javaType="java.sql.Time" />
+		<result column="day_begin_time3" property="dayBeginTime3"
+			jdbcType="TIME" javaType="java.sql.Time" />
+		<result column="day_end_time3" property="dayEndTime3" jdbcType="TIME"
+			javaType="java.sql.Time" />
+		<result column="day_begin_time4" property="dayBeginTime4"
+			jdbcType="TIME" javaType="java.sql.Time" />
+		<result column="day_end_time4" property="dayEndTime4" jdbcType="TIME"
+			javaType="java.sql.Time" />
+		<result column="enable_week" property="enableWeek" jdbcType="VARCHAR" />
+		<result column="insert_time" property="insertTime" jdbcType="TIMESTAMP" />
+		<result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+		<result column="user_name" property="userName" jdbcType="VARCHAR" />
+		<result column="enable_in" property="enableIn" jdbcType="SMALLINT" />
+		<result column="enable_out" property="enableOut" jdbcType="SMALLINT" />
+	</resultMap>
+	<resultMap id="selectAllParkDtoMap"
+		type="com.wadejerry.scms.webservice.server.support.pfm.dto.ParkDto">
+		<id column="pfm_parking_lot_id" property="pfmParkingLotId"
+			jdbcType="INTEGER" />
+		<result column="bim_company_id" property="bimCompanyId"
+			jdbcType="INTEGER" />
+		<result column="parking_lot_name" property="parkingLotName"
+			jdbcType="VARCHAR" />
+		<result column="car_number" property="carNumber" jdbcType="INTEGER" />
+		<result column="remain_name" property="remainName" jdbcType="INTEGER" />
+		<result column="attribution" property="attribution" jdbcType="VARCHAR" />
+		<result column="user_type" property="userType" jdbcType="VARCHAR" />
+		<result column="note" property="note" jdbcType="VARCHAR" />
+		<result column="reserve_car_number" property="reserveCarNumber"
+			jdbcType="INTEGER" />
+		<result column="in_id" property="inId" jdbcType="INTEGER" />
+		<result column="insert_time" property="insertTime" jdbcType="TIMESTAMP" />
+		<result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+
+	</resultMap>
+	<resultMap id="selectAllEntranceDtoMap"
+		type="com.wadejerry.scms.webservice.server.support.pfm.dto.EntranceDto">
+		<id column="pfm_entrance_id" jdbcType="INTEGER" property="pfmEntranceId" />
+		<result column="bim_company_id" jdbcType="INTEGER" property="bimCompanyId" />
+		<result column="entrance_name" jdbcType="VARCHAR" property="entranceName" />
+		<result column="enabled" jdbcType="INTEGER" property="enabled" />
+		<result column="park_id" jdbcType="INTEGER" property="parkId" />
+		<result column="time_id" jdbcType="INTEGER" property="timeId" />
+		<result column="insert_time" jdbcType="TIME" property="insertTime" />
+		<result column="update_time" jdbcType="TIME" property="updateTime" />
+		<result column="user_name" jdbcType="VARCHAR" property="userName" />
+		<result column="custom1" jdbcType="INTEGER" property="custom1" />
+	</resultMap>
+	<resultMap id="selectAllCarriageDtoMap"
+		type="com.wadejerry.scms.webservice.server.support.pfm.dto.CarriagewayDto">
+		<id column="carriageway_id" jdbcType="INTEGER" property="carriagewayId" />
+		<result column="carriageway_name" jdbcType="VARCHAR" property="carriagewayName" />
+		<result column="bim_company_id" jdbcType="INTEGER" property="bimCompanyId" />
+		<result column="entrance_id" jdbcType="INTEGER" property="entranceId" />
+		<result column="enabled" jdbcType="INTEGER" property="enabled" />
+		<result column="modle" jdbcType="INTEGER" property="modle" />
+		<result column="carriageway_type" jdbcType="INTEGER" property="carriagewayType" />
+		<result column="in_out" jdbcType="INTEGER" property="inOut" />
+		<result column="auto_release_fixed" jdbcType="INTEGER"
+			property="autoReleaseFixed" />
+		<result column="auto_release_temp" jdbcType="INTEGER" property="autoReleaseTemp" />
+		<result column="release_fixed" jdbcType="INTEGER" property="releaseFixed" />
+		<result column="release_temp" jdbcType="INTEGER" property="releaseTemp" />
+		<result column="custom1" jdbcType="INTEGER" property="custom1" />
+		<result column="custom2" jdbcType="INTEGER" property="custom2" />
+		<result column="custom3" jdbcType="INTEGER" property="custom3" />
+		<result column="custom4" jdbcType="INTEGER" property="custom4" />
+		<result column="custom5" jdbcType="INTEGER" property="custom5" />
+		<result column="custom6" jdbcType="INTEGER" property="custom6" />
+		<result column="custom7" jdbcType="INTEGER" property="custom7" />
+		<result column="custom8" jdbcType="INTEGER" property="custom8" />
+		<result column="insert_time" jdbcType="TIMESTAMP" property="insertTime" />
+		<result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+		<result column="user_name" jdbcType="VARCHAR" property="userName" />
+	</resultMap>
+	<!--webservice 查询所有booth -->
+	<select id="selectAllBoothDto" parameterType="int"
+		resultMap="selectAllBoothDtoMap">
+		select * from pfm_booth where bim_company_id = #{ companyId } and
+		pfm_entrance_id in
+		<foreach collection="entranceId" index="index" item="item"
+			open="(" separator="," close=")"> #{item}
+		</foreach>
+	</select>
+	<select id="selectAllBooth" resultMap="selectAllBoothDtoMap" >
+	select * from pfm_booth
+	</select>
+	<select id="selectAllLPRDto" parameterType="int" resultMap="selectAllLPRDtoMap">
+		select * from pfm_device_lpr where bim_company_id = #{ id }
+	</select>
+	<resultMap id="selectAllSubsiDtoMap" type="com.wadejerry.scms.webservice.server.support.pfm.dto.SubsidiaryCarNumDto" >
+    <id column="pfm_subsidiary_car_num_id" property="pfmSubsidiaryCarNumId" jdbcType="INTEGER" />
+    <result column="car_id" property="carId" jdbcType="INTEGER" />
+    <result column="car_number" property="carNumber" jdbcType="VARCHAR" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="user_name" property="userName" jdbcType="VARCHAR" />
+  </resultMap>
+	<select id="selectSubsiByCarid"  resultMap="selectAllSubsiDtoMap">
+		select * from pfm_subsidiary_car_num where car_id in <foreach collection="carId" index="index" item="item" open="("
+			separator="," close=")"> #{item}
+		</foreach>
+	</select>
+	<select id="selectAllCarInfoDto" resultMap="selectAllCarInfoDtoMap">
+		select z.* from(
+		select * from pfm_car_info where person_id is null
+		union
+		all
+		select
+		x.car_info_id,x.person_id,x.bim_company_id,x.car_number,y.person_name,x.card_id,y.cert_id,y.address,y.phone,y.sex,x.photo,x.status,x.enable_time,x.disable_time,x.insert_time,x.update_time,x.note,x.user_name,x.custom1,x.custom2,x.custom3,x.custom4
+		,x.is_del from pfm_car_info x inner join bim_person y on
+		x.person_id=y.person_id
+
+		) z left join pfm_car_type_rel x on
+		z.car_info_id = x.car_info_id left join pfm_car_type c on
+		x.car_type_id = c.car_type_id left join pfm_parking_lot v on
+		v.pfm_parking_lot_id = c.custom1
+		where
+		z.bim_company_id=#{companyId,jdbcType=INTEGER} and
+		z.update_time
+		&gt;#{updateTime,jdbcType=TIMESTAMP} and v.pfm_parking_lot_id in (select
+		distinct a.pfm_parking_lot_id from pfm_parking_lot a left join
+		pfm_parking_lot b on a.pfm_parking_lot_id = b.in_Id where a.in_id is
+		null and (a.pfm_parking_lot_id in
+		<foreach collection="parkId" index="index" item="item" open="("
+			separator="," close=")"> #{item}
+		</foreach>
+		or b.pfm_parking_lot_id in
+		<foreach collection="parkId" index="index" item="item" open="("
+			separator="," close=")"> #{item}
+		</foreach>
+		) )order by z.update_time limit ${pageParam.pageItems} offset
+		(${pageParam.reqPage}-1)*${pageParam.pageItems}
+	</select>
+	<select id="selectAllCarInfoDtoCount" resultType="int">
+		select count(z.car_info_id) from(
+		select * from pfm_car_info where person_id is null
+		union
+		all
+		select
+		x.car_info_id,x.person_id,x.bim_company_id,x.car_number,y.person_name,x.card_id,y.cert_id,y.address,y.phone,y.sex,x.photo,x.status,x.enable_time,x.disable_time,x.insert_time,x.update_time,x.note,x.user_name,x.custom1,x.custom2,x.custom3,x.custom4
+		,x.is_del from pfm_car_info x inner join bim_person y on
+		x.person_id=y.person_id
+
+		) z left join pfm_car_type_rel x on
+		z.car_info_id = x.car_info_id left join pfm_car_type c on
+		x.car_type_id = c.car_type_id left join pfm_parking_lot v on
+		v.pfm_parking_lot_id = c.custom1
+		where
+		z.bim_company_id=#{companyId,jdbcType=INTEGER} and
+		z.update_time
+		&gt;#{updateTime,jdbcType=DATE} and v.pfm_parking_lot_id in (select
+		distinct a.pfm_parking_lot_id from pfm_parking_lot a left join
+		pfm_parking_lot b on a.pfm_parking_lot_id = b.in_Id where a.in_id is
+		null and (a.pfm_parking_lot_id in
+		<foreach collection="parkId" index="index" item="item" open="("
+			separator="," close=")"> #{item}
+		</foreach>
+		or b.pfm_parking_lot_id in
+		<foreach collection="parkId" index="index" item="item" open="("
+			separator="," close=")"> #{item}
+		</foreach>
+		) ) 
+	</select>
+
+	<select id="selectAllCarTypeDto" resultMap="selectAllCarTypeDtoMap">
+		select * from
+		pfm_car_type where bim_company_id=#{companyId} and custom1 in 
+		<foreach collection="parkId" index="index" item="item" open="("
+			separator="," close=")"> #{item}
+		</foreach>
+	</select>
+
+	<select id="selectAllChargeRuleDto" parameterType="int"
+		resultMap="selectAllChargeRuleDtoMap">
+		select a.* from pfm_charge_rule a left join pfm_car_type b on a.car_type_id = b.car_type_id where a.bim_company_id=#{companyId} and b.custom1 in
+		<foreach collection="parkId" index="index" item="item" open="("
+			separator="," close=")"> #{item}
+		</foreach>
+	</select>
+	<select id="selectAllAnshiDto" parameterType="int"
+		resultMap="selectAllAnshiDtoMap">
+		select a.* from pfm_anshi a left join pfm_charge_rule b on
+		a.rule_id = b.rule_id left join pfm_car_type c on b.car_type_id = c.car_type_id where b.bim_company_id=#{companyId} and c.custom1 in
+		<foreach collection="parkId" index="index" item="item" open="("
+			separator="," close=")"> #{item}
+		</foreach>
+	</select>
+
+	<select id="selectAllBaoqiDto" parameterType="int"
+		resultMap="selectAllBaoqiDtoMap">
+		select a.* from pfm_baoqi a left join pfm_charge_rule b on
+		a.rule_id = b.rule_id left join pfm_car_type c on b.car_type_id = c.car_type_id where b.bim_company_id=#{companyId} and c.custom1 in
+		<foreach collection="parkId" index="index" item="item" open="("
+			separator="," close=")"> #{item}
+		</foreach>
+	</select>
+	<select id="selectAllDaynightDto" parameterType="int"
+		resultMap="selectAllDaynightDtoMap">
+		select a.* from pfm_daynight a left join pfm_charge_rule b
+		on a.rule_id = b.rule_id left join pfm_car_type c on b.car_type_id = c.car_type_id where b.bim_company_id=#{companyId} and c.custom1 in
+		<foreach collection="parkId" index="index" item="item" open="("
+			separator="," close=")"> #{item}
+		</foreach>
+	</select>
+	<select id="selectAllJianmianReleaseDto" parameterType="int"
+		resultMap="selectAllJianmianReleaseDtoMap">
+		select b.abnormal_release_id, b.rule_name, b.start_time, b.end_time, b.note, b.custom1, b.custom2, b.custom3, 
+    b.custom4, b.money,  b.bim_company_id, b.car_type_id, b.type  from pfm_jianmian_release b left join pfm_car_type c on b.car_type_id = c.car_type_id where b.bim_company_id=#{companyId} and c.custom1 in
+		<foreach collection="parkId" index="index" item="item" open="("
+			separator="," close=")"> #{item}
+		</foreach>
+	</select>
+	<select id="selectAllPeriodDto" parameterType="int"
+		resultMap="selectAllPeriodDtoMap">
+		select a.* from pfm_period a left join pfm_charge_rule b on a.rule_id =
+		b.rule_id left join pfm_car_type c on b.car_type_id = c.car_type_id where b.bim_company_id=#{companyId} and c.custom1 in
+		<foreach collection="parkId" index="index" item="item" open="("
+			separator="," close=")"> #{item}
+		</foreach>
+	</select>
+	<select id="selectAllPeriodTimeDto" parameterType="int"
+		resultMap="selectAllPeriodTimeDtoMap">
+		select a.* from pfm_period_time a left join pfm_period b on a.period_id =
+		b.period_id left join pfm_charge_rule c on b.rule_id = c.rule_id left join pfm_car_type d on d.car_type_id = c.car_type_id where c.bim_company_id=#{companyId} and d.custom1 in
+		<foreach collection="parkId" index="index" item="item" open="("
+			separator="," close=")"> #{item}
+		</foreach>
+	</select>
+	<select id="selectAllPertimeDto" parameterType="int"
+		resultMap="selectAllPertimeDtoMap">
+		select a.* from pfm_pertime a left join pfm_charge_rule b on a.rule_id =
+		b.rule_id left join pfm_car_type c on b.car_type_id = c.car_type_id where b.bim_company_id=#{companyId} and c.custom1 in
+		<foreach collection="parkId" index="index" item="item" open="("
+			separator="," close=")"> #{item}
+		</foreach>
+	</select>
+	<select id="selectAllTimeChargeDto" parameterType="int"
+		resultMap="selectAllTimeChargeDtoMap">
+		select a.* from pfm_time_charge a left join pfm_charge_rule b on a.rule_id =
+		b.rule_id left join pfm_car_type c on b.car_type_id = c.car_type_id where b.bim_company_id=#{companyId} and c.custom1 in
+		<foreach collection="parkId" index="index" item="item" open="("
+			separator="," close=")"> #{item}
+		</foreach>
+	</select>
+	<select id="selectAllTimeChargeTimeDto" parameterType="int"
+		resultMap="selectAllTimeChargeTimeDtoMap">
+		select a.* from pfm_time_charge_time a left join pfm_time_charge b on
+		a.time_charge_id = b.time_charge_id left join pfm_charge_rule c on
+		b.rule_id = c.rule_id left join pfm_car_type d on d.car_type_id = c.car_type_id where c.bim_company_id=#{companyId} and d.custom1 in
+		<foreach collection="parkId" index="index" item="item" open="("
+			separator="," close=")"> #{item}
+		</foreach>
+	</select>
+	<select id="selectAllUnitPeriodDto" parameterType="int"
+		resultMap="selectAllUnitPeriodDtoMap">
+		select a.* from pfm_unit_period a left join pfm_charge_rule b on a.rule_id =
+		b.rule_id left join pfm_car_type c on b.car_type_id = c.car_type_id where b.bim_company_id=#{companyId} and c.custom1 in
+		<foreach collection="parkId" index="index" item="item" open="("
+			separator="," close=")"> #{item}
+		</foreach>
+	</select>
+	<select id="selectAllUnitPeriodTimeDto" parameterType="int"
+		resultMap="selectAllUnitPeriodTimeDtoMap">
+		select a.* from pfm_unit_period_time a left join pfm_unit_period b on
+		a.unit_period_id = b.unit_period_id left join pfm_charge_rule c on
+		b.rule_id = c.rule_id left join pfm_car_type d on d.car_type_id = c.car_type_id where c.bim_company_id=#{companyId} and d.custom1 in
+		<foreach collection="parkId" index="index" item="item" open="("
+			separator="," close=")"> #{item}
+		</foreach> 
+	</select>
+	<select id="selectAllCarTypeRelDto" resultMap="selectAllCarTypeRelDtoMap">
+		select a.* from
+		pfm_car_type_rel a left join pfm_car_type b on a.car_type_id = b.car_type_id where b.bim_company_id=#{companyId} and a.update_time
+		&gt;#{updateTime} and b.custom1 in
+		<foreach collection="parkId" index="index" item="item" open="("
+			separator="," close=")"> #{item}
+		</foreach> order by a.update_time limit ${pageParam.pageItems} offset (${pageParam.reqPage}-1)*${pageParam.pageItems}
+	</select>
+		<select id="selectAllCarTypeRelDtoCount" resultType="int">
+		select count(a.*) from
+		pfm_car_type_rel a left join pfm_car_type b on a.car_type_id = b.car_type_id where b.bim_company_id=#{companyId} and a.update_time
+		&gt;#{updateTime} and b.custom1 in
+		<foreach collection="parkId" index="index" item="item" open="("
+			separator="," close=")"> #{item}
+		</foreach> 
+	</select>
+
+	<select id="selectAllAccountDto" resultMap="selectAllAccountDtoMap">
+		select a.* from
+		bim_card_app a left join pfm_car_type_rel b on a.car_id = b.car_info_id left join pfm_car_type c on b.car_type_id= c.car_type_id  where a.update_time &gt;#{updateTime} and
+		c.bim_company_id=#{companyId} and c.custom1 in <foreach collection="parkId" index="index" item="item" open="("
+			separator="," close=")"> #{item}
+		</foreach> order by a.update_time limit ${pageParam.pageItems} offset (${pageParam.reqPage}-1)*${pageParam.pageItems}
+
+	</select>
+		<select id="selectAllAccountDtoCount" resultType="int">
+		select count(a.*) from
+		bim_card_app a left join pfm_car_type_rel b on a.car_id = b.car_info_id left join pfm_car_type c on b.car_type_id= c.car_type_id  where a.update_time &gt;#{updateTime} and
+		c.bim_company_id=#{companyId} and c.custom1 in <foreach collection="parkId" index="index" item="item" open="("
+			separator="," close=")"> #{item}
+		</foreach> 
+
+	</select>
+	<select id="selectAllPfmTimeDto" resultMap="selectAllPfmTimeDtoMap">
+		select * from
+		pfm_time where bim_company_id = #{id}
+
+	</select>
+	<insert id="insertChargeRecord">
+		insert into pfm_charge_record ( bim_company_id, car_id,
+		car_number, card_id, person_name,
+		car_type_id, car_type_name, park_id,
+		park_name, in_booth_id, in_booth_name,
+		in_device_id, in_device_name, in_time,
+		in_photo, out_booth_id, out_booth_name,
+		out_device_id, out_device_name, out_time,
+		out_photo, rule_id, rule_name,
+		parking_duration, use_fee, user_name,
+		balance, disable_time, pay_method,
+		note)
+		values ( #{companyId,jdbcType=INTEGER},
+		#{chargeRecord.carId,jdbcType=INTEGER},
+		#{chargeRecord.carNumber,jdbcType=VARCHAR},
+		#{chargeRecord.cardId,jdbcType=VARCHAR},
+		#{chargeRecord.personName,jdbcType=VARCHAR},
+		#{chargeRecord.carTypeId,jdbcType=INTEGER},
+		#{chargeRecord.carTypeName,jdbcType=VARCHAR},
+		#{chargeRecord.parkId,jdbcType=INTEGER},
+		#{chargeRecord.parkName,jdbcType=VARCHAR},
+		#{chargeRecord.inBoothId,jdbcType=INTEGER},
+		#{chargeRecord.inBoothName,jdbcType=VARCHAR},
+		#{chargeRecord.inDeviceId,jdbcType=INTEGER},
+		#{chargeRecord.inDeviceName,jdbcType=VARCHAR},
+		#{chargeRecord.inTime,jdbcType=TIME},
+		#{chargeRecord.inPhoto,jdbcType=VARCHAR},
+		#{chargeRecord.outBoothId,jdbcType=INTEGER},
+		#{chargeRecord.outBoothName,jdbcType=VARCHAR},
+		#{chargeRecord.outDeviceId,jdbcType=INTEGER},
+		#{chargeRecord.outDeviceName,jdbcType=VARCHAR},
+		#{chargeRecord.outTime,jdbcType=TIME},
+		#{chargeRecord.outPhoto,jdbcType=VARCHAR},
+		#{chargeRecord.ruleId,jdbcType=INTEGER},
+		#{chargeRecord.ruleName,jdbcType=VARCHAR},
+		#{chargeRecord.parkingDuration,jdbcType=INTEGER},
+		#{chargeRecord.useFee,jdbcType=DOUBLE},
+		#{chargeRecord.userName,jdbcType=VARCHAR},
+		#{chargeRecord.balance,jdbcType=DOUBLE},
+		#{chargeRecord.disableTime,jdbcType=TIME},
+		#{chargeRecord.payMethod,jdbcType=INTEGER},
+		#{chargeRecord.note,jdbcType=VARCHAR})
+	</insert>
+	<insert id="insertInRecord">
+		insert into pfm_in_record ( car_id, bim_company_id,
+		car_number, card_id, person_name,
+		car_type_id, car_type_name, park_id,
+		park_name, in_booth_id, in_booth_name,
+		in_device_id, in_device_name, in_photo,
+		in_time, out_record_id)
+		values ( #{inRecord.carId,jdbcType=INTEGER}, #{companyId,jdbcType=INTEGER},
+		#{inRecord.carNumber,jdbcType=VARCHAR},
+		#{inRecord.cardId,jdbcType=VARCHAR},
+		#{inRecord.personName,jdbcType=VARCHAR},
+		#{inRecord.carTypeId,jdbcType=INTEGER},
+		#{inRecord.carTypeName,jdbcType=VARCHAR},
+		#{inRecord.parkId,jdbcType=INTEGER},
+		#{inRecord.parkName,jdbcType=VARCHAR},
+		#{inRecord.inBoothId,jdbcType=INTEGER},
+		#{inRecord.inBoothName,jdbcType=VARCHAR},
+		#{inRecord.inDeviceId,jdbcType=INTEGER},
+		#{inRecord.inDeviceName,jdbcType=VARCHAR},
+		#{inRecord.inPhoto,jdbcType=VARCHAR},
+		#{inRecord.inTime,jdbcType=TIME},
+		#{inRecord.outRecordId,jdbcType=INTEGER})
+
+	</insert>
+	<insert id="insertOutRecord">
+		insert into pfm_out_record ( car_id, bim_company_id,
+		car_number, card_id, person_name,
+		car_type_id, car_type_name, park_id,
+		park_name, out_booth_id, out_booth_name,
+		out_device_id, out_device_name, out_photo,
+		out_time)
+		values ( #{outRecord.carId,jdbcType=INTEGER}, #{companyId,jdbcType=INTEGER},
+		#{outRecord.carNumber,jdbcType=VARCHAR},
+		#{outRecord.cardId,jdbcType=VARCHAR},
+		#{outRecord.personName,jdbcType=VARCHAR},
+		#{outRecord.carTypeId,jdbcType=INTEGER},
+		#{outRecord.carTypeName,jdbcType=VARCHAR},
+		#{outRecord.parkId,jdbcType=INTEGER},
+		#{outRecord.parkName,jdbcType=VARCHAR},
+		#{outRecord.outBoothId,jdbcType=INTEGER},
+		#{outRecord.outBoothName,jdbcType=VARCHAR},
+		#{outRecord.outDeviceId,jdbcType=INTEGER},
+		#{outRecord.outDeviceName,jdbcType=VARCHAR},
+		#{outRecord.outPhoto,jdbcType=VARCHAR},
+		#{outRecord.outTime,jdbcType=TIME})
+
+	</insert>
+	<select id="selectAllParkDto" resultMap="selectAllParkDtoMap">
+		select * from
+		pfm_parking_lot where bim_company_id = #{companyId} and
+		(pfm_parking_lot_id=#{parkId} or in_id=#{parkId} )
+	</select>
+	<select id="selectAllEntranceDto" resultMap="selectAllEntranceDtoMap">
+		select * from pfm_entrance where bim_company_id=#{companyId} and
+		park_id in
+		<foreach collection="parkId" index="index" item="item" open="("
+			separator="," close=")"> #{item}
+		</foreach>
+	</select>
+	<select id="selectAllCarriagewayDto" resultMap="selectAllCarriageDtoMap">
+		select * from pfm_carriageway where bim_company_id = #{companyId} and
+		entrance_id in
+		<foreach collection="entranceId" index="index" item="item"
+			open="(" separator="," close=")"> #{item}
+		</foreach>
+	</select>
+	<resultMap id="CarriagewayDeviceRelDtoMap"
+		type="com.wadejerry.scms.webservice.server.support.pfm.dto.CarriagewayDeviceRelDto">
+		<id column="carriageway_device_rel_id" jdbcType="INTEGER"
+			property="carriagewayDeviceRelId" />
+		<result column="device_id" jdbcType="INTEGER" property="deviceId" />
+		<result column="carriageway_id" jdbcType="VARCHAR" property="carriagewayId" />
+		<result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+		<result column="user_name" jdbcType="VARCHAR" property="userName" />
+	</resultMap>
+	<select id="selectAllCarriagewayDeviceRelDto" resultMap="CarriagewayDeviceRelDtoMap">
+		select * from pfm_carriageway_device_rel where carriageway_id in
+		<foreach collection="parkId" index="index" item="item"
+			open="(" separator="," close=")"> #{item}
+		</foreach>
+	</select>
+	<resultMap id="pfmserverMap"
+		type="com.wadejerry.scms.webservice.server.support.pfm.dto.PfmServerDto">
+		<id column="pfm_server_id" property="pfmServerId" jdbcType="INTEGER" />
+		<result column="bim_company_id" property="bimCompanyId"
+			jdbcType="INTEGER" />
+		<result column="server_name" property="serverName" jdbcType="VARCHAR" />
+		<result column="ip" property="ip" jdbcType="VARCHAR" />
+		<result column="port" property="port" jdbcType="VARCHAR" />
+		<result column="insert_time" property="insertTime" jdbcType="TIMESTAMP" />
+		<result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+		<result column="user_name" property="userName" jdbcType="VARCHAR" />
+		<result column="net_zone_id" property="netZoneId" jdbcType="INTEGER" />
+		<result column="park_id" property="parkId" jdbcType="INTEGER" />
+	</resultMap>
+  <select id="selectPfmServerByBoothId" resultMap="pfmserverMap">
+  	select * from pfm_server where park_id=(select park_id from pfm_entrance where pfm_entrance_id=(select pfm_entrance_id from pfm_booth where pfm_booth_id=#{boothid})) and bim_company_id=#{companyId}
+  
+  </select>
+  <resultMap type="com.wadejerry.scms.webservice.server.support.pfm.dto.EntranceDto" id="entranceMap">
+    <id column="pfm_entrance_id" property="pfmEntranceId" jdbcType="INTEGER" /> 
+    <result column="bim_company_id" property="bimCompanyId" jdbcType="INTEGER" /> 
+    <result column="entrance_name" property="entranceName" jdbcType="VARCHAR" />
+    <result column="enabled" property="enabled" jdbcType="INTEGER" />
+    <result column="park_id" property="parkId" jdbcType="INTEGER" />
+    <result column="time_id" property="timeId" jdbcType="INTEGER" />
+    <result column="insert_time" property="insertTime" jdbcType="TIMESTAMP" />
+    <result column="updatet_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="user_name" property="userName" jdbcType="VARCHAR" />
+</resultMap>
+  
+  <select id="selectAllEntranceDto2" parameterType="int" resultMap="entranceMap">
+  
+  select * from pfm_entrance where bim_company_id=#{bimcompanyID};
+  
+  </select>
+  <resultMap id="recordMap" type="com.wadejerry.scms.webservice.server.support.pfm.dto.RecordDto" >
+    <id column="record_id" property="recordId" jdbcType="INTEGER" />
+    <result column="car_id" property="carId" jdbcType="INTEGER" />
+    <result column="car_number" property="carNumber" jdbcType="VARCHAR" />
+    <result column="card_id" property="cardId" jdbcType="VARCHAR" />
+    <result column="person_name" property="personName" jdbcType="VARCHAR" />
+    <result column="car_type_id" property="carTypeId" jdbcType="INTEGER" />
+    <result column="car_type_name" property="carTypeName" jdbcType="VARCHAR" />
+    <result column="park_id" property="parkId" jdbcType="INTEGER" />
+    <result column="park_name" property="parkName" jdbcType="VARCHAR" />
+    <result column="entrance_id" property="entranceId" jdbcType="INTEGER" />
+    <result column="entrance_name" property="entranceName" jdbcType="VARCHAR" />
+    <result column="carriageway_id" property="carriagewayId" jdbcType="INTEGER" />
+    <result column="carriageway_name" property="carriagewayName" jdbcType="VARCHAR" />
+    <result column="booth_id" property="boothId" jdbcType="INTEGER" />
+    <result column="booth_name" property="boothName" jdbcType="VARCHAR" />
+    <result column="device_id" property="deviceId" jdbcType="INTEGER" />
+    <result column="device_name" property="deviceName" jdbcType="VARCHAR" />
+    <result column="event_time" property="eventTime" jdbcType="TIMESTAMP" />
+    <result column="photo" property="photo" jdbcType="VARCHAR" />
+    <result column="note" property="note" jdbcType="VARCHAR" />
+    <result column="insert_time" property="insertTime" jdbcType="TIMESTAMP" />
+    <result column="user_id" property="userId" jdbcType="INTEGER" />
+    <result column="user_name" property="userName" jdbcType="VARCHAR" />
+    <result column="direction" property="direction" jdbcType="INTEGER" />
+  </resultMap>
+  <select id="selectRecordList" resultMap="recordMap">
+  		select * from pfm_record <where>
+  		<if test="startTime!=null">event_time &gt;=#{startTime}</if>
+  		<if test="endTime!=null">and event_time &lt;=#{endTime}</if>
+  		<if test="dir!=null">and direction=#{dir}</if>
+  		and flag=#{flag}
+  		<if test="carNum!=null">and car_number  like concat('%',#{carNum},'%')</if>
+  		<if test="entranceIdArr!=null">and entrance_id in
+  			<foreach collection="entranceIdArr" index="index" item="item"
+			open="(" separator="," close=")"> #{item}
+			</foreach>
+		</if>
+  		</where>
+  		order by event_time desc
+  		limit ${pageItems} offset (${reqPage}-1)*${pageItems}
+  </select>
+  <select id="selectRecordListCount" resultType="int">
+  		select count(*) from pfm_record <where>
+  		<if test="startTime!=null">event_time &gt;=#{startTime}</if>
+  		<if test="endTime!=null">and event_time &lt;=#{endTime}</if>
+  		<if test="dir!=null">and direction=#{dir}</if>
+  		and flag=#{flag}
+  		<if test="carNum!=null">and car_number  like concat('%',#{carNum},'%')</if>
+  		<if test="entranceIdArr!=null">and entrance_id in
+  			<foreach collection="entranceIdArr" index="index" item="item"
+			open="(" separator="," close=")"> #{item}
+			</foreach>
+		</if>
+  		</where>
+  </select>
+  
+  <resultMap id="chargeRecordResultMap" type="com.wadejerry.scms.webservice.server.support.pfm.dto.ChargeRecordDto" >
+    <id column="charge_record_id" property="chargeRecordId" jdbcType="INTEGER" />
+    <result column="car_id" property="carId" jdbcType="INTEGER" />
+    <result column="car_number" property="carNumber" jdbcType="VARCHAR" />
+    <result column="card_id" property="cardId" jdbcType="VARCHAR" />
+    <result column="person_name" property="personName" jdbcType="VARCHAR" />
+    <result column="car_type_id" property="carTypeId" jdbcType="INTEGER" />
+    <result column="car_type_name" property="carTypeName" jdbcType="VARCHAR" />
+    <result column="park_id" property="parkId" jdbcType="INTEGER" />
+    <result column="park_name" property="parkName" jdbcType="VARCHAR" />
+    <result column="in_entrance_id" property="inEntranceId" jdbcType="INTEGER" />
+    <result column="in_entrance_name" property="inEntranceName" jdbcType="VARCHAR" />
+    <result column="in_carriageway_id" property="inCarriagewayId" jdbcType="INTEGER" />
+    <result column="in_carriageway_name" property="inCarriagewayName" jdbcType="VARCHAR" />
+    <result column="in_booth_id" property="inBoothId" jdbcType="INTEGER" />
+    <result column="in_booth_name" property="inBoothName" jdbcType="VARCHAR" />
+    <result column="in_device_id" property="inDeviceId" jdbcType="INTEGER" />
+    <result column="in_device_name" property="inDeviceName" jdbcType="VARCHAR" />
+    <result column="in_time" property="strInTime" jdbcType="TIMESTAMP" />
+    <result column="in_photo" property="inPhoto" jdbcType="VARCHAR" />
+    <result column="in_user_id" property="inUserId" jdbcType="INTEGER" />
+    <result column="in_user_name" property="inUserName" jdbcType="VARCHAR" />
+    <result column="out_entrance_id" property="outEntranceId" jdbcType="INTEGER" />
+    <result column="out_entrance_name" property="outEntranceName" jdbcType="VARCHAR" />
+    <result column="out_carriageway_id" property="outCarriagewayId" jdbcType="INTEGER" />
+    <result column="out_carriageway_name" property="outCarriagewayName" jdbcType="VARCHAR" />
+    <result column="out_booth_id" property="outBoothId" jdbcType="INTEGER" />
+    <result column="out_booth_name" property="outBoothName" jdbcType="VARCHAR" />
+    <result column="out_device_id" property="outDeviceId" jdbcType="INTEGER" />
+    <result column="out_device_name" property="outDeviceName" jdbcType="VARCHAR" />
+    <result column="out_time" property="strOutTime" jdbcType="TIMESTAMP" />
+    <result column="out_photo" property="outPhoto" jdbcType="VARCHAR" />
+    <result column="rule_id" property="ruleId" jdbcType="INTEGER" />
+    <result column="rule_name" property="ruleName" jdbcType="VARCHAR" />
+    <result column="rule_type" property="ruleType" jdbcType="INTEGER" />
+    <result column="parking_duration" property="parkingduration" jdbcType="INTEGER" />
+    <result column="charge_fee" property="chargefee" jdbcType="NUMERIC" />
+    <result column="balance" property="balance" jdbcType="NUMERIC" />
+    <result column="disable_time" property="strDisableTime" jdbcType="TIMESTAMP" />
+    <result column="paymethod" property="paymethod" jdbcType="INTEGER" />
+    <result column="jianmian_fee" property="jianmianfee" jdbcType="NUMERIC" />
+    <result column="jianmian_rule_name" property="jianmianrulename" jdbcType="VARCHAR" />
+    <result column="note" property="note" jdbcType="VARCHAR" />
+    <result column="flag" property="flag" jdbcType="INTEGER" />
+    <result column="insert_time" property="strInsertTime" jdbcType="TIMESTAMP" />
+    <result column="userid" property="userId" jdbcType="INTEGER" />
+    <result column="user_name" property="userName" jdbcType="VARCHAR" />
+    <result column="custom1" property="custom1" jdbcType="INTEGER" />
+    <result column="custom2" property="custom2" jdbcType="INTEGER" />
+    <result column="custom3" property="custom3" jdbcType="VARCHAR" />
+    <result column="custom4" property="custom4" jdbcType="VARCHAR" />
+  </resultMap>
+  <select id="selectChargeRecordList" resultMap="chargeRecordResultMap">
+  		select * from pfm_charge_record <where>
+  		<if test="startTime!=null">out_time &gt;=#{startTime}</if>
+  		<if test="endTime!=null">and out_time &lt;=#{endTime}</if>
+  			and flag=#{flag}
+  		<if test="carNum!=null">and car_number like concat('%',#{carNum},'%')</if>
+  		<if test="entranceIdArr!=null and dir==1">
+  			and in_entrance_id in
+  			<foreach collection="entranceIdArr" index="index" item="item"
+			open="(" separator="," close=")"> #{item}
+			</foreach>
+		</if>
+		
+		<if test="entranceIdArr!=null and dir==2">
+  			and out_entrance_id in
+  			<foreach collection="entranceIdArr" index="index" item="item"
+			open="(" separator="," close=")"> #{item}
+			</foreach>
+		</if>
+		<if test="entranceIdArr!=null and dir==null">
+			and ( in_entrance_id in
+  			<foreach collection="entranceIdArr" index="index" item="item"
+			open="(" separator="," close=")"> #{item}
+			</foreach>
+			or
+			out_entrance_id in
+  			<foreach collection="entranceIdArr" index="index" item="item"
+			open="(" separator="," close=")"> #{item}
+			</foreach>
+			)
+		
+		</if>
+  		</where>
+  		order by out_time desc
+  		limit ${pageItems} offset (${reqPage}-1)*${pageItems}
+  </select>
+  <select id="selectChargeRecordListCount" resultType="int">
+  		select count(*) from pfm_charge_record <where>
+  		<if test="startTime!=null">out_time &gt;=#{startTime}</if>
+  		<if test="endTime!=null">and out_time &lt;=#{endTime}</if>
+  		<if test="carNum!=null">and car_number like concat('%',#{carNum},'%')</if>
+  			and flag=#{flag}
+  		<if test="entranceIdArr!=null and dir==1">
+  			and in_entrance_id in
+  			<foreach collection="entranceIdArr" index="index" item="item"
+			open="(" separator="," close=")"> #{item}
+			</foreach>
+		</if>
+		
+		<if test="entranceIdArr!=null and dir==2">
+  			and out_entrance_id in
+  			<foreach collection="entranceIdArr" index="index" item="item"
+			open="(" separator="," close=")"> #{item}
+			</foreach>
+		</if>
+		<if test="entranceIdArr!=null and dir==null">
+			and ( in_entrance_id in
+  			<foreach collection="entranceIdArr" index="index" item="item"
+			open="(" separator="," close=")"> #{item}
+			</foreach>
+			or
+			out_entrance_id in
+  			<foreach collection="entranceIdArr" index="index" item="item"
+			open="(" separator="," close=")"> #{item}
+			</foreach>
+			)
+		
+		</if>
+  		</where>
+  </select>
+  
+  <select id="selectCarriageWaydtoByentranceid" parameterType="java.util.List" resultMap="selectAllCarriageDtoMap">
+  
+  
+  select * from pfm_carriageway where entrance_id in<foreach collection="list" index="index" item="item"
+			open="(" separator="," close=")"> #{item}
+			</foreach>
+  
+  
+  </select>
+    <select id="selectCarriageWaydevicereldtoBycarriagewayid" parameterType="java.util.List" resultMap="CarriagewayDeviceRelDtoMap">
+  
+  
+  select * from pfm_carriageway_device_rel where carriageway_id in<foreach collection="list" index="index" item="item"
+			open="(" separator="," close=")"> #{item}
+			</foreach>
+  
+  
+  </select>
+     <select id="selectLPRdtoByDEVICEID" parameterType="java.util.List" resultMap="selectAllLPRDtoMap">
+  
+  
+  select * from pfm_device_lpr where pfm_device_lpr_id in<foreach collection="list" index="index" item="item"
+			open="(" separator="," close=")"> #{item}
+			</foreach>
+  
+  
+  </select>
+  
+  <select id="selectCountFromPfmchargeRecordByCarNumAndinsertTime" resultType="int">
+  select count(*) from pfm_charge_record where car_number=#{carNum} AND out_TIME=#{time}
+  
+  </select>
+  
+  
+    <select id="selectCountFromPfmRecordByCarNumAndinsertTime" resultType="int">
+    select count(*) from pfm_record where car_number=#{carNum} AND event_TIME=#{time}
+    </select>
+    
+    <resultMap id="DeviceScreenMap" type="com.wadejerry.scms.webservice.server.support.pfm.dto.DeviceScreenDto" >
+    <id column="pfm_device_screen_id" property="pfmDeviceScreenId" jdbcType="INTEGER" />
+    <result column="pfm_device_type" property="pfmDeviceType" jdbcType="INTEGER" />
+     <result column="device_code" property="deviceCode" jdbcType="VARCHAR" />
+    <result column="device_name" property="deviceName" jdbcType="VARCHAR" />
+    <result column="ip" property="ip" jdbcType="VARCHAR" />
+    <result column="port" property="port" jdbcType="INTEGER" />
+    <result column="login_id" property="loginId" jdbcType="VARCHAR" />
+    <result column="login_password" property="loginPassword" jdbcType="VARCHAR" />
+    <result column="insert_time" property="insertTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="user_name" property="userName" jdbcType="VARCHAR" />
+    <result column="device_id_arr" property="deviceIdArr" jdbcType="VARCHAR" />
+    <result column="custom1" property="custom1" jdbcType="INTEGER" />
+    <result column="custom2" property="custom2" jdbcType="INTEGER" />
+    <result column="custom3" property="custom3" jdbcType="INTEGER" />
+    <result column="custom4" property="custom4" jdbcType="INTEGER" />
+    <result column="custom5" property="custom5" jdbcType="VARCHAR" />
+    <result column="custom6" property="custom6" jdbcType="VARCHAR" />
+    <result column="custom7" property="custom7" jdbcType="VARCHAR" />
+    <result column="custom8" property="custom8" jdbcType="VARCHAR" />
+  </resultMap>
+    <select id="selectAllDeviceScreen" parameterType="int" resultMap ="DeviceScreenMap">
+    select * from pfm_device_screen where bim_company_id=#{id}
+    
+    </select>
+    <resultMap id="TaskMessageDto" type="com.wadejerry.scms.webservice.server.support.pfm.dto.TaskMessageDto" >
+    <id column="pfm_task_message_id" property="pfmTaskMessageId" jdbcType="INTEGER" />
+    <result column="message" property="message" jdbcType="VARCHAR" />
+    <result column="begin_time" property="beginTime" jdbcType="TIMESTAMP" />
+    <result column="end_time" property="endTime" jdbcType="TIMESTAMP" />
+    <result column="insert_time" property="insertTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="user_name" property="userName" jdbcType="VARCHAR" />
+    <result column="device_screen_id_arr" property="deviceScreenIdArr" jdbcType="VARCHAR" />
+    <result column="custom1" property="custom1" jdbcType="INTEGER" />
+    <result column="custom2" property="custom2" jdbcType="INTEGER" />
+    <result column="custom3" property="custom3" jdbcType="VARCHAR" />
+    <result column="custom4" property="custom4" jdbcType="VARCHAR" />
+  </resultMap>
+    <select id="selectAllTaskMessage" parameterType="int" resultMap="TaskMessageDto">
+    select * from pfm_task_message where bim_company_id=#{id}
+    </select>
+    
+   <resultMap id="specialCarMap" type="com.wadejerry.scms.webservice.server.support.pfm.dto.SpecialCarNumDto" >
+    <id column="pfm_special_car_id" property="pfmSpecialCarId" jdbcType="INTEGER" />
+    <result column="car_number" property="carNumber" jdbcType="VARCHAR" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="is_del" property="isDel" jdbcType="INTEGER" />
+  </resultMap>
+    
+    <select id="selectAllSpecial"  resultMap="specialCarMap">
+    
+    select *  from pfm_special_car where bim_company_id=#{companyId} and update_time &gt;#{updateTime} 
+    </select>
+    
+    <select id="selectAllSubsidiaryCarNum" parameterType="int" resultType="String">
+    select car_number from pfm_subsidiary_car_num where car_id = #{id}
+    </select>
+</mapper>

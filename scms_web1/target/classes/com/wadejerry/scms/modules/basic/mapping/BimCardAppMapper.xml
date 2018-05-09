@@ -1,0 +1,506 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.wadejerry.scms.modules.basic.dao.BimCardAppMapper" >
+  <resultMap id="BaseResultMap" type="com.wadejerry.scms.modules.basic.model.BimCardApp" >
+    <id column="bim_card_app_id" property="bimCardAppId" jdbcType="INTEGER" />
+    <result column="app_id" property="appId" jdbcType="INTEGER" />
+    <result column="app_code" property="appCode" jdbcType="VARCHAR" />
+    <result column="app_name" property="appName" jdbcType="VARCHAR" />
+    <result column="value1" property="value1" jdbcType="NUMERIC" />
+    <result column="value2" property="value2" jdbcType="NUMERIC" />
+    <result column="value3" property="value3" jdbcType="NUMERIC" />
+    <result column="value4" property="value4" jdbcType="NUMERIC" />
+    <result column="value5" property="value5" jdbcType="NUMERIC" />
+    <result column="value6" property="value6" jdbcType="NUMERIC" />
+    <result column="value7" property="value7" jdbcType="NUMERIC" />
+    <result column="value8" property="value8" jdbcType="NUMERIC" />
+    <result column="trade_id" property="tradeId" jdbcType="INTEGER" />
+    <result column="last_use_time" property="lastUseTime" jdbcType="TIMESTAMP" />
+    <result column="las_use_sec" property="lasUseSec" jdbcType="INTEGER" />
+    <result column="time_sec_fee" property="timeSecFee" jdbcType="NUMERIC" />
+    <result column="time_sec_count" property="timeSecCount" jdbcType="INTEGER" />
+    <result column="las_deposit_time" property="lasDepositTime" jdbcType="TIMESTAMP" />
+    <result column="month_deposit" property="monthDeposit" jdbcType="NUMERIC" />
+    <result column="last_aid_time" property="lastAidTime" jdbcType="TIMESTAMP" />
+    <result column="month_aid" property="monthAid" jdbcType="NUMERIC" />
+    <result column="day_fee" property="dayFee" jdbcType="NUMERIC" />
+    <result column="day_count" property="dayCount" jdbcType="INTEGER" />
+    <result column="month_fee" property="monthFee" jdbcType="NUMERIC" />
+    <result column="month_count" property="monthCount" jdbcType="INTEGER" />
+    <result column="total_deposit" property="totalDeposit" jdbcType="NUMERIC" />
+    <result column="total_use_fee" property="totalUseFee" jdbcType="NUMERIC" />
+    <result column="total_count" property="totalCount" jdbcType="INTEGER" />
+    <result column="total_dec_fee" property="totalDecFee" jdbcType="NUMERIC" />
+    <result column="total_aid" property="totalAid" jdbcType="NUMERIC" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="custom1" property="custom1" jdbcType="INTEGER" />
+    <result column="custom2" property="custom2" jdbcType="INTEGER" />
+    <result column="custom3" property="custom3" jdbcType="VARCHAR" />
+    <result column="custom4" property="custom4" jdbcType="VARCHAR" />
+    <result column="disable_time" property="disableTime" jdbcType="TIMESTAMP" />
+    <result column="card_id" property="cardId" jdbcType="INTEGER" />
+    <result column="car_id" property="carId" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    bim_card_app_id, app_id, app_code, app_name, value1, value2, value3, value4, value5, 
+    value6, value7, value8, trade_id, last_use_time, las_use_sec, time_sec_fee, time_sec_count, 
+    las_deposit_time, month_deposit, last_aid_time, month_aid, day_fee, day_count, month_fee, 
+    month_count, total_deposit, total_use_fee, total_count, total_dec_fee, total_aid, 
+    create_time, update_time, custom1, custom2, custom3, custom4, disable_time, card_id, 
+    car_id
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from bim_card_app
+    where bim_card_app_id = #{bimCardAppId,jdbcType=INTEGER}
+  </select>
+  <select id="selectByCarID" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from bim_card_app
+    where car_id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from bim_card_app
+    where bim_card_app_id = #{bimCardAppId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.wadejerry.scms.modules.basic.model.BimCardApp" >
+    insert into bim_card_app (bim_card_app_id, app_id, app_code, 
+      app_name, value1, value2, 
+      value3, value4, value5, 
+      value6, value7, value8, 
+      trade_id, last_use_time, las_use_sec, 
+      time_sec_fee, time_sec_count, las_deposit_time, 
+      month_deposit, last_aid_time, month_aid, 
+      day_fee, day_count, month_fee, 
+      month_count, total_deposit, total_use_fee, 
+      total_count, total_dec_fee, total_aid, 
+      create_time, update_time, custom1, 
+      custom2, custom3, custom4, 
+      disable_time, card_id, car_id
+      )
+    values (#{bimCardAppId,jdbcType=INTEGER}, #{appId,jdbcType=INTEGER}, #{appCode,jdbcType=VARCHAR}, 
+      #{appName,jdbcType=VARCHAR}, #{value1,jdbcType=NUMERIC}, #{value2,jdbcType=NUMERIC}, 
+      #{value3,jdbcType=NUMERIC}, #{value4,jdbcType=NUMERIC}, #{value5,jdbcType=NUMERIC}, 
+      #{value6,jdbcType=NUMERIC}, #{value7,jdbcType=NUMERIC}, #{value8,jdbcType=NUMERIC}, 
+      #{tradeId,jdbcType=INTEGER}, #{lastUseTime,jdbcType=TIMESTAMP}, #{lasUseSec,jdbcType=INTEGER}, 
+      #{timeSecFee,jdbcType=NUMERIC}, #{timeSecCount,jdbcType=INTEGER}, #{lasDepositTime,jdbcType=TIMESTAMP}, 
+      #{monthDeposit,jdbcType=NUMERIC}, #{lastAidTime,jdbcType=TIMESTAMP}, #{monthAid,jdbcType=NUMERIC}, 
+      #{dayFee,jdbcType=NUMERIC}, #{dayCount,jdbcType=INTEGER}, #{monthFee,jdbcType=NUMERIC}, 
+      #{monthCount,jdbcType=INTEGER}, #{totalDeposit,jdbcType=NUMERIC}, #{totalUseFee,jdbcType=NUMERIC}, 
+      #{totalCount,jdbcType=INTEGER}, #{totalDecFee,jdbcType=NUMERIC}, #{totalAid,jdbcType=NUMERIC}, 
+      #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{custom1,jdbcType=INTEGER}, 
+      #{custom2,jdbcType=INTEGER}, #{custom3,jdbcType=VARCHAR}, #{custom4,jdbcType=VARCHAR}, 
+      #{disableTime,jdbcType=TIMESTAMP}, #{cardId,jdbcType=INTEGER}, #{carId,jdbcType=INTEGER}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.wadejerry.scms.modules.basic.model.BimCardApp" >
+    insert into bim_card_app
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="bimCardAppId != null" >
+        bim_card_app_id,
+      </if>
+      <if test="appId != null" >
+        app_id,
+      </if>
+      <if test="appCode != null" >
+        app_code,
+      </if>
+      <if test="appName != null" >
+        app_name,
+      </if>
+      <if test="value1 != null" >
+        value1,
+      </if>
+      <if test="value2 != null" >
+        value2,
+      </if>
+      <if test="value3 != null" >
+        value3,
+      </if>
+      <if test="value4 != null" >
+        value4,
+      </if>
+      <if test="value5 != null" >
+        value5,
+      </if>
+      <if test="value6 != null" >
+        value6,
+      </if>
+      <if test="value7 != null" >
+        value7,
+      </if>
+      <if test="value8 != null" >
+        value8,
+      </if>
+      <if test="tradeId != null" >
+        trade_id,
+      </if>
+      <if test="lastUseTime != null" >
+        last_use_time,
+      </if>
+      <if test="lasUseSec != null" >
+        las_use_sec,
+      </if>
+      <if test="timeSecFee != null" >
+        time_sec_fee,
+      </if>
+      <if test="timeSecCount != null" >
+        time_sec_count,
+      </if>
+      <if test="lasDepositTime != null" >
+        las_deposit_time,
+      </if>
+      <if test="monthDeposit != null" >
+        month_deposit,
+      </if>
+      <if test="lastAidTime != null" >
+        last_aid_time,
+      </if>
+      <if test="monthAid != null" >
+        month_aid,
+      </if>
+      <if test="dayFee != null" >
+        day_fee,
+      </if>
+      <if test="dayCount != null" >
+        day_count,
+      </if>
+      <if test="monthFee != null" >
+        month_fee,
+      </if>
+      <if test="monthCount != null" >
+        month_count,
+      </if>
+      <if test="totalDeposit != null" >
+        total_deposit,
+      </if>
+      <if test="totalUseFee != null" >
+        total_use_fee,
+      </if>
+      <if test="totalCount != null" >
+        total_count,
+      </if>
+      <if test="totalDecFee != null" >
+        total_dec_fee,
+      </if>
+      <if test="totalAid != null" >
+        total_aid,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+      <if test="custom1 != null" >
+        custom1,
+      </if>
+      <if test="custom2 != null" >
+        custom2,
+      </if>
+      <if test="custom3 != null" >
+        custom3,
+      </if>
+      <if test="custom4 != null" >
+        custom4,
+      </if>
+      <if test="disableTime != null" >
+        disable_time,
+      </if>
+      <if test="cardId != null" >
+        card_id,
+      </if>
+      <if test="carId != null" >
+        car_id,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="bimCardAppId != null" >
+        #{bimCardAppId,jdbcType=INTEGER},
+      </if>
+      <if test="appId != null" >
+        #{appId,jdbcType=INTEGER},
+      </if>
+      <if test="appCode != null" >
+        #{appCode,jdbcType=VARCHAR},
+      </if>
+      <if test="appName != null" >
+        #{appName,jdbcType=VARCHAR},
+      </if>
+      <if test="value1 != null" >
+        #{value1,jdbcType=NUMERIC},
+      </if>
+      <if test="value2 != null" >
+        #{value2,jdbcType=NUMERIC},
+      </if>
+      <if test="value3 != null" >
+        #{value3,jdbcType=NUMERIC},
+      </if>
+      <if test="value4 != null" >
+        #{value4,jdbcType=NUMERIC},
+      </if>
+      <if test="value5 != null" >
+        #{value5,jdbcType=NUMERIC},
+      </if>
+      <if test="value6 != null" >
+        #{value6,jdbcType=NUMERIC},
+      </if>
+      <if test="value7 != null" >
+        #{value7,jdbcType=NUMERIC},
+      </if>
+      <if test="value8 != null" >
+        #{value8,jdbcType=NUMERIC},
+      </if>
+      <if test="tradeId != null" >
+        #{tradeId,jdbcType=INTEGER},
+      </if>
+      <if test="lastUseTime != null" >
+        #{lastUseTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="lasUseSec != null" >
+        #{lasUseSec,jdbcType=INTEGER},
+      </if>
+      <if test="timeSecFee != null" >
+        #{timeSecFee,jdbcType=NUMERIC},
+      </if>
+      <if test="timeSecCount != null" >
+        #{timeSecCount,jdbcType=INTEGER},
+      </if>
+      <if test="lasDepositTime != null" >
+        #{lasDepositTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="monthDeposit != null" >
+        #{monthDeposit,jdbcType=NUMERIC},
+      </if>
+      <if test="lastAidTime != null" >
+        #{lastAidTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="monthAid != null" >
+        #{monthAid,jdbcType=NUMERIC},
+      </if>
+      <if test="dayFee != null" >
+        #{dayFee,jdbcType=NUMERIC},
+      </if>
+      <if test="dayCount != null" >
+        #{dayCount,jdbcType=INTEGER},
+      </if>
+      <if test="monthFee != null" >
+        #{monthFee,jdbcType=NUMERIC},
+      </if>
+      <if test="monthCount != null" >
+        #{monthCount,jdbcType=INTEGER},
+      </if>
+      <if test="totalDeposit != null" >
+        #{totalDeposit,jdbcType=NUMERIC},
+      </if>
+      <if test="totalUseFee != null" >
+        #{totalUseFee,jdbcType=NUMERIC},
+      </if>
+      <if test="totalCount != null" >
+        #{totalCount,jdbcType=INTEGER},
+      </if>
+      <if test="totalDecFee != null" >
+        #{totalDecFee,jdbcType=NUMERIC},
+      </if>
+      <if test="totalAid != null" >
+        #{totalAid,jdbcType=NUMERIC},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="custom1 != null" >
+        #{custom1,jdbcType=INTEGER},
+      </if>
+      <if test="custom2 != null" >
+        #{custom2,jdbcType=INTEGER},
+      </if>
+      <if test="custom3 != null" >
+        #{custom3,jdbcType=VARCHAR},
+      </if>
+      <if test="custom4 != null" >
+        #{custom4,jdbcType=VARCHAR},
+      </if>
+      <if test="disableTime != null" >
+        #{disableTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="cardId != null" >
+        #{cardId,jdbcType=INTEGER},
+      </if>
+      <if test="carId != null" >
+        #{carId,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.wadejerry.scms.modules.basic.model.BimCardApp" >
+    update bim_card_app
+    <set >
+      <if test="appId != null" >
+        app_id = #{appId,jdbcType=INTEGER},
+      </if>
+      <if test="appCode != null" >
+        app_code = #{appCode,jdbcType=VARCHAR},
+      </if>
+      <if test="appName != null" >
+        app_name = #{appName,jdbcType=VARCHAR},
+      </if>
+      <if test="value1 != null" >
+        value1 = #{value1,jdbcType=NUMERIC},
+      </if>
+      <if test="value2 != null" >
+        value2 = #{value2,jdbcType=NUMERIC},
+      </if>
+      <if test="value3 != null" >
+        value3 = #{value3,jdbcType=NUMERIC},
+      </if>
+      <if test="value4 != null" >
+        value4 = #{value4,jdbcType=NUMERIC},
+      </if>
+      <if test="value5 != null" >
+        value5 = #{value5,jdbcType=NUMERIC},
+      </if>
+      <if test="value6 != null" >
+        value6 = #{value6,jdbcType=NUMERIC},
+      </if>
+      <if test="value7 != null" >
+        value7 = #{value7,jdbcType=NUMERIC},
+      </if>
+      <if test="value8 != null" >
+        value8 = #{value8,jdbcType=NUMERIC},
+      </if>
+      <if test="tradeId != null" >
+        trade_id = #{tradeId,jdbcType=INTEGER},
+      </if>
+      <if test="lastUseTime != null" >
+        last_use_time = #{lastUseTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="lasUseSec != null" >
+        las_use_sec = #{lasUseSec,jdbcType=INTEGER},
+      </if>
+      <if test="timeSecFee != null" >
+        time_sec_fee = #{timeSecFee,jdbcType=NUMERIC},
+      </if>
+      <if test="timeSecCount != null" >
+        time_sec_count = #{timeSecCount,jdbcType=INTEGER},
+      </if>
+      <if test="lasDepositTime != null" >
+        las_deposit_time = #{lasDepositTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="monthDeposit != null" >
+        month_deposit = #{monthDeposit,jdbcType=NUMERIC},
+      </if>
+      <if test="lastAidTime != null" >
+        last_aid_time = #{lastAidTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="monthAid != null" >
+        month_aid = #{monthAid,jdbcType=NUMERIC},
+      </if>
+      <if test="dayFee != null" >
+        day_fee = #{dayFee,jdbcType=NUMERIC},
+      </if>
+      <if test="dayCount != null" >
+        day_count = #{dayCount,jdbcType=INTEGER},
+      </if>
+      <if test="monthFee != null" >
+        month_fee = #{monthFee,jdbcType=NUMERIC},
+      </if>
+      <if test="monthCount != null" >
+        month_count = #{monthCount,jdbcType=INTEGER},
+      </if>
+      <if test="totalDeposit != null" >
+        total_deposit = #{totalDeposit,jdbcType=NUMERIC},
+      </if>
+      <if test="totalUseFee != null" >
+        total_use_fee = #{totalUseFee,jdbcType=NUMERIC},
+      </if>
+      <if test="totalCount != null" >
+        total_count = #{totalCount,jdbcType=INTEGER},
+      </if>
+      <if test="totalDecFee != null" >
+        total_dec_fee = #{totalDecFee,jdbcType=NUMERIC},
+      </if>
+      <if test="totalAid != null" >
+        total_aid = #{totalAid,jdbcType=NUMERIC},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="custom1 != null" >
+        custom1 = #{custom1,jdbcType=INTEGER},
+      </if>
+      <if test="custom2 != null" >
+        custom2 = #{custom2,jdbcType=INTEGER},
+      </if>
+      <if test="custom3 != null" >
+        custom3 = #{custom3,jdbcType=VARCHAR},
+      </if>
+      <if test="custom4 != null" >
+        custom4 = #{custom4,jdbcType=VARCHAR},
+      </if>
+      <if test="disableTime != null" >
+        disable_time = #{disableTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="cardId != null" >
+        card_id = #{cardId,jdbcType=INTEGER},
+      </if>
+      <if test="carId != null" >
+        car_id = #{carId,jdbcType=INTEGER},
+      </if>
+    </set>
+    where bim_card_app_id = #{bimCardAppId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.wadejerry.scms.modules.basic.model.BimCardApp" >
+    update bim_card_app
+    set app_id = #{appId,jdbcType=INTEGER},
+      app_code = #{appCode,jdbcType=VARCHAR},
+      app_name = #{appName,jdbcType=VARCHAR},
+      value1 = #{value1,jdbcType=NUMERIC},
+      value2 = #{value2,jdbcType=NUMERIC},
+      value3 = #{value3,jdbcType=NUMERIC},
+      value4 = #{value4,jdbcType=NUMERIC},
+      value5 = #{value5,jdbcType=NUMERIC},
+      value6 = #{value6,jdbcType=NUMERIC},
+      value7 = #{value7,jdbcType=NUMERIC},
+      value8 = #{value8,jdbcType=NUMERIC},
+      trade_id = #{tradeId,jdbcType=INTEGER},
+      last_use_time = #{lastUseTime,jdbcType=TIMESTAMP},
+      las_use_sec = #{lasUseSec,jdbcType=INTEGER},
+      time_sec_fee = #{timeSecFee,jdbcType=NUMERIC},
+      time_sec_count = #{timeSecCount,jdbcType=INTEGER},
+      las_deposit_time = #{lasDepositTime,jdbcType=TIMESTAMP},
+      month_deposit = #{monthDeposit,jdbcType=NUMERIC},
+      last_aid_time = #{lastAidTime,jdbcType=TIMESTAMP},
+      month_aid = #{monthAid,jdbcType=NUMERIC},
+      day_fee = #{dayFee,jdbcType=NUMERIC},
+      day_count = #{dayCount,jdbcType=INTEGER},
+      month_fee = #{monthFee,jdbcType=NUMERIC},
+      month_count = #{monthCount,jdbcType=INTEGER},
+      total_deposit = #{totalDeposit,jdbcType=NUMERIC},
+      total_use_fee = #{totalUseFee,jdbcType=NUMERIC},
+      total_count = #{totalCount,jdbcType=INTEGER},
+      total_dec_fee = #{totalDecFee,jdbcType=NUMERIC},
+      total_aid = #{totalAid,jdbcType=NUMERIC},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      custom1 = #{custom1,jdbcType=INTEGER},
+      custom2 = #{custom2,jdbcType=INTEGER},
+      custom3 = #{custom3,jdbcType=VARCHAR},
+      custom4 = #{custom4,jdbcType=VARCHAR},
+      disable_time = #{disableTime,jdbcType=TIMESTAMP},
+      card_id = #{cardId,jdbcType=INTEGER},
+      car_id = #{carId,jdbcType=INTEGER}
+    where bim_card_app_id = #{bimCardAppId,jdbcType=INTEGER}
+  </update>
+  
+  <delete id="deleteByCarId" parameterType="int">
+  delete from bim_card_app where car_id = #{id}
+  </delete>
+</mapper>

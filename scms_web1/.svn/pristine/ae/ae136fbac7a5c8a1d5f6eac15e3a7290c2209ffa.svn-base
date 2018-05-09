@@ -1,0 +1,14 @@
+package com.wadejerry.scms.modules.log.service;
+
+import java.util.List;
+
+import com.wadejerry.scms.frame.entity.PageParamsDto;
+import com.wadejerry.scms.modules.log.dto.ConfigurationLogDto;
+
+public interface ConfigurationLogService {
+
+	int getRecordTotal(PageParamsDto paramsDto);
+
+	List<ConfigurationLogDto> getConfigurationLogByPage(PageParamsDto paramsDto);
+
+}

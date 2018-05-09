@@ -1,0 +1,156 @@
+package com.wadejerry.scms.modules.sysconfig.controller;
+
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.shiro.SecurityUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.wadejerry.scms.frame.constant.ConstParamLog;
+import com.wadejerry.scms.frame.constant.user.ConstUser;
+import com.wadejerry.scms.frame.entity.DataTableDto;
+import com.wadejerry.scms.frame.entity.LoginInfo;
+import com.wadejerry.scms.frame.entity.OperateResult;
+import com.wadejerry.scms.frame.entity.PageParamsDto;
+import com.wadejerry.scms.frame.log.LogRecord;
+import com.wadejerry.scms.modules.sysconfig.model.BimNetZone;
+import com.wadejerry.scms.modules.sysconfig.service.WangyuService;
+import com.wadejerry.scms.utils.AjaxUtil;
+import com.wadejerry.scms.utils.json.JacksonUtil;
+
+@Controller
+public class WangyuSetController {
+	
+	@Autowired
+	private WangyuService wangyuService;
+	@Autowired
+	private LogRecord logRecord;
+	@RequestMapping(value = "/auth/sysconfig/getwangyuinfos.do")
+	@ResponseBody
+	public void getServerInfoList(HttpServletRequest request, HttpServletResponse response) {
+
+	PageParamsDto paramsDto = new PageParamsDto(request); // 获取分页参数
+	paramsDto.setIntValue1(ConstUser.CONST_ROLE_TYPE); // 角色类型
+	int iTotal = 0;
+
+	List<BimNetZone> dtoList = null;
+	if(!SecurityUtils.getSubject().isPermitted("WangyuSee")){
+	}else{
+		iTotal = wangyuService.getWangyuCount(paramsDto); // 获取记录总数
+	if (iTotal > 0) {
+		if (paramsDto.getLength() == -1) { // 查询所有记录
+			paramsDto.setLength(iTotal);
+		}
+		dtoList = wangyuService.getWangyuListByPage(paramsDto); // 获取分页记录
+
+	}
+	}
+	DataTableDto data = new DataTableDto(); // 返回数据封装
+	data.setDataList(dtoList);
+	data.setDraw(paramsDto.getDraw());
+	data.setRecordsFiltered(iTotal);
+	data.setRecordsTotal(iTotal);
+	AjaxUtil.ajaxWriteDataTable(data, response);
+	}
+	
+	@RequestMapping(value = "/auth/sysconfig/savewangyu.do")
+	@ResponseBody
+	public void saveServerInfo(HttpServletRequest request, HttpServletResponse response) {
+		Map<String,Object> condition=null;
+		OperateResult result=new OperateResult();
+		try {
+			condition = JacksonUtil.json2map(request.getParameter("condition"));
+		} catch (Exception e) {
+			
+			result.setResult(false);
+			result.setMsg("json转换异常");
+			AjaxUtil.ajaxWrite(result, response);
+			return;
+		}
+		if(condition.get("netZoneId").equals("")){
+		BimNetZone netzone = new BimNetZone();
+		netzone.setName(condition.get("name").toString());
+		netzone.setUrl(condition.get("url").toString());
+		netzone.setBimCompanyId(LoginInfo.getCompanyId());
+		netzone.setPort(Integer.parseInt(condition.get("port").toString()));
+		try{
+		
+			AjaxUtil.ajaxWrite(wangyuService.insertWangyu(netzone), response);
+			logRecord.recordLog(ConstParamLog.LOG_MODULE_BASIC_WANGYU, ConstParamLog.LOG_OPER_ADD, ConstParamLog.LOG_TYPE_CONFIG, netzone.getName());
+
+		}
+		catch(Exception e){
+			result.setResult(false);
+			result.setMsg("插入数据失败");
+			AjaxUtil.ajaxWrite(result, response);
+		}
+		}else{
+			BimNetZone netzone = new BimNetZone();
+			netzone.setName(condition.get("name").toString());
+			netzone.setUrl(condition.get("url").toString());
+			netzone.setBimCompanyId(LoginInfo.getCompanyId());
+			netzone.setPort(Integer.parseInt(condition.get("port").toString()));
+			netzone.setNetZoneId(Integer.parseInt(condition.get("netZoneId").toString()));
+			try{
+			
+				result.setResult(true);
+				AjaxUtil.ajaxWrite(wangyuService.updateWangyu(netzone), response);
+				logRecord.recordLog(ConstParamLog.LOG_MODULE_BASIC_WANGYU, ConstParamLog.LOG_OPER_UPDATE, ConstParamLog.LOG_TYPE_CONFIG, netzone.getName());
+
+			
+			}
+			catch(Exception e){
+				result.setResult(false);
+				result.setMsg("修改失败");
+				AjaxUtil.ajaxWrite(result, response);
+			}
+			
+			
+		}
+		
+	}
+	@RequestMapping(value = "/auth/sysconfig/delwangyu.do")
+	@ResponseBody
+	public void delServerInfo(HttpServletRequest request, HttpServletResponse response) {
+		List<BimNetZone> list;
+		OperateResult result=new OperateResult();
+		try {
+			list = JacksonUtil.json2list(request.getParameter("condition"),BimNetZone.class);
+		} catch (Exception e) {
+			
+			result.setResult(false);
+			result.setMsg("json转换异常");
+			AjaxUtil.ajaxWrite(result, response);
+			return;
+		}
+		try{
+			wangyuService.delWangyu(list);
+		result.setResult(true);
+		AjaxUtil.ajaxWrite(result, response);
+		}
+		catch(Exception e){
+			result.setResult(false);
+			result.setMsg("删除数据失败");
+			AjaxUtil.ajaxWrite(result, response);
+		}
+		
+		
+	}
+	
+	@RequestMapping(value = "/auth/sysconfig/getwangyulist.do")
+	@ResponseBody
+	public void getWangyuList(HttpServletRequest request, HttpServletResponse response){
+		
+		AjaxUtil.ajaxWriteObject(wangyuService.getWangyuList(), response);
+		
+	}
+	
+
+}

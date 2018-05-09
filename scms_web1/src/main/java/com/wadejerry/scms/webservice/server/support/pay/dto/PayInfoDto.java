@@ -1,0 +1,129 @@
+package com.wadejerry.scms.webservice.server.support.pay.dto;
+
+import java.math.BigDecimal;
+
+/**
+* 
+* @ClassName: PayInfoDto
+* @Description: 支付信息DTO
+* @author zhanying
+* @date 2017年6月29日 下午5:23:29
+*
+ */
+public class PayInfoDto {
+	//行号
+	private int rowAutoId; 
+	//订单号
+	private String orderId;
+	//车牌
+	private String carNumber;
+	//收费金额
+	private BigDecimal chargeFee;
+	//入场时间
+	private long inTime;
+	//出场时间
+	private long outTime; 
+	//备注信息
+	private String note;
+	//支付时间
+	private long payTime;
+	//支付状态
+	private long status; 
+	//车场序列号
+	private int parkSerialNo;
+	//记录更新时间
+	private long updateTime;
+	//停车时长 
+	private int parkingduration; 
+	//订单生成时间
+	private long genTime;
+	//收费客户端或者岗亭名称
+	private String clientName;
+	
+	public int getRowAutoId() {
+		return rowAutoId;
+	}
+	public void setRowAutoId(int rowAutoId) {
+		this.rowAutoId = rowAutoId;
+	}
+	public String getCarNumber() {
+		return carNumber;
+	}
+	public void setCarNumber(String carNumber) {
+		this.carNumber = carNumber;
+	}
+	public BigDecimal getChargeFee() {
+		return chargeFee;
+	}
+	public void setChargeFee(BigDecimal chargeFee) {
+		this.chargeFee = chargeFee;
+	}
+	public long getInTime() {
+		return inTime;
+	}
+	public void setInTime(long inTime) {
+		this.inTime = inTime;
+	}
+	public long getOutTime() {
+		return outTime;
+	}
+	public void setOutTime(long outTime) {
+		this.outTime = outTime;
+	}
+	public String getNote() {
+		return note;
+	}
+	public void setNote(String note) {
+		this.note = note;
+	}
+	public long getPayTime() {
+		return payTime;
+	}
+	public void setPayTime(long payTime) {
+		this.payTime = payTime;
+	}
+	public long getStatus() {
+		return status;
+	}
+	public void setStatus(long status) {
+		this.status = status;
+	}
+	public int getParkSerialNo() {
+		return parkSerialNo;
+	}
+	public void setParkSerialNo(int parkSerialNo) {
+		this.parkSerialNo = parkSerialNo;
+	}
+	public long getUpdateTime() {
+		return updateTime;
+	}
+	public void setUpdateTime(long updateTime) {
+		this.updateTime = updateTime;
+	}
+	public String getOrderId() {
+		return orderId;
+	}
+	public void setOrderId(String orderId) {
+		this.orderId = orderId;
+	}
+	public int getParkingduration() {
+		return parkingduration;
+	}
+	public void setParkingduration(int parkingduration) {
+		this.parkingduration = parkingduration;
+	}
+	public long getGenTime() {
+		return genTime;
+	}
+	public void setGenTime(long genTime) {
+		this.genTime = genTime;
+	}
+	public String getClientName() {
+		return clientName;
+	}
+	public void setClientName(String clientName) {
+		this.clientName = clientName;
+	}
+
+	
+}

@@ -1,0 +1,1036 @@
+package com.wadejerry.scms.modules.pfm.controller;
+
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.text.MessageFormat;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.ServletRequest;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.io.IOUtils;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.codehaus.jettison.json.JSONArray;
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
+
+import com.sun.tools.ws.processor.model.Request;
+import com.wadejerry.scms.frame.Authority.AuthorityGetter;
+import com.wadejerry.scms.frame.constant.ConstParamLog;
+import com.wadejerry.scms.frame.entity.DataTableDto;
+import com.wadejerry.scms.frame.entity.ExTemplate;
+import com.wadejerry.scms.frame.entity.ExportTemplate;
+import com.wadejerry.scms.frame.entity.LoginInfo;
+import com.wadejerry.scms.frame.entity.OperateResult;
+import com.wadejerry.scms.frame.entity.ReportPageParamsDto;
+import com.wadejerry.scms.frame.entity.SelectDataDto;
+import com.wadejerry.scms.frame.log.LogRecord;
+import com.wadejerry.scms.frame.web.SystemParams;
+import com.wadejerry.scms.modules.auth.model.BimUser;
+import com.wadejerry.scms.modules.pfm.dao.PfmCarriagewayDeviceRelMapper;
+import com.wadejerry.scms.modules.pfm.dao.PfmEntranceMapper;
+import com.wadejerry.scms.modules.pfm.dto.ZEntranceTreeDto;
+import com.wadejerry.scms.modules.pfm.dto.PfmRecordDto;
+import com.wadejerry.scms.modules.pfm.model.PfmCarriageway;
+import com.wadejerry.scms.modules.pfm.model.PfmChargeRecord;
+import com.wadejerry.scms.modules.pfm.model.PfmEntrance;
+import com.wadejerry.scms.modules.pfm.model.PfmCarType;
+import com.wadejerry.scms.modules.pfm.service.PfmCarTypeService;
+import com.wadejerry.scms.modules.pfm.service.EntranceService;
+import com.wadejerry.scms.modules.pfm.service.PfmCarriagewayService;
+import com.wadejerry.scms.modules.pfm.service.PfmChargeRecordReportService;
+import com.wadejerry.scms.modules.pfm.service.PfmRecordService;
+import com.wadejerry.scms.utils.AjaxUtil;
+import com.wadejerry.scms.utils.StringUtil;
+import com.wadejerry.scms.utils.Log.LogManager;
+import com.wadejerry.scms.utils.date.DateUtil;
+import com.wadejerry.scms.webservice.server.support.pfm.LprPhotoResult;
+
+@Controller
+public class ChargeRecordReportController {
+	@Autowired
+	private HttpServletRequest request;
+	@Autowired
+	private HttpServletResponse response;
+	@Autowired
+	private PfmChargeRecordReportService chargeRecordService;
+	@Autowired
+	private PfmRecordService pfmRecordService;
+	@Autowired
+	private PfmEntranceMapper entranceMapper;
+	@Autowired
+	private EntranceService entranceService;
+	@Autowired
+	private PfmCarriagewayService pfmCarriagewayService;
+	@Autowired
+	private PfmCarriagewayDeviceRelMapper pfmCarriagewayDeviceRelMapper;
+	@Autowired
+	private AuthorityGetter authorityGetter;
+	@Autowired
+	private PfmCarTypeService PfmCarTypeService;
+	@Autowired
+	private ExTemplate exTemplate;
+	@Autowired
+	private LogRecord logRecord;
+	
+	/*
+	 * 收费记录查询
+	 */
+	@RequestMapping("/report/selectAllListByPage.do")
+	@ResponseBody
+	public void GetChargeRecordInfoByPage(HttpServletRequest request) throws ParseException, JSONException{
+		List<Integer> listtype=authorityGetter.carTypeAuth();
+		ReportPageParamsDto paramsDto=ReportPageParamsDto.GetParamsDtoByRequest(request);
+		//String val=request.getParameter("columns[0][search][value]");
+		if(paramsDto==null){
+			int draw = Integer.parseInt(request.getParameter("draw"));
+			DataTableDto data = new DataTableDto(); // 返回数据封装
+			data.setDataList(null);
+			data.setDraw(draw);
+			data.setRecordsFiltered(0);
+			data.setRecordsTotal(0);
+			AjaxUtil.ajaxWriteDataTable(data, response);
+			return;
+		}else{
+			
+			int iTotal=0;
+			Date startTime=null;
+			Date endTime=null;
+			String carNumber=null;
+			Integer parkId=null;
+			Integer entranceId=null;
+			Integer carriagewayId=null;
+		    List<Integer> listtypeId=null;
+		    List<Integer> listentranceId=null;
+		    String size=null;
+			String hasPermission=null;
+			if(paramsDto.getSearchValue0()!=null){
+				//开始时间
+				startTime=paramsDto.getSearchValue0();
+			}
+			if(paramsDto.getSearchValue1()!=null){
+				//结束时间
+				endTime=paramsDto.getSearchValue1();
+			}
+			if(paramsDto.getSearchValue2()!=null&&!paramsDto.getSearchValue2().equals("")){
+				carNumber=paramsDto.getSearchValue2();
+			}
+			if(paramsDto.getSearchValue6()!=null&&!paramsDto.getSearchValue6().equals("")){
+				parkId=paramsDto.getIntValue4();
+			}
+			if(paramsDto.getSearchValue7()!=null&&!paramsDto.getSearchValue7().equals("")){
+				entranceId=paramsDto.getIntValue5();
+			}
+			if(paramsDto.getSearchValue8()!=null&&!paramsDto.getSearchValue8().equals("")){
+				carriagewayId=paramsDto.getIntValue7();
+			}
+			
+			if(paramsDto.getEntranceIdList()!=null&&paramsDto.getEntranceIdList().size()>0){
+				listentranceId=paramsDto.getEntranceIdList();
+			}
+			if(listtype!=null){//不是企业管理员，需要权限
+				if(listtype.size()>0){
+					listtypeId=listtype;
+					paramsDto.setListType(listtype);
+				}else{
+					size="1";
+					paramsDto.setSize("1");
+				}
+			}
+			List<PfmChargeRecord> dtolist=null;
+			iTotal=chargeRecordService.selectRecordTotal(startTime,endTime,carNumber,parkId,listentranceId,carriagewayId,listtypeId,hasPermission,size);
+			if(iTotal>0){
+				if(paramsDto.getLength()==-1){
+					paramsDto.setLength(iTotal);  //查询所有记录
+				}
+				
+				dtolist=chargeRecordService.selectAllListByPage(paramsDto);
+				
+			}
+			DataTableDto data = new DataTableDto(); // 返回数据封装
+			data.setDataList(dtolist);
+			data.setDraw(paramsDto.getDraw());
+			data.setRecordsFiltered(iTotal);
+			data.setRecordsTotal(iTotal);
+			AjaxUtil.ajaxWriteDataTable(data, response);
+			
+			
+			
+		}
+		
+	}
+	/*
+	 * 正常通行记录查询
+	 */
+	@RequestMapping("/report/selectNormalListByPage.do")
+	@ResponseBody
+	public void GetNormalInfoByPage() throws ParseException, JSONException{
+		List<Integer> listtype=authorityGetter.carTypeAuth();
+		ReportPageParamsDto paramsDto=ReportPageParamsDto.GetParamsDtoByRequest(request);
+		//String val=request.getParameter("columns[0][search][value]");
+		if(paramsDto==null){
+			int draw = Integer.parseInt(request.getParameter("draw"));
+			DataTableDto data = new DataTableDto(); // 返回数据封装
+			data.setDataList(null);
+			data.setDraw(draw);
+			data.setRecordsFiltered(0);
+			data.setRecordsTotal(0);
+			AjaxUtil.ajaxWriteDataTable(data, response);
+			return;
+		}else{
+		
+		int iTotal=0;
+		Date startTime=null;
+		Date endTime=null;
+		String carNumber=null;
+		Integer parkId=null;
+		Integer entranceId=null;
+		Integer carriagewayId=null;
+		Integer onlyentrance=null;
+		Integer direction=null;
+		List<Integer> listtypeId=null;
+		List<Integer> listentranceId=null;
+	    String size=null;
+		String hasPermission=null;
+		List<PfmRecordDto> dtolist=null;
+		//Date time=new Date();
+		if(paramsDto.getSearchValue0()!=null){
+			startTime=paramsDto.getSearchValue0();
+		}
+		if(paramsDto.getSearchValue1()!=null){
+			endTime=paramsDto.getSearchValue1();
+		}
+		if(paramsDto.getSearchValue2()!=null&&!paramsDto.getSearchValue2().equals("")){
+			carNumber=paramsDto.getSearchValue2();
+		}
+		if(paramsDto.getSearchValue6()!=null&&!paramsDto.getSearchValue6().equals("")){
+			parkId=paramsDto.getIntValue4();
+		}
+		if(paramsDto.getEntranceIdList()!=null&&paramsDto.getEntranceIdList().size()>0){
+			listentranceId=paramsDto.getEntranceIdList();
+		}
+		if(paramsDto.getSearchValue8()!=null&&!paramsDto.getSearchValue8().equals("")){
+			carriagewayId=paramsDto.getIntValue7();
+		}
+		if(paramsDto.getSearchValue3()!=null){
+			onlyentrance=paramsDto.getIntValue1();
+		}
+		if(paramsDto.getSearchValue4()!=null){
+			direction=paramsDto.getIntValue2();
+		}
+		if(listtype!=null){//不是企业管理员，需要权限
+			if(listtype.size()>0){
+				listtypeId=listtype;
+				paramsDto.setListType(listtype);
+			}else{
+				size="1";
+				paramsDto.setSize("1");
+			}
+		}
+		iTotal=pfmRecordService.selectRecordTotal(startTime,endTime,carNumber,onlyentrance,direction,parkId,listentranceId,carriagewayId,listtypeId,hasPermission,size);
+		if(iTotal>0){
+			if(paramsDto.getLength()==-1){
+				paramsDto.setLength(iTotal);  //查询所有记录
+			}
+			dtolist=pfmRecordService.selectAllListByPage(paramsDto);
+			
+		}
+		DataTableDto data = new DataTableDto(); // 返回数据封装
+		data.setDataList(dtolist);
+		data.setDraw(paramsDto.getDraw());
+		data.setRecordsFiltered(iTotal);
+		data.setRecordsTotal(iTotal);
+		AjaxUtil.ajaxWriteDataTable(data, response);
+		}
+	}
+	/*
+	 * 异常通行记录查询
+	 */
+	@RequestMapping("/report/selectabNormalListByPage.do")
+	@ResponseBody
+	public void GetAbNormalInfoByPage() throws ParseException, JSONException{
+		List<Integer> listtype=authorityGetter.carTypeAuth();
+		ReportPageParamsDto paramsDto=ReportPageParamsDto.GetParamsDtoByRequest(request);
+		//String val=request.getParameter("columns[0][search][value]");
+		if(paramsDto==null){
+			int draw = Integer.parseInt(request.getParameter("draw"));
+			DataTableDto data = new DataTableDto(); // 返回数据封装
+			data.setDataList(null);
+			data.setDraw(draw);
+			data.setRecordsFiltered(0);
+			data.setRecordsTotal(0);
+			AjaxUtil.ajaxWriteDataTable(data, response);
+			return;
+		}else{
+		
+		int iTotal=0;
+		Date startTime=null;
+		Date endTime=null;
+		Integer parkId=null;
+		Integer entranceId=null;
+		Integer carriagewayId=null;
+		Integer onlyentrance=null;
+		Integer direction=null;
+		List<Integer> listtypeId=null;
+		List<Integer> listentranceId=null;
+	    String size=null;
+		String hasPermission=null;
+		List<PfmRecordDto> dtolist=null;
+		Date time=new Date();
+		if(paramsDto.getSearchValue0()!=null){
+			startTime=paramsDto.getSearchValue0();
+		}
+		if(paramsDto.getSearchValue1()!=null){
+			endTime=paramsDto.getSearchValue1();
+		}
+		if(paramsDto.getSearchValue3()!=null){
+			onlyentrance=paramsDto.getIntValue1();
+		}
+		if(paramsDto.getSearchValue4()!=null){
+			direction=paramsDto.getIntValue2();
+		}
+		if(paramsDto.getSearchValue6()!=null&&!paramsDto.getSearchValue6().equals("")){
+			parkId=paramsDto.getIntValue4();
+		}
+		if(paramsDto.getEntranceIdList()!=null&&paramsDto.getEntranceIdList().size()>0){
+			listentranceId=paramsDto.getEntranceIdList();
+		}
+		if(paramsDto.getSearchValue8()!=null&&!paramsDto.getSearchValue8().equals("")){
+			carriagewayId=paramsDto.getIntValue7();
+		}
+		if(listtype!=null){//不是企业管理员，需要权限
+			if(listtype.size()>0){
+				listtypeId=listtype;
+				paramsDto.setListType(listtype);
+			}else{
+				size="1";
+				paramsDto.setSize("1");
+			}
+		}
+		iTotal=pfmRecordService.selectabNormalRecordTotal(startTime,endTime,onlyentrance,direction,parkId,listentranceId,carriagewayId,listtypeId,hasPermission,size);
+		if(iTotal>0){
+			if(paramsDto.getLength()==-1){
+				paramsDto.setLength(iTotal);  //查询所有记录
+			}
+			dtolist=pfmRecordService.selectabNormalListByPage(paramsDto);
+		}
+		DataTableDto data = new DataTableDto(); // 返回数据封装
+		data.setDataList(dtolist);
+		data.setDraw(paramsDto.getDraw());
+		data.setRecordsFiltered(iTotal);
+		data.setRecordsTotal(iTotal);
+		AjaxUtil.ajaxWriteDataTable(data, response);
+		}
+	}
+	
+	/*
+	 * 场内车辆记录查询
+	 */
+	@RequestMapping("/report/parkreport/selectListByPage.do")
+	@ResponseBody
+	public void SelectParkListByPage() throws ParseException, JSONException{
+		List<Integer> listtype=authorityGetter.carTypeAuth();
+		ReportPageParamsDto paramsDto=ReportPageParamsDto.GetParamsDtoByRequest(request);
+		//String val=request.getParameter("columns[0][search][value]");
+		if(paramsDto==null){
+			int draw = Integer.parseInt(request.getParameter("draw"));
+			DataTableDto data = new DataTableDto(); // 返回数据封装
+			data.setDataList(null);
+			data.setDraw(draw);
+			data.setRecordsFiltered(0);
+			data.setRecordsTotal(0);
+			AjaxUtil.ajaxWriteDataTable(data, response);
+			return;
+		}else{
+		
+		int iTotal=0;
+		Date startTime=null;
+		Date endTime=null;
+		String carNumber=null;
+		Integer parkId=null;
+		Integer entranceId=null;
+		Integer carriagewayId=null;
+		Integer carType=null;
+		List<PfmRecordDto> dtolist=null;
+		List<Integer> listtypeId=null;
+		List<Integer> listentranceId=null;
+	    String size=null;
+		String hasPermission=null;
+		if(paramsDto.getSearchValue0()!=null){
+			startTime=paramsDto.getSearchValue0();
+		}
+		if(paramsDto.getSearchValue1()!=null){
+			endTime=paramsDto.getSearchValue1();
+		}
+		if(paramsDto.getSearchValue2()!=null&&!paramsDto.getSearchValue2().equals("")){
+			carNumber=paramsDto.getSearchValue2();
+		}
+		if(paramsDto.getIntValue3()!=0){
+			carType=paramsDto.getIntValue3();
+		}
+		if(paramsDto.getSearchValue6()!=null&&!paramsDto.getSearchValue6().equals("")){
+			parkId=paramsDto.getIntValue4();
+		}
+		if(paramsDto.getEntranceIdList()!=null&&paramsDto.getEntranceIdList().size()>0){
+			listentranceId=paramsDto.getEntranceIdList();
+		}
+		if(paramsDto.getSearchValue8()!=null&&!paramsDto.getSearchValue8().equals("")){
+			carriagewayId=paramsDto.getIntValue7();
+		}
+		if(listtype!=null){//不是企业管理员，需要权限
+			if(listtype.size()>0){
+				listtypeId=listtype;
+				paramsDto.setListType(listtype);
+			}else{
+				size="1";
+				paramsDto.setSize("1");
+			}
+		}
+		iTotal=pfmRecordService.selectParkReportTotal(startTime,endTime,carNumber,parkId,listentranceId,carriagewayId,carType,listtypeId,hasPermission,size);
+		if(iTotal>0){
+			if(paramsDto.getLength()==-1){
+				paramsDto.setLength(iTotal);  //查询所有记录
+			}
+			dtolist=pfmRecordService.selectAllParkReportListByPage(paramsDto);
+		}
+		DataTableDto data = new DataTableDto(); // 返回数据封装
+		data.setDataList(dtolist);
+		data.setDraw(paramsDto.getDraw());
+		data.setRecordsFiltered(iTotal);
+		data.setRecordsTotal(iTotal);
+		AjaxUtil.ajaxWriteDataTable(data, response);
+		}
+	}
+	
+	@RequestMapping("/report/configentranceName.do")
+	@ResponseBody
+	public void configentranceName(){
+		List<PfmEntrance> entrancelist=entranceMapper.configName(LoginInfo.getCompanyId());
+		SelectDataDto selectDto=null;
+		List<SelectDataDto> list=new ArrayList<SelectDataDto>();
+		SelectDataDto dataDto=new SelectDataDto();
+		if(entrancelist.size()!=0){
+			for(PfmEntrance temp:entrancelist){
+				selectDto=new SelectDataDto();
+				selectDto.setId(temp.getPfmEntranceId());
+				selectDto.setText(temp.getEntranceName());
+				list.add(selectDto);
+			}
+			AjaxUtil.ajaxWriteObject(list, response);
+			return;
+		}
+	}
+	/*
+	 * 收费记录导出
+	 */
+	
+	@RequestMapping("/report/exportcharge/{formdata}.do")
+	@ResponseBody
+	public void ExportCharge(@PathVariable("formdata") String formdata) throws NumberFormatException, JSONException, ParseException{
+		List<Integer> listtype=authorityGetter.carTypeAuth();
+		List<Integer> listTypeId=null;
+		String size=null;
+		Date startTime=null;
+		Date endTime=null;
+		String carNumber=null;
+		String order=null;
+		 List<Integer> listentranceId=null;//出入口
+		if(!formdata.equals("")){
+			JSONObject json=new JSONObject(formdata);
+			//只有开始时间
+			if(!json.getString("startTime").equals("")&&json.getString("endTime").equals("")){
+				startTime=DateUtil.df.parse(json.getString("startTime"));
+			}
+			//只有结束时间
+			if(!json.getString("endTime").equals("")&&json.getString("startTime").equals("")){
+				endTime=DateUtil.df.parse(json.getString("endTime"));
+			}
+			//开始结束时间都有
+			if(!json.getString("endTime").equals("")&&!json.getString("startTime").equals("")){
+				endTime=DateUtil.df.parse(json.getString("endTime"));
+				startTime=DateUtil.df.parse(json.getString("startTime"));
+				
+			}
+			if(json.has("carNumber")&&!json.getString("carNumber").equals("")){
+				carNumber=json.getString("carNumber");
+			}
+			if(json.has("entranceId")&&!json.getString("entranceId").equals("")){
+				
+				if(json.get("entranceId") instanceof JSONArray){
+					//如果出入口有多个
+					JSONArray a=json.getJSONArray("entranceId");
+					listentranceId=new ArrayList<Integer>();
+					for(int i=0;i<a.length();i++){
+						listentranceId.add( Integer.valueOf((String) a.get(i)));
+					}
+					
+			}else{
+				//出入口只有一个
+				listentranceId=new ArrayList<Integer>();
+				listentranceId.add(Integer.valueOf(json.getString("entranceId").toString()));
+				
+			}
+				
+			
+		}
+			
+			if((json.has("order1")&&!json.getString("order1").equals(""))&&(json.has("order2")&&!json.getString("order2").equals(""))){
+		    	
+		    		order=MessageFormat.format("  order by {0} {1}", 
+							StringUtil.objNameToTableColName(json.getString("order1").toString())
+							, json.getString("order2").toString());
+			    		
+		    }
+				
+			
+			
+			
+			
+		}
+		if(listtype!=null){//不是企业管理员，需要权限
+			if(listtype.size()>0){
+				listTypeId=listtype;
+				
+			}else{
+				size="1";
+			}
+		}
+		
+		List<Map<String,Object>> data=chargeRecordService.exportcharge(startTime,endTime,carNumber,listTypeId,listentranceId,size,order);
+		String[] head = {"车牌","车主姓名","车辆类型","收费规则","停车时长","收费金额","减免金额","减免规则","收费员","入场时间","出场时间"};
+		String[] column={"car_number","person_name","car_type_name","rule_name","parking_duration","charge_fee","jianmian_fee","jianmian_rule_name","user_name","in_time","out_time"};
+		exTemplate.Export(data, head, column);
+		logRecord.recordLog(ConstParamLog.LOG_MODULE_PFM_CHARGER_RECORD_REPORT, ConstParamLog.LOG_OPER_EXPORT,  ConstParamLog.LOG_TYPE_CONFIG,"");
+
+	}
+	
+	/*
+	 * 消费记录车辆入场图片
+	 *
+	 */
+	
+	@RequestMapping("/report/chargePhoto.do")
+	@ResponseBody
+	public void getChangeLprPhoto(){
+		//图片路径  SystemParams.lprPath + 图片名称前8位(年月日)+图片名称
+		String inPhoto=request.getParameter("inPhoto");
+		//String outPhoto=request.getParameter("outPhoto");
+		LprPhotoResult result= new LprPhotoResult();
+		if(inPhoto.equals("")){
+			result.setiRet(false);
+			result.setStrError("该车辆无图片");
+			AjaxUtil.ajaxWriteObject(result, response);
+			return;
+		}
+		result.setiRet(true);
+		
+		String picPath=SystemParams.lprPath;
+		String todaystring = inPhoto.substring(0, 8).replace("-", "");
+		String path = picPath+"\\"+todaystring+"\\"+inPhoto;
+		File photo=new File(path);
+		//File photo=new File("C:\\Users\\Amery\\Desktop\\"+path);
+		if(photo.exists()){
+			InputStream input = null;
+			try{
+				input = new FileInputStream(photo);
+				result.setPhoto(IOUtils.toByteArray(input));
+				result.setiRet(true);
+			}
+			catch(FileNotFoundException e){
+				result.setiRet(false);
+				result.setStrError("未找到图片文件");
+				LogManager.logException(e);
+			} 
+			catch (IOException e) {
+				result.setiRet(false);
+				result.setStrError("服务器读取文件错误");
+				LogManager.logException(e);
+			}
+			
+		}
+		else{
+			result.setiRet(false);
+			result.setStrError("未找到图片文件");
+		}		
+		//return result;
+		AjaxUtil.ajaxWriteObject(result, response);
+		}
+	
+	
+	
+	/*
+	 * 消费记录车辆出场图片
+	 *
+	 */
+	
+	@RequestMapping("/report/chargeOutPhoto.do")
+	@ResponseBody
+	public void getChangeLprOutPhoto(){
+		//图片路径  SystemParams.lprPath + 图片名称前8位(年月日)+图片名称
+		//String inPhoto=request.getParameter("inPhoto");
+		String outPhoto=request.getParameter("outPhoto");
+		LprPhotoResult result= new LprPhotoResult();
+		
+		if(outPhoto.equals("")){
+			result.setiRet(false);
+			result.setStrError("该车辆无图片");
+			AjaxUtil.ajaxWriteObject(result, response);
+			return;
+		}
+		result.setiRet(true);
+		String picPath=SystemParams.lprPath;
+		String todaystring = outPhoto.substring(0, 8).replace("-", "");
+		String path = picPath+"\\"+todaystring+"\\"+outPhoto;
+		File photo=new File(path);
+		if(photo.exists()){
+			InputStream input = null;
+			try{
+				input = new FileInputStream(photo);
+				result.setPhoto(IOUtils.toByteArray(input));
+				result.setiRet(true);
+			}
+			catch(FileNotFoundException e){
+				result.setiRet(false);
+				result.setStrError("未找到图片文件");
+				LogManager.logException(e);
+			} 
+			catch (IOException e) {
+				result.setiRet(false);
+				result.setStrError("服务器读取文件错误");
+				LogManager.logException(e);
+			}
+			
+		}
+		else{
+			result.setiRet(false);
+			result.setStrError("未找到图片文件");
+		}		
+		//return result;
+		AjaxUtil.ajaxWriteObject(result, response);
+		}
+	
+	
+	/*
+	 * 车辆图片
+	 *
+	 */
+	
+	@RequestMapping("/report/carPhoto.do")
+	@ResponseBody
+	public void getCarPhoto(){
+		//图片路径  SystemParams.lprPath + 图片名称前8位(年月日)+图片名称
+		//String inPhoto=request.getParameter("inPhoto");
+		String Photo=request.getParameter("Photo");
+		LprPhotoResult result= new LprPhotoResult();
+		
+		if(Photo.equals("")){
+			result.setiRet(false);
+			result.setStrError("该车辆无图片");
+			AjaxUtil.ajaxWriteObject(result, response);
+			return;
+		}
+		result.setiRet(true);
+		String picPath=SystemParams.lprPath;
+		String todaystring = Photo.substring(0, 8).replace("-", "");
+		String path = picPath+"\\"+todaystring+"\\"+Photo;
+		File photo=new File(path);
+		if(photo.exists()){
+			InputStream input = null;
+			try{
+				input = new FileInputStream(photo);
+				result.setPhoto(IOUtils.toByteArray(input));
+				result.setiRet(true);
+			}
+			catch(FileNotFoundException e){
+				result.setiRet(false);
+				result.setStrError("未找到图片文件");
+				LogManager.logException(e);
+			} 
+			catch (IOException e) {
+				result.setiRet(false);
+				result.setStrError("服务器读取文件错误");
+				LogManager.logException(e);
+			}
+			
+		}
+		else{
+			result.setiRet(false);
+			result.setStrError("未找到图片文件");
+		}		
+		//return result;
+		AjaxUtil.ajaxWriteObject(result, response);
+		}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	/*
+	 * 正常通行记录导出
+	 */
+	@RequestMapping("/report/exportnormal/{formdata}.do")
+	@ResponseBody
+	public void ExportNormal(@PathVariable("formdata") String formdata) throws JSONException, ParseException{
+		//OperateResult o = new OperateResult();
+		List<Integer> listtype=authorityGetter.carTypeAuth();
+		List<Integer> listTypeId=null;
+		Date startTime=null;
+		Date endTime=null;
+		String carNumber=null;
+		String order=null;
+		 List<Integer> listentranceId=null;//出入口
+		String size=null;
+		Integer direction=null;//方向
+		if(!formdata.equals("")){
+			JSONObject json=new JSONObject(formdata);
+			//只有开始时间
+			if(!json.getString("startTime").equals("")&&json.getString("endTime").equals("")){
+				
+				startTime=DateUtil.df.parse(json.getString("startTime"));
+			}
+			//只有结束时间
+			if(!json.getString("endTime").equals("")&&json.getString("startTime").equals("")){
+				endTime=DateUtil.df.parse(json.getString("endTime"));
+			}
+			//开始结束时间都有
+			if(!json.getString("endTime").equals("")&&!json.getString("startTime").equals("")){
+				endTime=DateUtil.df.parse(json.getString("endTime"));
+				startTime=DateUtil.df.parse(json.getString("startTime"));
+				
+			}
+			if(json.has("carNumber")&&!json.getString("carNumber").equals("")){
+				carNumber=json.getString("carNumber");
+			}
+			if(json.has("direction")&&!json.getString("direction").equals("0")){
+				direction=Integer.valueOf(json.getString("direction"));
+			}
+			if(json.has("entranceId")&&!json.getString("entranceId").equals("")){
+				
+				if(json.get("entranceId") instanceof JSONArray){
+					//如果出入口有多个
+					JSONArray a=json.getJSONArray("entranceId");
+					listentranceId=new ArrayList<Integer>();
+					for(int i=0;i<a.length();i++){
+						listentranceId.add( Integer.valueOf((String) a.get(i)));
+					}
+					
+			}else{
+				//出入口只有一个
+				listentranceId=new ArrayList<Integer>();
+				listentranceId.add(Integer.valueOf(json.getString("entranceId").toString()));
+				
+			}
+				
+			
+		}
+			if((json.has("order1")&&!json.getString("order1").equals(""))&&(json.has("order2")&&!json.getString("order2").equals(""))){
+		    	
+	    		order=MessageFormat.format("  order by {0} {1}", 
+						StringUtil.objNameToTableColName(json.getString("order1").toString())
+						, json.getString("order2").toString());
+		    	
+	    	
+	    	
+	    }
+			
+		}
+		if(listtype!=null){//不是企业管理员，需要权限
+			if(listtype.size()>0){
+				listTypeId=listtype;
+			}else{
+				size="1";
+			}
+		}
+		List<Map<String,Object>> data=pfmRecordService.exportNormalCharge(startTime,endTime,carNumber,direction,listentranceId,listTypeId,size,order);
+		String[] head = {"车牌","进出方向","车主姓名","车辆类型","车场","出入口","通行时间","车道","岗亭","操作员"};
+		String[] column={"car_number","direction","person_name","car_type_name","park_name","entrance_name","event_time","carriageway_name","booth_name","user_name"};
+		exTemplate.Export(data, head, column);
+		logRecord.recordLog(ConstParamLog.LOG_MODULE_PFM_NORAML_REPORT, ConstParamLog.LOG_OPER_EXPORT,  ConstParamLog.LOG_TYPE_CONFIG,"");
+	
+	}
+	
+	/*
+	 * 异常通行导出
+	 */
+	@RequestMapping("/report/exportabnormal/{formdata}.do")
+	@ResponseBody
+	public void ExportAbnormal(@PathVariable("formdata") String formdata) throws NumberFormatException, JSONException, ParseException{
+		
+		List<Integer> listtype=authorityGetter.carTypeAuth();
+		List<Integer> listTypeId=null;
+		Date startTime=null;
+		Date endTime=null;
+		String order=null;
+		List<Integer> listentranceId=null;//出入口
+		Integer direction=null;//方向
+		String size=null;
+		if(!formdata.equals("")){
+			JSONObject json=new JSONObject(formdata);
+			//只有开始时间
+			if(!json.getString("startTime").equals("")&&json.getString("endTime").equals("")){
+				
+				startTime=DateUtil.df.parse(json.getString("startTime"));
+			}
+			//只有结束时间
+			if(!json.getString("endTime").equals("")&&json.getString("startTime").equals("")){
+				endTime=DateUtil.df.parse(json.getString("endTime"));
+			}
+			//开始结束时间都有
+			if(!json.getString("endTime").equals("")&&!json.getString("startTime").equals("")){
+				endTime=DateUtil.df.parse(json.getString("endTime"));
+				startTime=DateUtil.df.parse(json.getString("startTime"));
+				
+			}
+			if(json.has("direction")&&!json.getString("direction").equals("0")){
+				direction=Integer.valueOf(json.getString("direction"));
+			}
+			if(json.has("entranceId")&&!json.getString("entranceId").equals("")){
+				
+				if(json.get("entranceId") instanceof JSONArray){
+					//如果出入口有多个
+					JSONArray a=json.getJSONArray("entranceId");
+					listentranceId=new ArrayList<Integer>();
+					for(int i=0;i<a.length();i++){
+						listentranceId.add( Integer.valueOf((String) a.get(i)));
+					}
+					
+			}else{
+				//出入口只有一个
+				listentranceId=new ArrayList<Integer>();
+				listentranceId.add(Integer.valueOf(json.getString("entranceId").toString()));
+				
+			}
+				
+			
+		}
+			if((json.has("order1")&&!json.getString("order1").equals(""))&&(json.has("order2")&&!json.getString("order2").equals(""))){
+		    	
+	    		order=MessageFormat.format("  order by {0} {1}", 
+						StringUtil.objNameToTableColName(json.getString("order1").toString())
+						, json.getString("order2").toString());
+		    	
+	    	
+	    	
+	    }
+			
+			
+		}
+		if(listtype!=null){//不是企业管理员，需要权限
+			if(listtype.size()>0){
+				listTypeId=listtype;
+			}else{
+				size="1";
+			}
+		}
+		List<Map<String,Object>> data=pfmRecordService.exportAbnormalCharge(startTime,endTime,direction,listentranceId,listTypeId,size,order);
+		String[] head = {"进出方向","通行时间","车场","出入口","车道","岗亭","操作员"};
+		String[] column={"direction","event_time","park_name","entrance_name","carriageway_name","booth_name","user_name"};
+		exTemplate.Export(data, head, column);
+		logRecord.recordLog(ConstParamLog.LOG_MODULE_PFM_ABNORAML_REPORT, ConstParamLog.LOG_OPER_EXPORT,  ConstParamLog.LOG_TYPE_CONFIG,"");
+	}
+	/*
+	 * 场内车辆导出
+	 */
+	@RequestMapping("/report/parkreport/export/{formdata}.do")
+	@ResponseBody
+	public void Export(@PathVariable("formdata") String formdata) throws JSONException, ParseException{
+		//OperateResult o = new OperateResult();
+		List<Integer> listtype=authorityGetter.carTypeAuth();
+		List<Integer> listTypeId=null;
+		Date startTime=null;
+		Date endTime=null;
+		List<Integer> listentranceId=null;//出入口
+		String carNumber=null;
+		String size=null;
+		String order=null;
+		Integer carType=null;
+		if(!formdata.equals("")){
+			JSONObject json=new JSONObject(formdata);
+			//只有开始时间
+			if(!json.getString("startTime").equals("")&&json.getString("endTime").equals("")){
+				
+				startTime=DateUtil.df.parse(json.getString("startTime"));
+			}
+			//只有结束时间
+			if(!json.getString("endTime").equals("")&&json.getString("startTime").equals("")){
+				endTime=DateUtil.df.parse(json.getString("endTime"));
+			}
+			//开始结束时间都有
+			if(!json.getString("endTime").equals("")&&!json.getString("startTime").equals("")){
+				endTime=DateUtil.df.parse(json.getString("endTime"));
+				startTime=DateUtil.df.parse(json.getString("startTime"));
+				
+			}
+			if(json.has("carNumber")&&!json.getString("carNumber").equals("")){
+				carNumber=json.getString("carNumber");
+			}
+			if(json.has("carTypeId")&&!json.getString("carTypeId").equals("0")){
+				carType=Integer.valueOf(json.getString("carTypeId"));
+			}
+			if(json.has("entranceId")&&!json.getString("entranceId").equals("")){
+				
+				if(json.get("entranceId") instanceof JSONArray){
+					//如果出入口有多个
+					JSONArray a=json.getJSONArray("entranceId");
+					listentranceId=new ArrayList<Integer>();
+					for(int i=0;i<a.length();i++){
+						listentranceId.add( Integer.valueOf((String) a.get(i)));
+					}
+					
+			}else{
+				//出入口只有一个
+				listentranceId=new ArrayList<Integer>();
+				listentranceId.add(Integer.valueOf(json.getString("entranceId").toString()));
+				
+			}
+				
+			
+		}
+			if((json.has("order1")&&!json.getString("order1").equals(""))&&(json.has("order2")&&!json.getString("order2").equals(""))){
+		    	
+	    		order=MessageFormat.format("  order by {0} {1}", 
+						StringUtil.objNameToTableColName(json.getString("order1").toString())
+						, json.getString("order2").toString());
+		    	
+	    	
+	    	
+	    }
+			
+			
+			
+		}
+		
+		if(listtype!=null){//不是企业管理员，需要权限
+			if(listtype.size()>0){
+				listTypeId=listtype;
+			}else{
+				size="1";
+			}
+		}
+		
+		List<Map<String,Object>> data=pfmRecordService.exportParkReport(startTime,endTime,carNumber,carType,listTypeId,listentranceId,size,order);
+		String[] head = {"车牌","车主姓名","车辆类型","车场","出入口","通行时间","车道","岗亭","操作员"};
+		String[] column={"car_number","person_name","car_type_name","park_name","entrance_name","event_time","carriageway_name","booth_name","user_name"};
+		exTemplate.Export(data, head, column);
+		logRecord.recordLog(ConstParamLog.LOG_MODULE_PFM_IN_PARK_CAR_REPORT, ConstParamLog.LOG_OPER_EXPORT,  ConstParamLog.LOG_TYPE_CONFIG,"");
+	
+	}
+	@RequestMapping("/report/parkreport/configCarType.do")
+	@ResponseBody
+	public void configCarType(){
+		List<PfmCarType> carTypelist=PfmCarTypeService.configParkReport();
+		SelectDataDto selectDto=null;
+		List<SelectDataDto> list=new ArrayList<SelectDataDto>();
+		SelectDataDto dataDto=new SelectDataDto();
+		dataDto.setId(0);
+		dataDto.setText("全部");
+		list.add(dataDto);
+		if(carTypelist.size()!=0){
+			for(PfmCarType temp:carTypelist){
+				selectDto=new SelectDataDto();
+				selectDto.setId(temp.getCarTypeId());
+				selectDto.setText(temp.getTypeName());
+				list.add(selectDto);
+			}
+			AjaxUtil.ajaxWriteObject(list, response);
+			return;
+		}
+	}
+	
+	/*
+	 * 上传车辆照片
+	 
+	@RequestMapping("/report/uploadphoto.do")
+	@ResponseBody
+	public void uoloadTouxiang(HttpServletRequest request, HttpServletResponse response) {
+		String formData=request.getParameter("formData");
+		MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) (ServletRequest) request;
+		// 得到上传的文件
+		MultipartFile mFile = multipartRequest.getFile("up_img");
+		// 得到上传服务器的路径
+
+		String path = request.getSession().getServletContext().getRealPath("photo");
+		File file = new File(path);
+		if (!file.exists()) {
+			file.mkdir();
+		}
+		// 得到上传的文件的文件名
+		String oldFileName = mFile.getOriginalFilename();
+		String suffix = oldFileName.substring(oldFileName.lastIndexOf("."));
+		String filename = LoginInfo.getLoginName() + new Date().getTime() + suffix;
+		path += ("\\" + filename);
+		InputStream inputStream = null;
+		FileOutputStream outputStream = null;
+		try {
+			inputStream = mFile.getInputStream();
+			outputStream = new FileOutputStream(path);
+			byte[] b = new byte[1048576];
+			int length = 0;
+			while ((length = inputStream.read(b)) != -1) {
+				outputStream.write(b, 0, length);
+			}
+			//BimUser user = userMapper.selectByPrimaryKey(LoginInfo.getLoginId());
+			//user.setPhoto("/photo/" + filename);
+			//userMapper.updateByPrimaryKeySelective(user);
+			OperateResult result = new OperateResult();
+			result.setResult(true);
+			//result.setMsg(user.getPhoto());
+			AjaxUtil.ajaxWrite(result, response);
+		}
+
+		catch (IOException e) {
+
+			e.printStackTrace();
+			OperateResult result = new OperateResult();
+			result.setResult(false);
+			AjaxUtil.ajaxWrite(result, response);
+			File filea = new File(path);
+			if (filea.exists()) {
+				filea.delete();
+			}
+
+		} finally {
+
+			if (inputStream != null)
+				try {
+					inputStream.close();
+
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			if (outputStream != null)
+				try {
+					outputStream.close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+		}
+	}*/
+	
+	
+}

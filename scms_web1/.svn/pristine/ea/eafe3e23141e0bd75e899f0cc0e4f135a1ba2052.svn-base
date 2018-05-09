@@ -1,0 +1,447 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.wadejerry.scms.modules.auth.dao.BimUserMapper" >
+  <resultMap id="BaseResultMap" type="com.wadejerry.scms.modules.auth.model.BimUser" >
+    <id column="bim_user_id" property="bimUserId" jdbcType="INTEGER" />
+    <result column="user_name" property="userName" jdbcType="VARCHAR" />
+    <result column="user_type" property="userType" jdbcType="INTEGER" />
+    <result column="in_id" property="inId" jdbcType="INTEGER" />
+    <result column="bim_company_id" property="bimCompanyId" jdbcType="INTEGER" />
+    <result column="password" property="password" jdbcType="VARCHAR" />
+    <result column="use_system" property="useSystem" jdbcType="VARCHAR" />
+    <result column="phone" property="phone" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="SMALLINT" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="s_level" property="sLevel" jdbcType="INTEGER" />
+    <result column="photo" property="photo" jdbcType="VARCHAR" />
+    <result column="last_login_tiem" property="lastLoginTiem" jdbcType="TIMESTAMP" />
+    <result column="ip" property="ip" jdbcType="VARCHAR" />
+    <result column="mac" property="mac" jdbcType="VARCHAR" />
+    <result column="note" property="note" jdbcType="VARCHAR" />
+    <result column="custom1" property="custom1" jdbcType="INTEGER" />
+    <result column="custom2" property="custom2" jdbcType="INTEGER" />
+    <result column="custom3" property="custom3" jdbcType="VARCHAR" />
+    <result column="custom4" property="custom4" jdbcType="VARCHAR" />
+    <result column='eeal_name' property ='eealName' jdbcType ='VARCHAR'/>
+    <result column='disable_time' property ='disableTime' jdbcType ='TIMESTAMP'/>
+    <result column='email' property ='email' jdbcType ='VARCHAR'/>
+  </resultMap>
+  
+  <resultMap id="RoleResultMap" type="com.wadejerry.scms.modules.auth.dto.RoleDto" >
+    <id column="bim_user_id" property="bimUserId" jdbcType="INTEGER" />
+    <result column="user_name" property="userName" jdbcType="VARCHAR" />
+    <result column="in_id" property="inId" jdbcType="INTEGER" />
+    <result column="in_name" property="inName" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="note" property="note" jdbcType="VARCHAR" />  
+  </resultMap>
+  
+   <resultMap id="UserResultMap" type="com.wadejerry.scms.modules.auth.dto.UserDto" >
+    <id column="bim_user_id" property="bimUserId" jdbcType="INTEGER" />
+    <result column="user_name" property="userName" jdbcType="VARCHAR" />
+    <result column="user_type" property="userType" jdbcType="INTEGER" />
+    <result column="in_id" property="inId" jdbcType="INTEGER" />
+    <result column="bim_company_id" property="bimCompanyId" jdbcType="INTEGER" />
+    <result column="password" property="password" jdbcType="VARCHAR" />
+    <result column="use_system" property="useSystem" jdbcType="VARCHAR" />
+    <result column="phone" property="phone" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="SMALLINT" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="s_level" property="sLevel" jdbcType="INTEGER" />
+    <result column="photo" property="photo" jdbcType="VARCHAR" />
+    <result column="last_login_tiem" property="lastLoginTiem" jdbcType="TIMESTAMP" />
+    <result column="ip" property="ip" jdbcType="VARCHAR" />
+    <result column="mac" property="mac" jdbcType="VARCHAR" />
+    <result column="note" property="note" jdbcType="VARCHAR" />
+    <result column="custom1" property="custom1" jdbcType="INTEGER" />
+    <result column="custom2" property="custom2" jdbcType="INTEGER" />
+    <result column="custom3" property="custom3" jdbcType="VARCHAR" />
+    <result column="custom4" property="custom4" jdbcType="VARCHAR" />
+    <result column="in_name" property="inName" jdbcType="VARCHAR"/>
+    <result column='eeal_name' property ='eealName' jdbcType ='VARCHAR'/>
+    <result column='disable_time' property ='disableTime' jdbcType ='TIMESTAMP'/>
+    <result column='email' property ='email' jdbcType ='VARCHAR'/>
+  </resultMap>
+  
+  <sql id="Base_Column_List" >
+    bim_user_id, user_name, user_type, in_id, bim_company_id, password, use_system, phone, 
+    status, create_time, update_time, s_level, photo, last_login_tiem, ip, mac, note, 
+    custom1, custom2, custom3, custom4,eeal_name,disable_time,email
+  </sql>
+ 
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from bim_user
+    where bim_user_id = #{bimUserId,jdbcType=INTEGER}
+  </select>
+  
+  <select id="selectByUserName" resultMap="BaseResultMap"  >
+    select 
+    <include refid="Base_Column_List" />
+    from bim_user
+    where user_name = #{0} and user_type = #{1} 
+  </select>
+  
+  <!-- 获取用户记录总数 -->
+  <select id="selectRecordTotal" parameterType="com.wadejerry.scms.frame.entity.PageParamsDto" resultType="java.lang.Integer">
+  	select count(bim_user_id) 
+  	from bim_user 
+  	where 
+  	<!-- 如果不是企业操作员，就只有当前用户创建的操作员权限  -->
+  	(#{loginUserLevel,jdbcType=INTEGER} = 1 or in_id = #{loginUserId,jdbcType=INTEGER} ) and
+  	<!--用户或角色名称模糊查询-->
+  	(#{searchValue0,jdbcType=VARCHAR}='' or user_name like CONCAT('%',#{searchValue0,jdbcType=VARCHAR},'%' )) 
+  	<!-- 角色或用户类型 -->
+  	and user_type = #{intValue1,jdbcType=INTEGER} 
+  	<!-- 过滤企业 -->
+  	and bim_company_id = #{companyId,jdbcType=INTEGER}
+  </select>
+  <!-- 获取角色记录总数 -->
+  <select id="selectRoleRecordTotal"  resultType="java.lang.Integer">
+  	select count(bim_user_id) 
+  	from bim_user 
+  	 where
+  		<!-- 如果不是企业操作员，就只有当前用户创建的操作员权限  -->
+	  	(#{pageParams.loginUserLevel,jdbcType=INTEGER} = 1  <if test="roleIds!=null and roleIds.size()!=0">or bim_user_id in<foreach collection="roleIds" item="item" open="(" close=")" separator=","> #{item}</foreach></if>) and
+	  	<!--用户或角色名称模糊查询-->
+	  	(#{pageParams.searchValue0,jdbcType=VARCHAR}='' or user_name like CONCAT('%',#{pageParams.searchValue0,jdbcType=VARCHAR},'%' )) 
+	  	<!-- 角色或用户类型 -->
+	  	and user_type = #{pageParams.intValue1,jdbcType=INTEGER} 
+	  	<!-- 过滤企业 -->
+	  	and bim_company_id = #{pageParams.companyId,jdbcType=INTEGER}
+  </select>
+  
+  <!-- 根据id集合获取用户名集合 -->
+  <select id="selectNamesByIds" resultType='String'>
+  		 select userName from bim_user where user_type=#{0} and bim_user_id in 
+  		 <foreach item="bimUserId" index="index" collection="list" open="(" separator="," close=")">  
+　　　　		#{item}  
+　　		</foreach>  
+  </select>
+  
+  <!-- 分页获取操作员信息 -->
+  <select id="selectByPage"  resultMap="UserResultMap" parameterType="com.wadejerry.scms.frame.entity.PageParamsDto">
+ 	    select * from (select x.*,y.user_name as in_name 
+ 	    from bim_user x left join bim_user y  
+  		 on x.in_id = y.bim_user_id 
+	  	where 
+		<!-- 如果不是企业操作员，就只有当前用户创建的操作员权限  -->
+	  	(#{loginUserLevel,jdbcType=INTEGER} = 1 or x.in_id = #{loginUserId,jdbcType=INTEGER} ) and
+	  	<!--用户或角色名称模糊查询-->
+	  	(#{searchValue0,jdbcType=VARCHAR}='' or x.user_name like CONCAT('%',#{searchValue0,jdbcType=VARCHAR},'%' )) 
+	  	<!-- 角色或用户类型 -->
+	  	and x.user_type = #{intValue1,jdbcType=INTEGER} 
+	  	<!-- 过滤企业 -->
+	  	and x.bim_company_id = #{companyId,jdbcType=INTEGER})xx ${order} 
+	  	LIMIT  #{length,jdbcType=INTEGER} OFFSET  #{start,jdbcType=INTEGER} 
+  </select>
+  
+  <!-- 分页获取角色信息 -->
+  <select id ="selectRoleListByPage" resultMap ="RoleResultMap" >
+  		select * from ( select x.bim_user_id,x.user_name,x.in_id,y.user_name as in_name,x.create_time,x.update_time,x.note
+  		 from bim_user x left join bim_user y  
+  		 on x.in_id = y.bim_user_id 
+  		 where
+  		<!-- 如果不是企业操作员，就只有当前用户创建的操作员权限  -->
+	  	(#{pageParams.loginUserLevel,jdbcType=INTEGER} = 1  <if test="roleIds!=null and roleIds.size()!=0">or x.bim_user_id in<foreach collection="roleIds" item="item" open="(" close=")" separator=","> #{item}</foreach></if>) and
+	  	<!--用户或角色名称模糊查询-->
+	  	(#{pageParams.searchValue0,jdbcType=VARCHAR}='' or x.user_name like CONCAT('%',#{pageParams.searchValue0,jdbcType=VARCHAR},'%' )) 
+	  	<!-- 角色或用户类型 -->
+	  	and x.user_type = #{pageParams.intValue1,jdbcType=INTEGER} 
+	  	<!-- 过滤企业 -->
+	  	and x.bim_company_id = #{pageParams.companyId,jdbcType=INTEGER}
+	  	) xx ${pageParams.order}
+	  	LIMIT  #{pageParams.length,jdbcType=INTEGER} OFFSET  #{pageParams.start,jdbcType=INTEGER} 
+  </select>
+ 
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from bim_user
+    where bim_user_id = #{bimUserId,jdbcType=INTEGER}
+  </delete>
+ 
+  <insert id="insert" parameterType="com.wadejerry.scms.modules.auth.model.BimUser" useGeneratedKeys="true" keyProperty="bimUserId">
+    insert into bim_user (bim_user_id, user_name, user_type, 
+      in_id, bim_company_id, password, 
+      use_system, phone, status, 
+      create_time, update_time, s_level, 
+      photo, last_login_tiem, ip, 
+      mac, note, custom1, 
+      custom2, custom3, custom4,eeal_name,disable_time
+      )
+    values (#{bimUserId,jdbcType=INTEGER}, #{userName,jdbcType=VARCHAR}, #{userType,jdbcType=INTEGER}, 
+      #{inId,jdbcType=INTEGER}, #{bimCompanyId,jdbcType=INTEGER}, #{password,jdbcType=VARCHAR}, 
+      #{useSystem,jdbcType=VARCHAR}, #{phone,jdbcType=VARCHAR}, #{status,jdbcType=SMALLINT}, 
+      #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{sLevel,jdbcType=INTEGER}, 
+      #{photo,jdbcType=VARCHAR}, #{lastLoginTiem,jdbcType=TIMESTAMP}, #{ip,jdbcType=VARCHAR}, 
+      #{mac,jdbcType=VARCHAR}, #{note,jdbcType=VARCHAR}, #{custom1,jdbcType=INTEGER}, 
+      #{custom2,jdbcType=INTEGER}, #{custom3,jdbcType=VARCHAR}, #{custom4,jdbcType=VARCHAR},
+      #{eealName,jdbcType=VARCHAR},
+      #{disableTime,jdbcType=TIMESTAMP},
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.wadejerry.scms.modules.auth.model.BimUser" useGeneratedKeys="true" keyProperty="bimUserId" >
+    insert into bim_user
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="bimUserId != null" >
+        bim_user_id,
+      </if>
+      <if test="userName != null" >
+        user_name,
+      </if>
+      <if test="userType != null" >
+        user_type,
+      </if>
+      <if test="inId != null" >
+        in_id,
+      </if>
+      <if test="bimCompanyId != null" >
+        bim_company_id,
+      </if>
+      <if test="password != null" >
+        password,
+      </if>
+      <if test="useSystem != null" >
+        use_system,
+      </if>
+      <if test="phone != null" >
+        phone,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+      <if test="sLevel != null" >
+        s_level,
+      </if>
+      <if test="photo != null" >
+        photo,
+      </if>
+      <if test="lastLoginTiem != null" >
+        last_login_tiem,
+      </if>
+      <if test="ip != null" >
+        ip,
+      </if>
+      <if test="mac != null" >
+        mac,
+      </if>
+      <if test="note != null" >
+        note,
+      </if>
+      <if test="custom1 != null" >
+        custom1,
+      </if>
+      <if test="custom2 != null" >
+        custom2,
+      </if>
+      <if test="custom3 != null" >
+        custom3,
+      </if>
+      <if test="custom4 != null" >
+        custom4,
+      </if>
+      <if test="eealName != null" >
+        eeal_name,
+      </if>
+      <if test="disableTime != null" >
+        disable_time,
+      </if>
+      <if test="email != null" >
+        email,
+      </if>     
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="bimUserId != null" >
+        #{bimUserId,jdbcType=INTEGER},
+      </if>
+      <if test="userName != null" >
+        #{userName,jdbcType=VARCHAR},
+      </if>
+      <if test="userType != null" >
+        #{userType,jdbcType=INTEGER},
+      </if>
+      <if test="inId != null" >
+        #{inId,jdbcType=INTEGER},
+      </if>
+      <if test="bimCompanyId != null" >
+        #{bimCompanyId,jdbcType=INTEGER},
+      </if>
+      <if test="password != null" >
+        #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="useSystem != null" >
+        #{useSystem,jdbcType=VARCHAR},
+      </if>
+      <if test="phone != null" >
+        #{phone,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=SMALLINT},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="sLevel != null" >
+        #{sLevel,jdbcType=INTEGER},
+      </if>
+      <if test="photo != null" >
+        #{photo,jdbcType=VARCHAR},
+      </if>
+      <if test="lastLoginTiem != null" >
+        #{lastLoginTiem,jdbcType=TIMESTAMP},
+      </if>
+      <if test="ip != null" >
+        #{ip,jdbcType=VARCHAR},
+      </if>
+      <if test="mac != null" >
+        #{mac,jdbcType=VARCHAR},
+      </if>
+      <if test="note != null" >
+        #{note,jdbcType=VARCHAR},
+      </if>
+      <if test="custom1 != null" >
+        #{custom1,jdbcType=INTEGER},
+      </if>
+      <if test="custom2 != null" >
+        #{custom2,jdbcType=INTEGER},
+      </if>
+      <if test="custom3 != null" >
+        #{custom3,jdbcType=VARCHAR},
+      </if>
+      <if test="custom4 != null" >
+        #{custom4,jdbcType=VARCHAR},
+      </if>
+      <if test="eealName != null" >
+      	#{eealName,jdbcType=VARCHAR},
+      </if>
+      <if test="disableTime != null" >
+        #{disableTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="email != null" >
+       #{email,jdbcType=VARCHAR},
+      </if>   
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.wadejerry.scms.modules.auth.model.BimUser" >
+    update bim_user
+    <set >
+      <if test="userName != null" >
+        user_name = #{userName,jdbcType=VARCHAR},
+      </if>
+      <if test="userType != null" >
+        user_type = #{userType,jdbcType=INTEGER},
+      </if>
+      <if test="inId != null" >
+        in_id = #{inId,jdbcType=INTEGER},
+      </if>
+      <if test="bimCompanyId != null" >
+        bim_company_id = #{bimCompanyId,jdbcType=INTEGER},
+      </if>
+      <if test="password != null" >
+        password = #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="useSystem != null" >
+        use_system = #{useSystem,jdbcType=VARCHAR},
+      </if>
+      <if test="phone != null" >
+        phone = #{phone,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=SMALLINT},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="sLevel != null" >
+        s_level = #{sLevel,jdbcType=INTEGER},
+      </if>
+      <if test="photo != null" >
+        photo = #{photo,jdbcType=VARCHAR},
+      </if>
+      <if test="lastLoginTiem != null" >
+        last_login_tiem = #{lastLoginTiem,jdbcType=TIMESTAMP},
+      </if>
+      <if test="ip != null" >
+        ip = #{ip,jdbcType=VARCHAR},
+      </if>
+      <if test="mac != null" >
+        mac = #{mac,jdbcType=VARCHAR},
+      </if>
+      <if test="note != null" >
+        note = #{note,jdbcType=VARCHAR},
+      </if>
+      <if test="custom1 != null" >
+        custom1 = #{custom1,jdbcType=INTEGER},
+      </if>
+      <if test="custom2 != null" >
+        custom2 = #{custom2,jdbcType=INTEGER},
+      </if>
+      <if test="custom3 != null" >
+        custom3 = #{custom3,jdbcType=VARCHAR},
+      </if>
+      <if test="custom4 != null" >
+        custom4 = #{custom4,jdbcType=VARCHAR},
+      </if>
+      <if test="eealName != null" >
+      	eeal_name =#{eealName,jdbcType=VARCHAR},
+      </if>
+      <if test="disableTime != null" >
+        disable_time = #{disableTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="email != null" >
+      email= #{email,jdbcType=VARCHAR},
+      </if>   
+    </set>
+    where bim_user_id = #{bimUserId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.wadejerry.scms.modules.auth.model.BimUser" >
+    update bim_user
+    set user_name = #{userName,jdbcType=VARCHAR},
+      user_type = #{userType,jdbcType=INTEGER},
+      in_id = #{inId,jdbcType=INTEGER},
+      bim_company_id = #{bimCompanyId,jdbcType=INTEGER},
+      password = #{password,jdbcType=VARCHAR},
+      use_system = #{useSystem,jdbcType=VARCHAR},
+      phone = #{phone,jdbcType=VARCHAR},
+      status = #{status,jdbcType=SMALLINT},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      s_level = #{sLevel,jdbcType=INTEGER},
+      photo = #{photo,jdbcType=VARCHAR},
+      last_login_tiem = #{lastLoginTiem,jdbcType=TIMESTAMP},
+      ip = #{ip,jdbcType=VARCHAR},
+      mac = #{mac,jdbcType=VARCHAR},
+      note = #{note,jdbcType=VARCHAR},
+      custom1 = #{custom1,jdbcType=INTEGER},
+      custom2 = #{custom2,jdbcType=INTEGER},
+      custom3 = #{custom3,jdbcType=VARCHAR},
+      custom4 = #{custom4,jdbcType=VARCHAR},
+      eeal_Name= #{eealName,jdbcType=VARCHAR},
+      disable_Time = #{disableTime,jdbcType=TIMESTAMP},
+      email= #{email,jdbcType=VARCHAR}
+    where bim_user_id = #{bimUserId,jdbcType=INTEGER}
+  </update>
+  
+  
+  <select id="selectRoleByUserId" parameterType="int" resultType="String">
+  
+  select user_name from bim_user where bim_user_id in(select bim_role_id from bim_user_role where user_id=#{id})
+  </select>
+  
+
+</mapper>

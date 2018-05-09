@@ -1,0 +1,153 @@
+<%@ page contentType="text/html; charset=UTF-8"%>
+<!DOCTYPE html>
+<html>
+ <style>
+.form-control[readonly]{
+background-color: rgba(255, 255, 255, 0)!important;
+}
+</style> 
+
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<title>维德杰瑞车辆管理平台</title>
+<!-- Tell the browser to be responsive to screen width -->
+<meta
+	content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
+	name="viewport">
+	<link rel="stylesheet" type="text/css" href="/pages/pfm/carmanage/css/car_manage.css" >
+
+<%@ include file="/common/jsp/common_css.jsp"%>
+</head>
+<%@ include file="/common/jsp/commonBody.jsp"%>
+	
+	<div class="wrapper">
+		<%@ include file="/common/jsp/top.jsp"%>
+		<%@ include file="/pages/basic/basic_menu.jsp"%>
+		
+		<!-- Content Wrapper. Contains page content -->
+		<div class="content-wrapper">
+			<!-- Content Header (Page header) -->
+			<section class="content-header">
+				<h1>
+					配置日志界面
+				</h1>
+				<ol class="breadcrumb">
+					<li><a href="/index.do"><i class="fa fa-dashboard"></i> 主页</a></li>
+					<li class="active">配置日志</li>
+				</ol>
+			</section>
+			<!-- Main content -->
+			
+			<section class="content">
+			<div class="box">
+			<div class="box-body"> 
+            
+            <div>
+
+            
+            <form class="form-horizontal" id="form1">
+             <div class="form-group"> 
+            <div class="col-sm-10" style="padding-left:0px;">
+            <div class="col-sm-2"><label>开始时间</label></div>
+            <div class="col-sm-4">
+            <div id ="startTimeNotice" class="point-out" style="width: 348px;top:-38px; left:0px; display: none;"></div>
+            <input type="text" class="form-control"  name="startTime"style="cursor: not-allowed;"readonly="readonly" onclick="WdatePicker({lang:'zh-cn',dateFmt:'yyyy-MM-dd HH:mm:ss',maxDate:'2099-12-31'})">
+            <!--  <span class="glyphicon glyphicon-calendar "></span> -->
+            </div>
+            
+            <div class="col-sm-2"><label  class=" control-label">结束时间</label></div>
+            <div class="col-sm-4">
+             <div id ="endTimeNotice" class="point-out" style="width: 348px;top:-38px; left:0px; display: none;"></div>
+            <input type="text" class="form-control"   name="endTime"style="cursor: not-allowed;"readonly="readonly" onclick="WdatePicker({lang:'zh-cn',dateFmt:'yyyy-MM-dd HH:mm:ss',maxDate:'2099-12-31'})">
+            </div>
+            </div>
+            </div>
+            <div class="form-group">
+            <div class="col-sm-10" style="padding-left:0px;">
+            <div class="col-sm-2"><label  class=" control-label">配置类型</label></div>
+            <div class="col-sm-4">
+            <div id ="carNumberNotice" class="point-out" style="width: 348px;top:-38px; left:0px; display: none;"></div>
+             <select  class="form-control"  name="SystemCode"></select>
+            </div>
+             <div class="col-sm-2"><label  class=" control-label">用户</label></div>
+            <div class="col-sm-4">
+           <select  class="form-control"  name="user"></select>
+            </div>
+            </div> 
+            
+            
+            </div>
+            
+            
+            </form>
+            
+
+            </div>
+            
+					
+						<table id="configurationlogexample" class="table table-bordered table-striped" >
+							<thead>
+								<tr>
+								    
+									<th>编号</th>
+									<th>配置类型</th>
+									<th>系统模块</th>
+									<th>操作类型</th>
+									<th>用户</th>
+									<th>IP地址</th>
+									<th>时间</th>
+									<th>内容</th>
+									
+									
+								</tr>
+							</thead>
+							<tbody>						
+							</tbody>
+							<tfoot>						
+							</tfoot>
+						</table>
+							
+			
+
+            
+            	
+            
+			</div> 
+			</div>
+			</section>
+			</div>
+		</div>
+		<%-- <%@ include file="ChargeImg.jsp"%>
+		<%@ include file="ChargeInPhoto.jsp"%>
+		<%@ include file="ChargeOutPhoto.jsp"%>
+		<%@ include file="/common/jsp/footer.jsp"%>
+		<%@ include file="/common/jsp/sidebar.jsp"%>	
+	 <%@ include file="/pages/pfm/report/basic_js.jsp"%> --%>
+	<!-- <script src="/pages/pfm/report/Czreport/jquery-ui-timepicker-addon.js" type="text/javascript"></script> 
+    <script src="/pages/pfm/report/Czreport/jquery-ui-timepicker-zh-CN.js" type="text/javascript"></script>  -->
+	
+	<%@ include file="/common/jsp/common_js.jsp"%>
+    <script src="ConfigurationLog.js">
+    </script>  
+   
+	<script type="text/javascript">
+	
+		function Buttonpermission(){
+			<shiro:lacksPermission name="ParkingAdd">$("#example1_wrapper a[name='wade.libs.datatable_add']").remove();</shiro:lacksPermission>
+			<shiro:lacksPermission name="ParkingDelete">$("#example1_wrapper a[name='wade.libs.datatable_del']").remove();</shiro:lacksPermission>
+			<shiro:lacksPermission name="ParkingEdit">$("#example1_wrapper a[name='wade.libs.datatable_edit']").remove();</shiro:lacksPermission>
+			
+		}
+		function Seepermission(){
+			<shiro:lacksPermission name="ParkingSee">$("#example1 tbody td").text("没有浏览权限");</shiro:lacksPermission>
+		
+		}
+	
+	</script> 
+	
+	 <script src="/plugins/My97DatePicker/WdatePicker.js"></script>
+	 
+</body>
+
+</html>

@@ -1,0 +1,63 @@
+package com.wadejerry.scms.modules.pfm.service;
+
+import java.util.List;
+import java.util.Map;
+
+import com.wadejerry.scms.frame.entity.OperateResult;
+import com.wadejerry.scms.frame.entity.PageParamsDto;
+import com.wadejerry.scms.modules.pfm.dto.ChargeRuleDto;
+import com.wadejerry.scms.modules.pfm.model.PfmAnshi;
+import com.wadejerry.scms.modules.pfm.model.PfmBaoqi;
+import com.wadejerry.scms.modules.pfm.model.PfmCarInfo;
+import com.wadejerry.scms.modules.pfm.model.PfmChargeRule;
+import com.wadejerry.scms.modules.pfm.model.PfmDaynight;
+import com.wadejerry.scms.modules.pfm.model.PfmJianmianRelease;
+import com.wadejerry.scms.modules.pfm.model.PfmPeriod;
+import com.wadejerry.scms.modules.pfm.model.PfmPeriodTime;
+import com.wadejerry.scms.modules.pfm.model.PfmPertime;
+import com.wadejerry.scms.modules.pfm.model.PfmTimeCharge;
+import com.wadejerry.scms.modules.pfm.model.PfmTimeChargeTime;
+import com.wadejerry.scms.modules.pfm.model.PfmUnitPeriod;
+import com.wadejerry.scms.modules.pfm.model.PfmUnitPeriodTime;
+import com.wadejerry.scms.modules.pfm.model.PfmCarType;
+
+
+public interface PfmChargeRuleService {
+	public List<ChargeRuleDto> getChargeRuleListByPage(PageParamsDto ppd);
+	public int getChargeRuleCount(PageParamsDto ppd);
+	public int deleteChargeRule(List<ChargeRuleDto> dto) throws Exception;
+	public OperateResult addFenShiRule(PfmChargeRule rule,PfmTimeCharge timecharge,List<PfmTimeChargeTime> timelist,PfmJianmianRelease reducerule,PfmJianmianRelease exceptionrule) throws Exception;
+	public OperateResult addFenShiDuanRule(PfmChargeRule rule,PfmPeriod period,List<PfmPeriodTime> timelist,PfmJianmianRelease reducerule,PfmJianmianRelease exceptionrule) throws Exception;
+	public OperateResult addFenDanweiShiDuanRule(PfmChargeRule rule,PfmUnitPeriod period,List<PfmUnitPeriodTime> timelist,PfmJianmianRelease reducerule,PfmJianmianRelease exceptionrule) throws Exception;
+	public OperateResult addAnciRule(PfmChargeRule rule,PfmPertime time,PfmJianmianRelease reducerule,PfmJianmianRelease exceptionrule)throws Exception;
+	public OperateResult addAnshiRule(PfmChargeRule rule,PfmAnshi anshi,PfmJianmianRelease reducerule,PfmJianmianRelease exceptionrule)throws Exception;
+	public OperateResult addFreeRule(PfmChargeRule rule,PfmJianmianRelease reducerule,PfmJianmianRelease exceptionrule)throws Exception;
+	public OperateResult addDaynightRule(PfmChargeRule rule,PfmDaynight daynight,PfmJianmianRelease reducerule,PfmJianmianRelease exceptionrule)throws Exception;
+	public OperateResult addBaoqiRule(PfmChargeRule rule,PfmBaoqi baoqi,PfmJianmianRelease reducerule,PfmJianmianRelease exceptionrule)throws Exception;
+	public OperateResult addJianmianRule(PfmJianmianRelease rule)throws Exception;
+	public OperateResult updateJianmianRule(PfmJianmianRelease rule)throws Exception;
+
+	public Map getChargeRuleByID(int id);
+	public Map getJianmianRuleByID(int id);
+	public List<PfmTimeChargeTime> getFenshiTimeArray(int id);
+	public List<PfmPeriodTime> getFenshiduanTimeArray(int id);
+	public List<PfmUnitPeriodTime> getDanweishiduanTimeArray(int id);
+	
+	public OperateResult updateFenshiRule(PfmChargeRule rule,PfmTimeCharge timecharge,List<PfmTimeChargeTime> timelist,PfmJianmianRelease reducerule,PfmJianmianRelease exceptionrule) throws Exception;
+	public OperateResult updateFenshiDuanRule(PfmChargeRule rule,PfmPeriod period,List<PfmPeriodTime> timelist,PfmJianmianRelease reducerule,PfmJianmianRelease exceptionrule) throws Exception;
+	public OperateResult updateDanweishiDuanRule(PfmChargeRule rule,PfmUnitPeriod unitperiod,List<PfmUnitPeriodTime> timelist,PfmJianmianRelease reducerule,PfmJianmianRelease exceptionrule) throws Exception;
+	public OperateResult updateAnciRule(PfmChargeRule rule,PfmPertime time,PfmJianmianRelease reducerule,PfmJianmianRelease exceptionrule) throws Exception;
+	public OperateResult updateAnShiRule(PfmChargeRule rule,PfmAnshi time,PfmJianmianRelease reducerule,PfmJianmianRelease exceptionrule) throws Exception;
+	public OperateResult updateBaoqiRule(PfmChargeRule rule,PfmBaoqi baoqi,PfmJianmianRelease reducerule,PfmJianmianRelease exceptionrule) throws Exception;
+	public OperateResult updateFreeRule(PfmChargeRule rule,PfmJianmianRelease reducerule,PfmJianmianRelease exceptionrule) throws Exception;
+	public OperateResult updateDaynightRule(PfmChargeRule rule,PfmDaynight daynight,PfmJianmianRelease reducerule,PfmJianmianRelease exceptionrule) throws Exception;
+
+//提供接口
+	public PfmCarInfo selectByCarNum(String carNum);
+	public boolean isBaoqi(int carInfoId);
+	public PfmBaoqi baoqiRule(int carInfoId);
+	public PfmCarType selectByCarinfoId(int carInfoId);
+	public List<String> selectCarNumByValue(int index,String value);
+	public List<String> selectAllCarNum();
+	public PfmCarInfo selectByCardid(String cardid);
+}

@@ -1,0 +1,57 @@
+package com.wadejerry.scms.webservice.server.support.weixin.dto;
+
+import java.math.BigDecimal;
+import java.util.Date;
+
+public class WeixinOrderDto {
+	private int orderId ; //订单编号
+	private long payTime; //支付时间
+	private BigDecimal money; //支付金额
+	private long  insertTime; //订单添加时间
+	private long  updateTime; //订单更新时间
+	private String clientName; //客户端名称
+	private ParkInfoDto parkInfoDto; //停车信息
+	
+	public int getOrderId() {
+		return orderId;
+	}
+	public void setOrderId(int orderId) {
+		this.orderId = orderId;
+	}
+	public long getPayTime() {
+		return payTime;
+	}
+	public void setPayTime(long payTime) {
+		this.payTime = payTime;
+	}
+	public BigDecimal getMoney() {
+		return money;
+	}
+	public void setMoney(BigDecimal money) {
+		this.money = money;
+	}
+	public long getInsertTime() {
+		return insertTime;
+	}
+	public void setInsertTime(long insertTime) {
+		this.insertTime = insertTime;
+	}
+	public long getUpdateTime() {
+		return updateTime;
+	}
+	public void setUpdateTime(long updateTime) {
+		this.updateTime = updateTime;
+	}
+	public String getClientName() {
+		return clientName;
+	}
+	public void setClientName(String clientName) {
+		this.clientName = clientName;
+	}
+	public ParkInfoDto getParkInfoDto() {
+		return parkInfoDto;
+	}
+	public void setParkInfoDto(ParkInfoDto parkInfoDto) {
+		this.parkInfoDto = parkInfoDto;
+	}
+}

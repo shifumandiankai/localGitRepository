@@ -1,0 +1,92 @@
+<%@ page contentType="text/html; charset=UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<title>维德杰瑞SCMS管理平台</title>
+<!-- Tell the browser to be responsive to screen width -->
+<meta
+	content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
+	name="viewport">
+<%@ include file="/common/jsp/common_css.jsp"%>
+<link href="/pages/basic/database/database.css" rel="stylesheet"/>
+<style type="text/css">
+
+.point-out{
+pointer-events:none;
+}
+</style>
+</head>
+<%@ include file="/common/jsp/commonBody.jsp"%>
+	<div class="wrapper">
+		<%@ include file="/common/jsp/top.jsp"%>
+		<%@ include file="/pages/basic/basic_menu.jsp"%>
+		<!-- Content Wrapper. Contains page content -->
+		<div class="content-wrapper">
+			<!-- Content Header (Page header) -->
+			<section class="content-header">
+				<h1>
+					数据库管理界面
+				</h1>
+				<ol class="breadcrumb">
+					<li><a href="/index.do"><i class="fa fa-dashboard"></i> 主页</a></li>
+					<li class="active">数据库管理</li>
+				</ol>
+			</section>
+			<!-- Main content -->
+
+			<section class="content">
+				<div class="box">
+<!-- 					<div class="box-header"> -->
+<!-- 						<h3 class="box-title">Data Table With Full Features</h3> -->
+<!-- 					</div> -->
+					<!-- /.box-header -->
+					<div class="box-body">
+						<table id="t_database" class="table table-bordered table-striped">
+							<thead>
+								<tr>	
+									
+									<th>序号</th>
+									<th>备份时间</th>
+									<th>数据文件大小</th> 
+									<th>备份数据名称</th>
+									
+									
+									
+								</tr>
+							</thead>
+							<tbody>						
+							</tbody>
+							<tfoot>						
+							</tfoot>
+						</table>
+					</div>
+				</div>			
+			</section>
+		</div>
+		<%@ include file="/common/jsp/footer.jsp"%>
+		<%@ include file="/common/jsp/sidebar.jsp"%>
+	</div>
+	
+	<%@ include file="/common/jsp/common_js.jsp"%>
+	<script src="/plugins/My97DatePicker/WdatePicker.js"></script>
+	<script src="database.js"></script>
+	<script type="text/javascript">
+	
+		function Buttonpermission(){
+			<shiro:lacksPermission name="DatabaseDelete">$("#t_database_wrapper a[name='wade.libs.datatable_del']").remove();</shiro:lacksPermission>
+			<shiro:lacksPermission name="DatabaseBackup">$("#t_database_wrapper a[id='wade.libs.datatable_custom_备份']").remove();</shiro:lacksPermission>
+			<shiro:lacksPermission name="DatabaseRevert">$("#t_database_wrapper a[id='wade.libs.datatable_custom_还原']").remove();</shiro:lacksPermission>
+			<shiro:lacksPermission name="DatabaseConfig">$("#t_database_wrapper a[id='wade.libs.datatable_custom_配置']").remove();</shiro:lacksPermission>
+		}
+		function Seepermission(){
+			<shiro:lacksPermission name="DatabaseSee">$("#t_database tbody td").text("没有浏览权限");</shiro:lacksPermission>
+		
+		}
+	
+	</script>
+	
+	<%@ include file="databaseconf.jsp"%>
+</body>
+</html>

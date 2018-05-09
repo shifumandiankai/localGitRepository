@@ -1,0 +1,9 @@
+package com.wadejerry.scms.webservice.server.support.weixin;
+
+public class PayInfoResult {
+
+	public PayInfoResult() {
+		// TODO Auto-generated constructor stub
+	}
+
+}

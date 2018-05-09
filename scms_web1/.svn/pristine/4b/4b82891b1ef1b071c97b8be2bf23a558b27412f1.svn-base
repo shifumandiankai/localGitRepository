@@ -1,0 +1,215 @@
+<%@ page contentType="text/html; charset=UTF-8"%>
+<%@taglib prefix="shiro" uri="http://shiro.apache.org/tags"%>
+<!-- Left side column. contains the logo and sidebar -->
+<aside class="main-sidebar">
+	<!-- sidebar: style can be found in sidebar.less -->
+	<section class="sidebar">
+
+		<ul class="sidebar-menu">
+
+
+			<li class="leftJichu"><span>一卡通应用</span></li>
+
+			<shiro:hasPermission name="CarManages">
+				<li id="personnel_managemenu" class="treeview"><a
+					href="/pages/onecard/personnel/personnel.jsp"> <i
+						class="fa fa-users"></i><span>人员资料</span> 
+				</a> </li>
+			</shiro:hasPermission>
+
+			<shiro:hasPermission name="ParkingSetting">
+				<li id="parkpotsetting" class="treeview"><a href="#"> <i
+						class="fa fa-cog"></i><span>门禁管理</span> <span
+						class="pull-right-container"> <i
+							class="fa fa-angle-left pull-right"></i>
+					</span>
+				</a>
+					<ul class="treeview-menu">
+						<!--包括门、门组管理-->
+						<shiro:hasPermission name="ParkingManage">
+							<li><a href="/pages/pfm/parkinglot/park.jsp"><i
+									class="fa fa-circle-o"></i>门信息管理</a></li>
+						</shiro:hasPermission>
+
+						<shiro:hasPermission name="InOutManage">
+							<li><a href="/pages/pfm/entrance/entrance.jsp"><i
+									class="fa fa-circle-o"></i>刷卡时段</a></l刷卡时段i>
+						</shiro:hasPermission>
+
+ 						<!--包括人员权限和门禁权限-->
+						<shiro:hasPermission name="InOutManage">
+							<li><a href="/pages/pfm/entrance/entrance.jsp"><i
+									class="fa fa-circle-o"></i>权限管理</a></li>
+						</shiro:hasPermission>
+
+						<shiro:hasPermission name="SpecialNumber">
+							<li><a href="/pages/pfm/specialcarnum/specialcarnum.jsp"><i
+									class="fa fa-circle-o"></i>事件监控</a></li>
+						</shiro:hasPermission>
+
+						<shiro:hasPermission name="SpecialNumber">
+							<li><a href="/pages/pfm/specialcarnum/specialcarnum.jsp"><i
+									class="fa fa-circle-o"></i>权限下载</a></li>
+						</shiro:hasPermission>
+
+						<shiro:hasPermission name="SpecialNumber">
+							<li><a href="/pages/pfm/specialcarnum/specialcarnum.jsp"><i
+									class="fa fa-circle-o"></i>报表查询</a></li>
+						</shiro:hasPermission>
+
+					</ul></li>
+			</shiro:hasPermission>
+
+			<shiro:hasPermission name="ReportQuery">
+				<li id="datareport" class="treeview"><a href="#"> <i
+						class="fa fa-pie-chart"></i><span>消费管理</span> <span
+						class="pull-right-container"> <i
+							class="fa fa-angle-left pull-right"></i>
+					</span>
+				</a>
+					<ul class="treeview-menu">
+						<shiro:hasPermission name="TongjiRecord">
+							<li id="feerecord"><a
+								href="/pages/pfm/report/Czreport/czreport.jsp"><i
+									class="fa fa-circle-o"></i>商户管理</a></li>
+						</shiro:hasPermission>
+
+						<shiro:hasPermission name="TongjiRecord">
+							<li id="feerecord"><a
+								href="/pages/pfm/report/Czreport/czreport.jsp"><i
+									class="fa fa-circle-o"></i>营业时段</a></li>
+						</shiro:hasPermission>
+						<!-- 包含高级参数-->
+						<shiro:hasPermission name="TongjiRecord">
+							<li id="feerecord"><a
+								href="/pages/pfm/report/Czreport/czreport.jsp"><i
+									class="fa fa-circle-o"></i>消费规则</a></li>
+						</shiro:hasPermission>
+						<shiro:hasPermission name="TongjiRecord">
+							<li id="feerecord"><a
+								href="/pages/pfm/report/Czreport/czreport.jsp"><i
+									class="fa fa-circle-o"></i>费用管理</a></li>
+						</shiro:hasPermission>
+						<shiro:hasPermission name="TongjiRecord">
+							<li id="feerecord"><a
+								href="/pages/pfm/report/Czreport/czreport.jsp"><i
+									class="fa fa-circle-o"></i>报表查询</a></li>
+						</shiro:hasPermission>
+					</ul></li>
+			</shiro:hasPermission>
+
+			<shiro:hasPermission name="ReportQuery">
+				<li id="datareport" class="treeview"><a href="#"> <i
+						class="fa fa-pie-chart"></i><span>访客管理</span> <span
+						class="pull-right-container"> <i
+							class="fa fa-angle-left pull-right"></i>
+					</span>
+				</a>
+					<ul class="treeview-menu">
+						<shiro:hasPermission name="MingxiRecord">
+							<li id="carrecord"><a
+								href="/pages/pfm/report/ChargeRecord.jsp"><i
+									class="fa fa-circle-o"></i>访客预约</a></li>
+						</shiro:hasPermission>
+						<shiro:hasPermission name="TongjiRecord">
+							<li id="feerecord"><a
+								href="/pages/pfm/report/Czreport/czreport.jsp"><i
+									class="fa fa-circle-o"></i>访客登记</a></li>
+						</shiro:hasPermission>
+						<shiro:hasPermission name="TongjiRecord">
+							<li id="feerecord"><a
+								href="/pages/pfm/report/Czreport/czreport.jsp"><i
+									class="fa fa-circle-o"></i>权限配置</a></li>
+						</shiro:hasPermission>
+						<shiro:hasPermission name="TongjiRecord">
+							<li id="feerecord"><a
+								href="/pages/pfm/report/Czreport/czreport.jsp"><i
+									class="fa fa-circle-o"></i>报表查询</a></li>
+						</shiro:hasPermission>
+					</ul></li>
+			</shiro:hasPermission>
+
+			<shiro:hasPermission name="ReportQuery">
+				<li id="datareport" class="treeview"><a href="#"> <i
+						class="fa fa-pie-chart"></i><span>考勤管理</span> <span
+						class="pull-right-container"> <i
+							class="fa fa-angle-left pull-right"></i>
+					</span>
+				</a>
+					<ul class="treeview-menu">
+						<shiro:hasPermission name="MingxiRecord">
+							<li id="carrecord"><a
+								href="/pages/pfm/report/ChargeRecord.jsp"><i
+									class="fa fa-circle-o"></i>班次管理</a></li>
+						</shiro:hasPermission>
+						<shiro:hasPermission name="TongjiRecord">
+							<li id="feerecord"><a
+								href="/pages/pfm/report/Czreport/czreport.jsp"><i
+									class="fa fa-circle-o"></i>班组管理</a></li>
+						</shiro:hasPermission>
+						<shiro:hasPermission name="TongjiRecord">
+							<li id="feerecord"><a
+								href="/pages/pfm/report/Czreport/czreport.jsp"><i
+									class="fa fa-circle-o"></i>考勤排班</a></li>
+						</shiro:hasPermission>
+						<shiro:hasPermission name="TongjiRecord">
+							<li id="feerecord"><a
+								href="/pages/pfm/report/Czreport/czreport.jsp"><i
+									class="fa fa-circle-o"></i>调整单管理</a></li>
+						</shiro:hasPermission>
+						<shiro:hasPermission name="TongjiRecord">
+							<li id="feerecord"><a
+								href="/pages/pfm/report/Czreport/czreport.jsp"><i
+									class="fa fa-circle-o"></i>考勤运算</a></li>
+						</shiro:hasPermission>
+						<shiro:hasPermission name="TongjiRecord">
+							<li id="feerecord"><a
+								href="/pages/pfm/report/Czreport/czreport.jsp"><i
+									class="fa fa-circle-o"></i>报表查询</a></li>
+						</shiro:hasPermission>
+					</ul></li>
+			</shiro:hasPermission>
+
+			<shiro:hasPermission name="ReportQuery">
+				<li id="datareport" class="treeview"><a href="#"> <i
+						class="fa fa-pie-chart"></i><span>梯控管理</span> <span
+						class="pull-right-container"> <i
+							class="fa fa-angle-left pull-right"></i>
+					</span>
+				</a>
+					<ul class="treeview-menu">
+						<shiro:hasPermission name="MingxiRecord">
+							<li id="carrecord"><a
+								href="/pages/pfm/report/ChargeRecord.jsp"><i
+									class="fa fa-circle-o"></i>电梯参数</a></li>
+						</shiro:hasPermission>
+						<shiro:hasPermission name="TongjiRecord">
+							<li id="feerecord"><a
+								href="/pages/pfm/report/Czreport/czreport.jsp"><i
+									class="fa fa-circle-o"></i>计划模板</a></li>
+						</shiro:hasPermission>
+						<shiro:hasPermission name="TongjiRecord">
+							<li id="feerecord"><a
+								href="/pages/pfm/report/Czreport/czreport.jsp"><i
+									class="fa fa-circle-o"></i>免刷卡时段</a></li>
+						</shiro:hasPermission>
+						<shiro:hasPermission name="TongjiRecord">
+							<li id="feerecord"><a
+								href="/pages/pfm/report/Czreport/czreport.jsp"><i
+									class="fa fa-circle-o"></i>梯控授权</a></li>
+						</shiro:hasPermission>
+						<shiro:hasPermission name="TongjiRecord">
+							<li id="feerecord"><a
+								href="/pages/pfm/report/Czreport/czreport.jsp"><i
+									class="fa fa-circle-o"></i>梯控信息查询</a></li>
+						</shiro:hasPermission>
+						<shiro:hasPermission name="TongjiRecord">
+							<li id="feerecord"><a
+								href="/pages/pfm/report/Czreport/czreport.jsp"><i
+									class="fa fa-circle-o"></i>梯控参数设置</a></li>
+						</shiro:hasPermission>
+					</ul></li>
+			</shiro:hasPermission>
+		</ul>
+	</section>
+</aside>

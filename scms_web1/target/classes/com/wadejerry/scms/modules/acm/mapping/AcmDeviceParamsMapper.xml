@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.wadejerry.scms.modules.acm.dao.AcmDeviceParamsMapper" >
+  <resultMap id="BaseResultMap" type="com.wadejerry.scms.modules.acm.model.AcmDeviceParams" >
+    <id column="acm_device_params_id" property="acmDeviceParamsId" jdbcType="INTEGER" />
+    <result column="params_name" property="paramsName" jdbcType="VARCHAR" />
+    <result column="params_code" property="paramsCode" jdbcType="INTEGER" />
+    <result column="params_type" property="paramsType" jdbcType="INTEGER" />
+    <result column="int_value" property="intValue" jdbcType="INTEGER" />
+    <result column="str_value" property="strValue" jdbcType="VARCHAR" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="user_name" property="userName" jdbcType="VARCHAR" />
+    <result column="custom1" property="custom1" jdbcType="INTEGER" />
+    <result column="custom2" property="custom2" jdbcType="INTEGER" />
+    <result column="custom3" property="custom3" jdbcType="VARCHAR" />
+    <result column="custom4" property="custom4" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    acm_device_params_id, params_name, params_code, params_type, int_value, str_value, 
+    update_time, user_name, custom1, custom2, custom3, custom4
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from acm_device_params
+    where acm_device_params_id = #{acmDeviceParamsId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from acm_device_params
+    where acm_device_params_id = #{acmDeviceParamsId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.wadejerry.scms.modules.acm.model.AcmDeviceParams" >
+    insert into acm_device_params (acm_device_params_id, params_name, params_code, 
+      params_type, int_value, str_value, 
+      update_time, user_name, custom1, 
+      custom2, custom3, custom4
+      )
+    values (#{acmDeviceParamsId,jdbcType=INTEGER}, #{paramsName,jdbcType=VARCHAR}, #{paramsCode,jdbcType=INTEGER}, 
+      #{paramsType,jdbcType=INTEGER}, #{intValue,jdbcType=INTEGER}, #{strValue,jdbcType=VARCHAR}, 
+      #{updateTime,jdbcType=TIMESTAMP}, #{userName,jdbcType=VARCHAR}, #{custom1,jdbcType=INTEGER}, 
+      #{custom2,jdbcType=INTEGER}, #{custom3,jdbcType=VARCHAR}, #{custom4,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.wadejerry.scms.modules.acm.model.AcmDeviceParams" >
+    insert into acm_device_params
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="acmDeviceParamsId != null" >
+        acm_device_params_id,
+      </if>
+      <if test="paramsName != null" >
+        params_name,
+      </if>
+      <if test="paramsCode != null" >
+        params_code,
+      </if>
+      <if test="paramsType != null" >
+        params_type,
+      </if>
+      <if test="intValue != null" >
+        int_value,
+      </if>
+      <if test="strValue != null" >
+        str_value,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+      <if test="userName != null" >
+        user_name,
+      </if>
+      <if test="custom1 != null" >
+        custom1,
+      </if>
+      <if test="custom2 != null" >
+        custom2,
+      </if>
+      <if test="custom3 != null" >
+        custom3,
+      </if>
+      <if test="custom4 != null" >
+        custom4,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="acmDeviceParamsId != null" >
+        #{acmDeviceParamsId,jdbcType=INTEGER},
+      </if>
+      <if test="paramsName != null" >
+        #{paramsName,jdbcType=VARCHAR},
+      </if>
+      <if test="paramsCode != null" >
+        #{paramsCode,jdbcType=INTEGER},
+      </if>
+      <if test="paramsType != null" >
+        #{paramsType,jdbcType=INTEGER},
+      </if>
+      <if test="intValue != null" >
+        #{intValue,jdbcType=INTEGER},
+      </if>
+      <if test="strValue != null" >
+        #{strValue,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="userName != null" >
+        #{userName,jdbcType=VARCHAR},
+      </if>
+      <if test="custom1 != null" >
+        #{custom1,jdbcType=INTEGER},
+      </if>
+      <if test="custom2 != null" >
+        #{custom2,jdbcType=INTEGER},
+      </if>
+      <if test="custom3 != null" >
+        #{custom3,jdbcType=VARCHAR},
+      </if>
+      <if test="custom4 != null" >
+        #{custom4,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.wadejerry.scms.modules.acm.model.AcmDeviceParams" >
+    update acm_device_params
+    <set >
+      <if test="paramsName != null" >
+        params_name = #{paramsName,jdbcType=VARCHAR},
+      </if>
+      <if test="paramsCode != null" >
+        params_code = #{paramsCode,jdbcType=INTEGER},
+      </if>
+      <if test="paramsType != null" >
+        params_type = #{paramsType,jdbcType=INTEGER},
+      </if>
+      <if test="intValue != null" >
+        int_value = #{intValue,jdbcType=INTEGER},
+      </if>
+      <if test="strValue != null" >
+        str_value = #{strValue,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="userName != null" >
+        user_name = #{userName,jdbcType=VARCHAR},
+      </if>
+      <if test="custom1 != null" >
+        custom1 = #{custom1,jdbcType=INTEGER},
+      </if>
+      <if test="custom2 != null" >
+        custom2 = #{custom2,jdbcType=INTEGER},
+      </if>
+      <if test="custom3 != null" >
+        custom3 = #{custom3,jdbcType=VARCHAR},
+      </if>
+      <if test="custom4 != null" >
+        custom4 = #{custom4,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where acm_device_params_id = #{acmDeviceParamsId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.wadejerry.scms.modules.acm.model.AcmDeviceParams" >
+    update acm_device_params
+    set params_name = #{paramsName,jdbcType=VARCHAR},
+      params_code = #{paramsCode,jdbcType=INTEGER},
+      params_type = #{paramsType,jdbcType=INTEGER},
+      int_value = #{intValue,jdbcType=INTEGER},
+      str_value = #{strValue,jdbcType=VARCHAR},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      user_name = #{userName,jdbcType=VARCHAR},
+      custom1 = #{custom1,jdbcType=INTEGER},
+      custom2 = #{custom2,jdbcType=INTEGER},
+      custom3 = #{custom3,jdbcType=VARCHAR},
+      custom4 = #{custom4,jdbcType=VARCHAR}
+    where acm_device_params_id = #{acmDeviceParamsId,jdbcType=INTEGER}
+  </update>
+</mapper>

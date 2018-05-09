@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.wadejerry.scms.modules.sysconfig.dao.BimSysParamsMapper" >
+  <resultMap id="BaseResultMap" type="com.wadejerry.scms.modules.sysconfig.model.BimSysParams" >
+    <id column="bim_sys_params_id" property="bimSysParamsId" jdbcType="INTEGER" />
+    <result column="param_id" property="paramId" jdbcType="VARCHAR" />
+    <result column="param_name" property="paramName" jdbcType="VARCHAR" />
+    <result column="value_type" property="valueType" jdbcType="INTEGER" />
+    <result column="int_value" property="intValue" jdbcType="INTEGER" />
+    <result column="str_value" property="strValue" jdbcType="VARCHAR" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+    <result column="config_type" property="configType" jdbcType="INTEGER" />
+    <result column="config_order" property="configOrder" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    bim_sys_params_id, param_id, param_name, value_type, int_value, str_value, remark, 
+    config_type, config_order
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from bim_sys_params
+    where bim_sys_params_id = #{bimSysParamsId,jdbcType=INTEGER}
+  </select>
+  <select id="select" resultMap="BaseResultMap"  >
+    select 
+    <include refid="Base_Column_List" />
+    from bim_sys_params  where config_type=#{configType} order by config_order
+   
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from bim_sys_params
+    where bim_sys_params_id = #{bimSysParamsId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.wadejerry.scms.modules.sysconfig.model.BimSysParams" >
+    insert into bim_sys_params (bim_sys_params_id, param_id, param_name, 
+      value_type, int_value, str_value, 
+      remark, config_type, config_order
+      )
+    values (#{bimSysParamsId,jdbcType=INTEGER}, #{paramId,jdbcType=VARCHAR}, #{paramName,jdbcType=VARCHAR}, 
+      #{valueType,jdbcType=INTEGER}, #{intValue,jdbcType=INTEGER}, #{strValue,jdbcType=VARCHAR}, 
+      #{remark,jdbcType=VARCHAR}, #{configType,jdbcType=INTEGER}, #{configOrder,jdbcType=INTEGER}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.wadejerry.scms.modules.sysconfig.model.BimSysParams" >
+    insert into bim_sys_params
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="bimSysParamsId != null" >
+        bim_sys_params_id,
+      </if>
+      <if test="paramId != null" >
+        param_id,
+      </if>
+      <if test="paramName != null" >
+        param_name,
+      </if>
+      <if test="valueType != null" >
+        value_type,
+      </if>
+      <if test="intValue != null" >
+        int_value,
+      </if>
+      <if test="strValue != null" >
+        str_value,
+      </if>
+      <if test="remark != null" >
+        remark,
+      </if>
+      <if test="configType != null" >
+        config_type,
+      </if>
+      <if test="configOrder != null" >
+        config_order,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="bimSysParamsId != null" >
+        #{bimSysParamsId,jdbcType=INTEGER},
+      </if>
+      <if test="paramId != null" >
+        #{paramId,jdbcType=VARCHAR},
+      </if>
+      <if test="paramName != null" >
+        #{paramName,jdbcType=VARCHAR},
+      </if>
+      <if test="valueType != null" >
+        #{valueType,jdbcType=INTEGER},
+      </if>
+      <if test="intValue != null" >
+        #{intValue,jdbcType=INTEGER},
+      </if>
+      <if test="strValue != null" >
+        #{strValue,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null" >
+        #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="configType != null" >
+        #{configType,jdbcType=INTEGER},
+      </if>
+      <if test="configOrder != null" >
+        #{configOrder,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.wadejerry.scms.modules.sysconfig.model.BimSysParams" >
+    update bim_sys_params
+    <set >
+      <if test="paramId != null" >
+        param_id = #{paramId,jdbcType=VARCHAR},
+      </if>
+      <if test="paramName != null" >
+        param_name = #{paramName,jdbcType=VARCHAR},
+      </if>
+      <if test="valueType != null" >
+        value_type = #{valueType,jdbcType=INTEGER},
+      </if>
+      <if test="intValue != null" >
+        int_value = #{intValue,jdbcType=INTEGER},
+      </if>
+      <if test="strValue != null" >
+        str_value = #{strValue,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null" >
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="configType != null" >
+        config_type = #{configType,jdbcType=INTEGER},
+      </if>
+      <if test="configOrder != null" >
+        config_order = #{configOrder,jdbcType=INTEGER},
+      </if>
+    </set>
+    where bim_sys_params_id = #{bimSysParamsId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.wadejerry.scms.modules.sysconfig.model.BimSysParams" >
+    update bim_sys_params
+    set param_id = #{paramId,jdbcType=VARCHAR},
+      param_name = #{paramName,jdbcType=VARCHAR},
+      value_type = #{valueType,jdbcType=INTEGER},
+      int_value = #{intValue,jdbcType=INTEGER},
+      str_value = #{strValue,jdbcType=VARCHAR},
+      remark = #{remark,jdbcType=VARCHAR},
+      config_type = #{configType,jdbcType=INTEGER},
+      config_order = #{configOrder,jdbcType=INTEGER}
+    where bim_sys_params_id = #{bimSysParamsId,jdbcType=INTEGER}
+  </update>
+</mapper>

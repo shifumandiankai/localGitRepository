@@ -1,0 +1,250 @@
+package com.wadejerry.scms.modules.device.controller;
+
+import java.rmi.RemoteException;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.shiro.SecurityUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.wadejerry.scms.frame.constant.ConstParamLog;
+import com.wadejerry.scms.frame.constant.user.ConstUser;
+import com.wadejerry.scms.frame.entity.DataTableDto;
+import com.wadejerry.scms.frame.entity.LoginInfo;
+import com.wadejerry.scms.frame.entity.OperateResult;
+import com.wadejerry.scms.frame.entity.PageParamsDto;
+import com.wadejerry.scms.frame.log.LogRecord;
+import com.wadejerry.scms.modules.device.dao.PfmServerMapper;
+import com.wadejerry.scms.modules.device.model.PfmServer;
+import com.wadejerry.scms.modules.device.service.ServerService;
+import com.wadejerry.scms.modules.sysconfig.dao.BimNetZoneMapper;
+import com.wadejerry.scms.modules.sysconfig.model.BimNetZone;
+import com.wadejerry.scms.utils.AjaxUtil;
+import com.wadejerry.scms.utils.json.JacksonUtil;
+import com.wadejerry.scms.webservice.client.PfmWebServiceStub;
+import com.wadejerry.scms.webservice.client.PfmWebServiceStub.RemoteConfiguration;
+import com.wadejerry.scms.webservice.client.PfmWebServiceStub.RemoteConfigurationResponse;
+import com.wadejerry.scms.webservice.client.PfmWebServiceStub.ServiceParams;
+
+
+@Controller
+public class ServerController {
+
+	@Autowired
+	private ServerService serverService;
+	@Autowired
+	private PfmServerMapper pfmServerMapper;
+	@Autowired
+	private BimNetZoneMapper netZoneMapper;
+	@Autowired
+	private LogRecord logRecord;
+	@RequestMapping(value = "auth/server/getServerInfo.do")
+	public void getServerInfoList(HttpServletRequest request, HttpServletResponse response) {
+
+		PageParamsDto paramsDto = new PageParamsDto(request); // 获取分页参数
+		paramsDto.setIntValue1(ConstUser.CONST_ROLE_TYPE); // 角色类型
+		int iTotal =0;
+
+		List<PfmServer> dtoList = null;
+		if(!SecurityUtils.getSubject().isPermitted("ServerSee")){
+		}else{
+			iTotal = serverService.getServerCount(paramsDto); // 获取记录总数
+			if (iTotal > 0) {
+				if (paramsDto.getLength() == -1) { // 查询所有记录
+					paramsDto.setLength(iTotal);
+				}
+				dtoList = serverService.getServerListByPage(paramsDto); // 获取分页记录
+
+			}
+		}
+		DataTableDto data = new DataTableDto(); // 返回数据封装
+		data.setDataList(dtoList);
+		data.setDraw(paramsDto.getDraw());
+		data.setRecordsFiltered(iTotal);
+		data.setRecordsTotal(iTotal);
+		AjaxUtil.ajaxWriteDataTable(data, response);
+	}
+
+	@RequestMapping(value = "/auth/server/saveServer.do")
+	public void saveServerInfo(HttpServletRequest request, HttpServletResponse response) {
+		Map<String,Object> condition=null;
+		OperateResult result=new OperateResult();
+		try {
+			condition = JacksonUtil.json2map(request.getParameter("condition"));
+		} catch (Exception e) {
+
+			result.setResult(false);
+			result.setMsg("json转换异常");
+			AjaxUtil.ajaxWrite(result, response);
+			return;
+		}
+		if(condition.get("pfmServerId").equals("")){
+			PfmServer server = new PfmServer();
+			server.setBimCompanyId(LoginInfo.getCompanyId());
+			server.setInsertTime(new Date());
+			server.setUpdateTime(new Date());
+			server.setIp(condition.get("ip").toString());
+			server.setPort(condition.get("port").toString());
+			server.setServerName(condition.get("serverName").toString());
+			server.setUserName(LoginInfo.getLoginName());
+			server.setParkId(Integer.parseInt(condition.get("parkId").toString()));
+			if(condition.get("netZone").toString().equals("null"))
+			{}
+			else{
+				server.setNetZoneId(Integer.parseInt(condition.get("netZone").toString()));
+			}
+
+
+			try{
+
+				result=serverService.insertServer(server);
+				logRecord.recordLog(ConstParamLog.LOG_MODULE_BASIC_PFM_SERVER, ConstParamLog.LOG_OPER_ADD, ConstParamLog.LOG_TYPE_CONFIG, server.getServerName());
+
+				AjaxUtil.ajaxWrite(result, response);
+
+			}
+			catch(Exception e){
+				result.setResult(false);
+				result.setMsg("插入数据失败");
+				AjaxUtil.ajaxWrite(result, response);
+			}
+		}else{
+			PfmServer server = pfmServerMapper.selectByPrimaryKey(Integer.parseInt(condition.get("pfmServerId").toString()));
+			server.setUpdateTime(new Date());
+			server.setIp(condition.get("ip").toString());
+			server.setPort(condition.get("port").toString());
+			server.setServerName(condition.get("serverName").toString());
+			server.setParkId(Integer.parseInt(condition.get("parkId").toString()));
+
+			if(condition.get("netZone").toString().equals("null"))
+			{
+				server.setNetZoneId(null);
+			}
+			else{
+				server.setNetZoneId(Integer.parseInt(condition.get("netZone").toString()));
+			}
+			try{
+
+				result = serverService.updateServer(server);
+				logRecord.recordLog(ConstParamLog.LOG_MODULE_BASIC_PFM_SERVER, ConstParamLog.LOG_OPER_UPDATE, ConstParamLog.LOG_TYPE_CONFIG, server.getServerName());
+
+				AjaxUtil.ajaxWrite(result, response);
+			}
+
+			catch(Exception e){
+				result.setResult(false);
+				result.setMsg("修改失败");
+				AjaxUtil.ajaxWrite(result, response);
+			}
+
+
+		}
+
+	}
+	@RequestMapping(value = "/auth/server/delServer.do")
+	public void delServerInfo(HttpServletRequest request, HttpServletResponse response) {
+		List<PfmServer> list;
+		OperateResult result=new OperateResult();
+		try {
+			list = JacksonUtil.json2list(request.getParameter("condition"),PfmServer.class);
+		} catch (Exception e) {
+
+			result.setResult(false);
+			result.setMsg("服务器异常");
+			AjaxUtil.ajaxWrite(result, response);
+			return;
+		}
+		//检查是否有设备关联服务器，有则提示
+
+
+		try{
+			if(serverService.delServer(list)==1) {
+
+				result.setResult(true);
+				AjaxUtil.ajaxWrite(result, response);
+			}
+			else {
+				result.setResult(false);
+				result.setMsg("存在服务器与停车场设备关联，请先删除停车场设备");
+				AjaxUtil.ajaxWrite(result, response);
+			}
+		}
+		catch(Exception e){
+			result.setResult(false);
+			result.setMsg("删除数据失败");
+			AjaxUtil.ajaxWrite(result, response);
+		}
+
+
+	}
+
+
+	@RequestMapping(value = "/auth/server/checkport.do")
+	public void checkPort(HttpServletRequest request, HttpServletResponse response) {
+
+		String ip = request.getParameter("ip");
+		String port = request.getParameter("port");
+		String flag = request.getParameter("flag");
+		String id = request.getParameter("id");
+		AjaxUtil.ajaxWrite(serverService.checkPort(id,ip, port,flag), response);
+	}
+
+	@RequestMapping(value = "/auth/server/remoteconfig.do")
+	public void remoteConfig(HttpServletRequest request, HttpServletResponse response) {
+		OperateResult o = new OperateResult(true,"");
+		String condition = request.getParameter("condition");
+		PfmServer server = JacksonUtil.toObject(condition, PfmServer.class);
+		BimNetZone  netZone = netZoneMapper.selectByPrimaryKey(server.getNetZoneId());
+		if(netZone==null){
+			o.setResult(false);
+			o.setMsg("远程配置失败，请配置服务器的网域");
+		}else{
+			RemoteConfiguration recofig = new RemoteConfiguration();
+			ServiceParams params = new ServiceParams();
+			params.setSCMSUrl(netZone.getUrl());
+			params.setSCMSPort(netZone.getPort());
+			params.setServerName(server.getServerName());
+			params.setCompanyId(server.getBimCompanyId());
+			params.setUserId(LoginInfo.getLoginId());
+			params.setUserName(LoginInfo.getLoginName());
+			params.setParkId(server.getParkId());
+
+			params.setServiceId(server.getPfmServerId());
+			recofig.setServiceParams(params);
+
+			try {
+				RemoteConfigurationResponse resp = new PfmWebServiceStub("http://"+server.getIp()+":"+server.getPort()+"/PfmWebService/service").remoteConfiguration(recofig);
+				if(resp.getRemoteConfigurationResult().getIRet()==0){
+					o.setMsg("配置成功");
+					logRecord.recordLog(ConstParamLog.LOG_MODULE_BASIC_PFM_SERVER, ConstParamLog.LOG_OPER_OTHER, ConstParamLog.LOG_TYPE_CTRL, server.getServerName());
+
+				}
+				else{
+					o.setResult(false);
+					o.setMsg("服务器端异常");
+				}
+			} catch (RemoteException e) {
+				// TODO Auto-generated catch block
+				o.setResult(false);
+				o.setMsg("平台异常");
+				e.printStackTrace();
+			}
+		}
+
+		AjaxUtil.ajaxWrite(o, response);
+	}
+	@RequestMapping(value = "/auth/server/getparklotlist.do")
+	@ResponseBody
+	public void getParkLotList(HttpServletRequest request, HttpServletResponse response) {
+
+		AjaxUtil.ajaxWriteObject(serverService.selectAllParkingLot(), response);
+	}
+}

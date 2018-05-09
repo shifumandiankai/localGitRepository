@@ -1,0 +1,38 @@
+package com.wadejerry.scms.modules.pfm.dao;
+
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.ibatis.annotations.Param;
+
+import com.wadejerry.scms.frame.entity.PageParamsDto;
+import com.wadejerry.scms.frame.entity.ReportPageParamsDto;
+import com.wadejerry.scms.modules.pfm.model.PfmChargeRecord;
+
+public interface PfmChargeRecordMapper {
+    int deleteByPrimaryKey(Integer chargeRecordId);
+
+    int insert(PfmChargeRecord record);
+
+    int insertSelective(PfmChargeRecord record);
+
+    PfmChargeRecord selectByPrimaryKey(Integer chargeRecordId);
+
+    int updateByPrimaryKeySelective(PfmChargeRecord record);
+
+    int updateByPrimaryKey(PfmChargeRecord record);
+
+	List<PfmChargeRecord> selectAllListByPage(ReportPageParamsDto paramsDto);
+
+	int selectRecordTotal(ReportPageParamsDto paramsDto);
+
+	List<PfmChargeRecord> selectAllByCharge(PfmChargeRecord chargeRecord);
+
+	int selectRecordTotal(@Param("startTime")Date startTime, @Param("endTime")Date endTime,@Param("carNumber")String carNumber, @Param("parkId")Integer parkId, @Param("entranceId")List<Integer> entranceId, @Param("carriagewayId")Integer awayId, @Param("listtype")List<Integer> listtype, @Param("hasPermission")String hasPermission,@Param("size")String size);
+
+	List<PfmChargeRecord> selectAllListByPage(@Param("startTime")Date startTime, @Param("endTime")Date endTime,@Param("carNumber") String carNumber, @Param("inentranceid")int inentranceid,
+			@Param("outentranceid")int outentranceid);
+
+	List<Map<String, Object>> exportcharge(@Param("list")List<Integer> list,  @Param("size")String size);
+}

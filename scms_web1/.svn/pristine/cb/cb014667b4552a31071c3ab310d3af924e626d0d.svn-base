@@ -1,0 +1,70 @@
+package com.wadejerry.scms.modules.pfm.serviceImpl;
+
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.wadejerry.scms.frame.entity.PageParamsDto;
+import com.wadejerry.scms.frame.entity.ReportPageParamsDto;
+import com.wadejerry.scms.modules.pfm.dao.PfmChargeRecordMapper;
+import com.wadejerry.scms.modules.pfm.model.PfmChargeRecord;
+import com.wadejerry.scms.modules.pfm.service.PfmChargeRecordReportService;
+@Service("chargeRecordService")
+public class PfmChargeRecordRecordServiceImpl implements PfmChargeRecordReportService {
+	@Autowired
+	private PfmChargeRecordMapper chargeRecordMapper; 
+	
+	/*@Override
+	public List<PfmChargeRecord> selectAllListByPage(PageParamsDto paramsDto) {
+		// TODO Auto-generated method stub
+		return chargeRecordMapper.selectAllListByPage(paramsDto);
+	}*/
+
+	/*@Override
+	public int selectRecordTotal(PageParamsDto paramsDto) {
+		
+		return chargeRecordMapper.selectRecordTotal(paramsDto);
+	}*/
+
+	@Override
+	public List<PfmChargeRecord> selectAllByCharge(PfmChargeRecord chargeRecord) {
+		return chargeRecordMapper.selectAllByCharge(chargeRecord);
+		
+		
+	}
+
+	@Override
+	public int selectRecordTotal(ReportPageParamsDto paramsDto) {
+		
+		return chargeRecordMapper.selectRecordTotal(paramsDto);
+	}
+
+	@Override
+	public List<PfmChargeRecord> selectAllListByPage(ReportPageParamsDto paramsDto) {
+		return chargeRecordMapper.selectAllListByPage(paramsDto);
+	}
+
+	@Override
+	public int selectRecordTotal(Date startTime, Date endTime, String carNumber, Integer parkId,List<Integer> entranceId,Integer awayId,List<Integer> listtype,String hasPermission,String size) {
+		
+		return chargeRecordMapper.selectRecordTotal(startTime,endTime,carNumber,parkId,entranceId,awayId,listtype,hasPermission,size);
+	}
+
+	@Override
+	public List<PfmChargeRecord> selectAllListByPage(Date startTime, Date endTime, String carNumber,
+			int inentranceid, int outentranceid) {
+		
+		return chargeRecordMapper.selectAllListByPage(startTime,endTime,carNumber,inentranceid,outentranceid);
+	}
+
+	@Override
+	public List<Map<String, Object>> exportcharge(List<Integer> list,String size) {
+		
+		return chargeRecordMapper.exportcharge(list,size);
+	}
+
+
+}

@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.wadejerry.scms.modules.pfm.dao.PfmDaynightMapper" >
+  <resultMap id="BaseResultMap" type="com.wadejerry.scms.modules.pfm.model.PfmDaynight" >
+    <id column="daynight_id" property="daynightId" jdbcType="INTEGER" />
+    <result column="period_start_time" property="periodStartTime" jdbcType="TIME" javaType="java.sql.Time"/>
+    <result column="first_time" property="firstTime" jdbcType="INTEGER" />
+    <result column="first_time_charge" property="firstTimeCharge" jdbcType="NUMERIC" />
+    <result column="unit_time" property="unitTime" jdbcType="SMALLINT" />
+    <result column="unit_time_charge" property="unitTimeCharge" jdbcType="NUMERIC" />
+    <result column="pertime_start_time" property="pertimeStartTime" jdbcType="TIME" javaType="java.sql.Time" />
+    <result column="pertime_charge" property="pertimeCharge" jdbcType="NUMERIC" />
+    <result column="free_time" property="freeTime" jdbcType="SMALLINT" />
+    <result column="if_charge_over_free_time" property="ifChargeOverFreeTime" jdbcType="SMALLINT" />
+    <result column="use_top momey_in24" property="useTopMomeyIn24" jdbcType="SMALLINT" />
+    <result column="one_one" property="oneOne" jdbcType="SMALLINT" />
+    <result column="by_time_period" property="byTimePeriod" jdbcType="SMALLINT" />
+    <result column="rule_id" property="ruleId" jdbcType="INTEGER" />
+    <result column="custom2" property="custom2" jdbcType="INTEGER" />
+    <result column="custom3" property="custom3" jdbcType="VARCHAR" />
+    <result column="custom4" property="custom4" jdbcType="VARCHAR" />
+    <result column="top_money" property="topMoney" jdbcType="NUMERIC" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    daynight_id, period_start_time, first_time, first_time_charge, unit_time, unit_time_charge, 
+    pertime_start_time, pertime_charge, free_time, if_charge_over_free_time, "use_top momey_in24", 
+    one_one, by_time_period, rule_id, custom2, custom3, custom4 , top_money
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from pfm_daynight
+    where daynight_id = #{daynightId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from pfm_daynight
+    where daynight_id = #{daynightId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.wadejerry.scms.modules.pfm.model.PfmDaynight" >
+    insert into pfm_daynight (daynight_id, period_start_time, first_time, 
+      first_time_charge, unit_time, unit_time_charge, 
+      pertime_start_time, pertime_charge, free_time, 
+      if_charge_over_free_time, "use_top momey_in24", 
+      one_one, by_time_period, rule_id, 
+      custom2, custom3, custom4 , top_money
+      )
+    values (#{daynightId,jdbcType=INTEGER}, #{periodStartTime,jdbcType=TIME}, #{firstTime,jdbcType=INTEGER}, 
+      #{firstTimeCharge,jdbcType=NUMERIC}, #{unitTime,jdbcType=SMALLINT}, #{unitTimeCharge,jdbcType=NUMERIC}, 
+      #{pertimeStartTime,jdbcType=TIME}, #{pertimeCharge,jdbcType=NUMERIC}, #{freeTime,jdbcType=SMALLINT}, 
+      #{ifChargeOverFreeTime,jdbcType=SMALLINT}, #{useTopMomeyIn24,jdbcType=SMALLINT}, 
+      #{oneOne,jdbcType=SMALLINT}, #{byTimePeriod,jdbcType=SMALLINT}, #{ruleId,jdbcType=INTEGER}, 
+      #{custom2,jdbcType=INTEGER}, #{custom3,jdbcType=VARCHAR}, #{custom4,jdbcType=VARCHAR},#{topMoney,jdbcType=NUMERIC}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.wadejerry.scms.modules.pfm.model.PfmDaynight" >
+    insert into pfm_daynight
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="daynightId != null" >
+        daynight_id,
+      </if>
+      <if test="periodStartTime != null" >
+        period_start_time,
+      </if>
+      <if test="firstTime != null" >
+        first_time,
+      </if>
+      <if test="firstTimeCharge != null" >
+        first_time_charge,
+      </if>
+      <if test="unitTime != null" >
+        unit_time,
+      </if>
+      <if test="unitTimeCharge != null" >
+        unit_time_charge,
+      </if>
+      <if test="pertimeStartTime != null" >
+        pertime_start_time,
+      </if>
+      <if test="pertimeCharge != null" >
+        pertime_charge,
+      </if>
+      <if test="freeTime != null" >
+        free_time,
+      </if>
+      <if test="ifChargeOverFreeTime != null" >
+        if_charge_over_free_time,
+      </if>
+      <if test="useTopMomeyIn24 != null" >
+        "use_top momey_in24",
+      </if>
+      <if test="oneOne != null" >
+        one_one,
+      </if>
+      <if test="byTimePeriod != null" >
+        by_time_period,
+      </if>
+      <if test="ruleId != null" >
+        rule_id,
+      </if>
+      <if test="custom2 != null" >
+        custom2,
+      </if>
+      <if test="custom3 != null" >
+        custom3,
+      </if>
+      <if test="custom4 != null" >
+        custom4,
+      </if>
+      <if test="topMoney != null" >
+        top_money,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="daynightId != null" >
+        #{daynightId,jdbcType=INTEGER},
+      </if>
+      <if test="periodStartTime != null" >
+        #{periodStartTime,jdbcType=TIME},
+      </if>
+      <if test="firstTime != null" >
+        #{firstTime,jdbcType=INTEGER},
+      </if>
+      <if test="firstTimeCharge != null" >
+        #{firstTimeCharge,jdbcType=NUMERIC},
+      </if>
+      <if test="unitTime != null" >
+        #{unitTime,jdbcType=SMALLINT},
+      </if>
+      <if test="unitTimeCharge != null" >
+        #{unitTimeCharge,jdbcType=NUMERIC},
+      </if>
+      <if test="pertimeStartTime != null" >
+        #{pertimeStartTime,jdbcType=TIME},
+      </if>
+      <if test="pertimeCharge != null" >
+        #{pertimeCharge,jdbcType=NUMERIC},
+      </if>
+      <if test="freeTime != null" >
+        #{freeTime,jdbcType=SMALLINT},
+      </if>
+      <if test="ifChargeOverFreeTime != null" >
+        #{ifChargeOverFreeTime,jdbcType=SMALLINT},
+      </if>
+      <if test="useTopMomeyIn24 != null" >
+        #{useTopMomeyIn24,jdbcType=SMALLINT},
+      </if>
+      <if test="oneOne != null" >
+        #{oneOne,jdbcType=SMALLINT},
+      </if>
+      <if test="byTimePeriod != null" >
+        #{byTimePeriod,jdbcType=SMALLINT},
+      </if>
+      <if test="ruleId != null" >
+        #{ruleId,jdbcType=INTEGER},
+      </if>
+      <if test="custom2 != null" >
+        #{custom2,jdbcType=INTEGER},
+      </if>
+      <if test="custom3 != null" >
+        #{custom3,jdbcType=VARCHAR},
+      </if>
+      <if test="custom4 != null" >
+        #{custom4,jdbcType=VARCHAR},
+      </if>
+       <if test="topMoney != null" >
+        #{topMoney,jdbcType=NUMERIC},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.wadejerry.scms.modules.pfm.model.PfmDaynight" >
+    update pfm_daynight
+    <set >
+      <if test="periodStartTime != null" >
+        period_start_time = #{periodStartTime,jdbcType=TIME},
+      </if>
+      <if test="firstTime != null" >
+        first_time = #{firstTime,jdbcType=INTEGER},
+      </if>
+      <if test="firstTimeCharge != null" >
+        first_time_charge = #{firstTimeCharge,jdbcType=NUMERIC},
+      </if>
+      <if test="unitTime != null" >
+        unit_time = #{unitTime,jdbcType=SMALLINT},
+      </if>
+      <if test="unitTimeCharge != null" >
+        unit_time_charge = #{unitTimeCharge,jdbcType=NUMERIC},
+      </if>
+      <if test="pertimeStartTime != null" >
+        pertime_start_time = #{pertimeStartTime,jdbcType=TIME},
+      </if>
+      <if test="pertimeCharge != null" >
+        pertime_charge = #{pertimeCharge,jdbcType=NUMERIC},
+      </if>
+      <if test="freeTime != null" >
+        free_time = #{freeTime,jdbcType=SMALLINT},
+      </if>
+      <if test="ifChargeOverFreeTime != null" >
+        if_charge_over_free_time = #{ifChargeOverFreeTime,jdbcType=SMALLINT},
+      </if>
+      <if test="useTopMomeyIn24 != null" >
+        "use_top momey_in24" = #{useTopMomeyIn24,jdbcType=SMALLINT},
+      </if>
+      <if test="oneOne != null" >
+        one_one = #{oneOne,jdbcType=SMALLINT},
+      </if>
+      <if test="byTimePeriod != null" >
+        by_time_period = #{byTimePeriod,jdbcType=SMALLINT},
+      </if>
+      <if test="ruleId != null" >
+        rule_id = #{ruleId,jdbcType=INTEGER},
+      </if>
+      <if test="custom2 != null" >
+        custom2 = #{custom2,jdbcType=INTEGER},
+      </if>
+      <if test="custom3 != null" >
+        custom3 = #{custom3,jdbcType=VARCHAR},
+      </if>
+      <if test="custom4 != null" >
+        custom4 = #{custom4,jdbcType=VARCHAR},
+      </if>
+      <if test="topMoney != null" >
+        top_money = #{topMoney,jdbcType=NUMERIC},
+      </if>
+    </set>
+    where daynight_id = #{daynightId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.wadejerry.scms.modules.pfm.model.PfmDaynight" >
+    update pfm_daynight
+    set period_start_time = #{periodStartTime,jdbcType=TIME},
+      first_time = #{firstTime,jdbcType=INTEGER},
+      first_time_charge = #{firstTimeCharge,jdbcType=NUMERIC},
+      unit_time = #{unitTime,jdbcType=SMALLINT},
+      unit_time_charge = #{unitTimeCharge,jdbcType=NUMERIC},
+      pertime_start_time = #{pertimeStartTime,jdbcType=TIME},
+      pertime_charge = #{pertimeCharge,jdbcType=NUMERIC},
+      free_time = #{freeTime,jdbcType=SMALLINT},
+      if_charge_over_free_time = #{ifChargeOverFreeTime,jdbcType=SMALLINT},
+      "use_top momey_in24" = #{useTopMomeyIn24,jdbcType=SMALLINT},
+      one_one = #{oneOne,jdbcType=SMALLINT},
+      by_time_period = #{byTimePeriod,jdbcType=SMALLINT},
+      rule_id = #{ruleId,jdbcType=INTEGER},
+      custom2 = #{custom2,jdbcType=INTEGER},
+      custom3 = #{custom3,jdbcType=VARCHAR},
+      custom4 = #{custom4,jdbcType=VARCHAR},
+       top_money = #{topMoney,jdbcType=NUMERIC}
+    where daynight_id = #{daynightId,jdbcType=INTEGER}
+  </update>
+   <select id="selectByRuleId" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from pfm_daynight
+    where rule_id = #{ruleId,jdbcType=INTEGER}
+  </select>
+</mapper>

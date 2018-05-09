@@ -1,0 +1,143 @@
+package com.wadejerry.scms.modules.pfm.controller;
+
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.shiro.SecurityUtils;
+import org.codehaus.jettison.json.JSONArray;
+import org.codehaus.jettison.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.wadejerry.scms.frame.entity.DataTableDto;
+import com.wadejerry.scms.frame.entity.LoginInfo;
+import com.wadejerry.scms.frame.entity.OperateResult;
+import com.wadejerry.scms.frame.entity.PageParamsDto;
+import com.wadejerry.scms.modules.pfm.dto.MessageDto;
+import com.wadejerry.scms.modules.pfm.model.PfmTaskMessage;
+import com.wadejerry.scms.modules.pfm.service.MessageService;
+import com.wadejerry.scms.utils.AjaxUtil;
+import com.wadejerry.scms.utils.date.DateUtil;
+import com.wadejerry.scms.utils.json.JacksonUtil;
+
+@Controller
+public class MessageController {
+	@Autowired
+	private MessageService messageService;
+	@RequestMapping("/messagelist")
+	@ResponseBody
+	public void messageList(HttpServletRequest request,HttpServletResponse response){
+		PageParamsDto paramsDto = new PageParamsDto(request); //获取分页参数
+		int iTotal =0;
+		List<MessageDto> dtoList = null;
+		
+		if(!SecurityUtils.getSubject().isPermitted("MessageSee")){
+		}else{
+			 iTotal = messageService.selectMessageCount(paramsDto); //获取记录总数
+		if (iTotal > 0) {
+			if(paramsDto.getLength() == -1){ //查询所有记录
+				paramsDto.setLength(iTotal);
+			}
+			dtoList= messageService.selectMessageList(paramsDto); //获取分页记录
+		}
+		}
+		DataTableDto data = new DataTableDto();  //返回数据封装 
+		data.setDataList(dtoList);
+		data.setDraw(paramsDto.getDraw());
+		data.setRecordsFiltered(iTotal);
+		data.setRecordsTotal(iTotal);
+		AjaxUtil.ajaxWriteDataTable(data, response);
+		
+	}
+	
+	@RequestMapping("/message/GetRolesSelectData.do")
+	@ResponseBody
+	public void selectData(HttpServletRequest request,HttpServletResponse response){
+			
+			AjaxUtil.ajaxWriteObject(messageService.selectScreenData(), response);
+		}
+	@RequestMapping("/message/del.do")
+	@ResponseBody
+	public void delMessage(HttpServletRequest request,HttpServletResponse response){
+			List<MessageDto> dto;
+			try {
+				dto = JacksonUtil.json2list(request.getParameter("condition"),MessageDto.class);
+				AjaxUtil.ajaxWrite(messageService.delMessage(dto), response);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				AjaxUtil.ajaxWrite(new OperateResult(false,"删除失败"), response);
+			}
+			
+		}
+	
+	
+	@RequestMapping("/message/save.do")
+	@ResponseBody
+	public void saveMessage(HttpServletRequest request,HttpServletResponse response){
+			String condition = request.getParameter("condition");
+			OperateResult result = new OperateResult(false,"操作失败");
+			try {
+				JSONObject jsonObject = new JSONObject(condition); 
+				if(jsonObject.has("deviceScreen")){
+					if(jsonObject.get("deviceScreen").getClass()==JSONArray.class){
+						JSONArray array= jsonObject.getJSONArray("deviceScreen");
+						StringBuilder builder = new StringBuilder("");
+						for(int i =0;i<array.length();i++){
+							if(i==0){
+								builder.append(array.get(i).toString());
+							}
+							else{
+								builder.append(","+array.get(i).toString());
+							}
+						}
+					//	jsonObject.remove("deviceScreen");
+						jsonObject.put("deviceScreen",builder.toString());
+					}
+					
+				}else{
+					jsonObject.put("deviceScreen", "");
+				}
+			
+				Map  map= JacksonUtil.json2map(jsonObject.toString());
+				
+				if("".equals(map.get("pfmTaskMessageId"))){//添加
+					PfmTaskMessage message = new PfmTaskMessage();
+					message.setBimCompanyId(LoginInfo.getCompanyId());
+					message.setBeginTime(DateUtil.YMDHMdf.parse(map.get("beginTime").toString()));
+					message.setEndTime(DateUtil.YMDHMdf.parse(map.get("endTime").toString()));
+					message.setInsertTime(new Date());
+					message.setUpdateTime(new Date());
+					message.setMessage(map.get("message").toString());
+					message.setDeviceScreenIdArr(map.get("deviceScreen").toString());
+					message.setUserName(LoginInfo.getLoginName());
+					messageService.addMessage(message);
+					
+					result.setResult(true);
+				}
+				else{
+					PfmTaskMessage message = new PfmTaskMessage();
+					message.setPfmTaskMessageId(Integer.parseInt(map.get("pfmTaskMessageId").toString()));
+					message.setBimCompanyId(LoginInfo.getCompanyId());
+					message.setBeginTime(DateUtil.YMDHMdf.parse(map.get("beginTime").toString()));
+					message.setEndTime(DateUtil.YMDHMdf.parse(map.get("endTime").toString()));
+					message.setUpdateTime(new Date());
+					message.setMessage(map.get("message").toString());
+					
+					message.setDeviceScreenIdArr(map.get("deviceScreen").toString());
+					messageService.editMessage(message);
+					result.setResult(true);
+				}
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			AjaxUtil.ajaxWrite(result, response);
+		}
+}

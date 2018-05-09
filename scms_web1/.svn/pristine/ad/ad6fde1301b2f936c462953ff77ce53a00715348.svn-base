@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.wadejerry.scms.modules.sysconfig.dao.BimsysParamMapper" >
+<resultMap id="BaseResultMap" type="com.wadejerry.scms.modules.sysconfig.model.BimSysParams" >
+    <id column="bim_sys_params_id" property="bimSysParamsId" jdbcType="INTEGER" />
+    <result column="param_id" property="paramId" jdbcType="VARCHAR" />
+    <result column="param_name" property="paramName" jdbcType="VARCHAR" />
+    <result column="value_type" property="valueType" jdbcType="INTEGER" />
+    <result column="int_value" property="intValue" jdbcType="INTEGER" />
+    <result column="str_value" property="strValue" jdbcType="VARCHAR" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+    <result column="config_type" property="configType" jdbcType="INTEGER" />
+    <result column="config_order" property="configOrder" jdbcType="INTEGER" />
+  </resultMap>
+  <!-- 保存参数 -->
+  <!-- <update id="SaveParams">
+ 
+  </update> -->
+  <update id="updateTimeStyle">
+  update bim_sys_params set str_value=#{0} where config_order=11
+  </update>
+  <update id="updateTimeWeek">
+  update bim_sys_params set int_value=#{0} where config_order=12
+  </update>
+  <update id="updateAlarm">
+  update bim_sys_params set int_value=#{0} where config_order=14
+  </update>
+  <update id="updateConfig">
+  update bim_sys_params set int_value=#{0} where config_order=15
+  </update>
+  <update id="updateCommon">
+  update bim_sys_params set int_value=#{0} where config_order=13
+  </update>
+  <update id="updateWork">
+  update bim_sys_params set int_value=#{0} where config_order=17
+  </update>
+  <update id="updateMonitor">
+  update bim_sys_params set int_value=#{0} where config_order=16
+  </update>
+</mapper>

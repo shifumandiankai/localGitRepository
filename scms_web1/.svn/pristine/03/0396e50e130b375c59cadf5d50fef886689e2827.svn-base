@@ -1,0 +1,159 @@
+package com.wadejerry.scms.modules.basic.dto;
+
+import java.math.BigDecimal;
+
+public class AccountDto {
+
+	private Integer carInfoId;//车辆信息编号
+	private String personName;//车主姓名
+	private String cardId;//卡号
+	private String carNumber;//车牌号
+	private String value1;//余额
+	private BigDecimal bdvalue1;
+	private String typeName;//车辆类别名称
+	private Integer carTypeId;//车辆类别编号
+	private String strDisableTime;//到期时间String
+	//private Date DisableTime;//到期时间
+	private String note;//备注
+	private String strfee;//当前操作余额 string
+	//private BigDecimal fee;//当前操作余额 
+	private String strlastfee;//当前操作后的余额 string
+	//private BigDecimal lastFee;//当前操作后的余额
+	private Integer typeId;//消费类型 0充值 1退款
+	private String strtime;//操作时间 string
+	//private Date time;//操作时间 
+	private Integer intbqMoney;//包期金额 int
+	
+	private String baoqiType;//包期类型
+	//private Integer tradeId;//流水号
+	public Integer getCarInfoId() {
+		return carInfoId;
+	}
+	public void setCarInfoId(Integer carInfoId) {
+		this.carInfoId = carInfoId;
+	}
+	public String getPersonName() {
+		return personName;
+	}
+	public void setPersonName(String personName) {
+		this.personName = personName;
+	}
+	public String getCardId() {
+		return cardId;
+	}
+	public void setCardId(String cardId) {
+		this.cardId = cardId;
+	}
+	public String getCarNumber() {
+		return carNumber;
+	}
+	public void setCarNumber(String carNumber) {
+		this.carNumber = carNumber;
+	}
+	public String getValue1() {
+		return value1;
+	}
+	public void setValue1(String value1) {
+		this.value1 = value1;
+	}
+	public String getTypeName() {
+		return typeName;
+	}
+	public void setTypeName(String typeName) {
+		this.typeName = typeName;
+	}
+	public String getStrDisableTime() {
+		return strDisableTime;
+	}
+	public void setStrDisableTime(String strDisableTime) {
+		this.strDisableTime = strDisableTime;
+	}
+	public String getNote() {
+		return note;
+	}
+	public void setNote(String note) {
+		this.note = note;
+	}
+	public String getStrfee() {
+		return strfee;
+	}
+	public void setStrfee(String strfee) {
+		this.strfee = strfee;
+	}
+	public String getStrlastfee() {
+		return strlastfee;
+	}
+	public void setStrlastfee(String strlastfee) {
+		this.strlastfee = strlastfee;
+	}
+	public Integer getTypeId() {
+		return typeId;
+	}
+	public void setTypeId(Integer typeId) {
+		this.typeId = typeId;
+	}
+	public String getStrtime() {
+		return strtime;
+	}
+	public void setStrtime(String strtime) {
+		this.strtime = strtime;
+	}
+	
+	public Integer getIntbqMoney() {
+		return intbqMoney;
+	}
+	public void setIntbqMoney(Integer intbqMoney) {
+		this.intbqMoney = intbqMoney;
+	}
+	/*public Date getDisableTime() {
+		return DisableTime;
+	}
+	public void setDisableTime(Date disableTime) {
+		DisableTime = disableTime;
+	}
+	public BigDecimal getFee() {
+		return fee;
+	}
+	public void setFee(BigDecimal fee) {
+		this.fee = fee;
+	}
+	public BigDecimal getLastFee() {
+		return lastFee;
+	}
+	public void setLastFee(BigDecimal lastFee) {
+		this.lastFee = lastFee;
+	}
+	public Date getTime() {
+		return time;
+	}
+	public void setTime(Date time) {
+		this.time = time;
+	}*/
+	public Integer getCarTypeId() {
+		return carTypeId;
+	}
+	public void setCarTypeId(Integer carTypeId) {
+		this.carTypeId = carTypeId;
+	}
+	/*public Integer getTradeId() {
+		return tradeId;
+	}
+	public void setTradeId(Integer tradeId) {
+		this.tradeId = tradeId;
+	}
+	*/
+	public BigDecimal getBdvalue1() {
+		return bdvalue1;
+	}
+	public void setBdvalue1(BigDecimal bdvalue1) {
+		this.bdvalue1 = bdvalue1;
+	}
+	public String getBaoqiType() {
+		return baoqiType;
+	}
+	public void setBaoqiType(String baoqiType) {
+		this.baoqiType = baoqiType;
+	}
+	
+
+}

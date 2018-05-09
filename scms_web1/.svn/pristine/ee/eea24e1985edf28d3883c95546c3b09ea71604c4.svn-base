@@ -1,0 +1,303 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.wadejerry.scms.modules.pfm.dao.PfmParkingLotMapper" >
+  <resultMap id="BaseResultMap" type="com.wadejerry.scms.modules.pfm.model.PfmParkingLot" >
+    <id column="pfm_parking_lot_id" property="pfmParkingLotId" jdbcType="INTEGER" />
+    <result column="parking_lot_code" property="parkingLotCode" jdbcType="VARCHAR" />
+    <result column="bim_company_id" property="bimCompanyId" jdbcType="INTEGER" />
+    <result column="parking_lot_name" property="parkingLotName" jdbcType="VARCHAR" />
+    <result column="car_number" property="carNumber" jdbcType="INTEGER" />
+    <result column="parking_address" property="parkingAddress" jdbcType="VARCHAR" />
+    <result column="note" property="note" jdbcType="VARCHAR" />
+    <result column="reserve_car_number" property="reserveCarNumber" jdbcType="INTEGER" />
+    <result column="in_id" property="inId" jdbcType="INTEGER" />
+    <result column="insert_time" property="insertTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="user_name" property="userName" jdbcType="VARCHAR" />
+  </resultMap>
+  <resultMap type="com.wadejerry.scms.modules.pfm.dto.ParkingLotDto" id="DtoResultMap">
+  <id column="pfm_parking_lot_id" property="pfmParkingLotId" jdbcType="INTEGER" />
+    <result column="bim_company_id" property="bimCompanyId" jdbcType="INTEGER" />
+    <result column="parking_lot_name" property="parkingLotName" jdbcType="VARCHAR" />
+    <result column="car_number" property="carNumber" jdbcType="INTEGER" />
+    <result column="note" property="note" jdbcType="VARCHAR" />
+    <result column="insert_time" property="insertTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="in_id" property="inId" jdbcType="INTEGER" />
+    <result column="reserve_car_number" property="reserveCarNumber" jdbcType="INTEGER" />
+    <result column="pfm_server_id" property="pfmServerId" jdbcType="INTEGER" />
+    <result column="park_id" property="parkId" jdbcType="INTEGER" /> 
+    
+  </resultMap>
+  <resultMap type="com.wadejerry.scms.modules.pfm.model.PfmParkingLotInfo" id="ParkingBaseResultMap">
+  <id column="pfm_parking_lot_id" property="pfmParkingLotId" jdbcType="INTEGER" />
+    <result column="bim_company_id" property="bimCompanyId" jdbcType="INTEGER" />
+    <result column="merchant_name" property="merchantName" jdbcType="VARCHAR" />
+    <result column="parking_lot_name" property="parkingLotName" jdbcType="VARCHAR" />
+    <result column="car_number" property="carNumber" jdbcType="INTEGER" />
+    <result column="note" property="note" jdbcType="VARCHAR" />
+     <result column="insert_time" property="insertTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="in_id" property="inId" jdbcType="INTEGER" />
+     <result column="reserve_car_number" property="reserveCarNumber" jdbcType="INTEGER" />
+  </resultMap>
+  
+  <sql id="Base_Column_List" >
+    pfm_parking_lot_id, "parking_lot_code", bim_company_id, parking_lot_name, car_number, 
+    parking_address, note, reserve_car_number, in_id, insert_time, update_time, user_name
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select pfm_parking_lot_id,
+    <include refid="Base_Column_List" />
+    from pfm_parking_lot
+    where pfm_parking_lot_id = #{pfmParkingLotId,jdbcType=INTEGER}
+  </select>
+  <!-- 获取记录总数 -->
+  <select id="selectRecordTotal" parameterType="com.wadejerry.scms.frame.entity.PageParamsDto"  resultType="java.lang.Integer" >
+  select count(pfm_parking_lot_id) from pfm_parking_lot where
+  <!-- 如果不是企业操作员，就只有当前用户创建的操作员权限  -->
+  (#{loginUserLevel,jdbcType=INTEGER}=1) and 
+  <!--用户或角色名称模糊查询-->
+  	(#{searchValue0,jdbcType=VARCHAR}='' or parking_lot_name like CONCAT('%',#{searchValue0,jdbcType=VARCHAR},'%' ))
+  	<!-- 过滤企业 -->
+  	and bim_company_id = #{companyId,jdbcType=INTEGER}
+  </select>
+  <!-- 分页获取操作员信息 -->
+  <select id="selectRoleListByPage" parameterType="com.wadejerry.scms.frame.entity.PageParamsDto" resultMap="DtoResultMap" >
+   select  <!-- l.pfm_parking_lot_id,l.parking_lot_name,l.car_number,l.in_id,l.note,s.pfm_server_id,s.park_id --> * from pfm_parking_lot l left join pfm_server s on
+	  	
+		<!-- 如果不是企业操作员，就只有当前用户创建的操作员权限  -->
+	  	(#{loginUserLevel,jdbcType=INTEGER} = 1) and
+	  	<!--用户或角色名称模糊查询-->
+	  	(#{searchValue0,jdbcType=VARCHAR}='' or l.parking_lot_name like CONCAT('%',#{searchValue0,jdbcType=VARCHAR},'%' )) 
+	  	
+	  	<!-- 过滤企业 -->
+	  	and (l.bim_company_id = #{companyId,jdbcType=INTEGER}) and l.pfm_parking_lot_id=s.park_id
+	  	${order} 
+	  	LIMIT  #{length,jdbcType=INTEGER} OFFSET  #{start,jdbcType=INTEGER} 
+  </select>
+  <!--查询车场名称  -->
+  <select id="findByParkName" resultMap="ParkingBaseResultMap">
+  select pfm_parking_lot_id,bim_company_id,parking_lot_name,car_number,reserve_car_number,note,in_id
+  from pfm_parking_lot where parking_lot_name=#{0} and bim_company_id=#{1}
+  </select>
+  
+  <!-- 查询修改时的车场编号 -->
+  <select id="getUserById" parameterType="java.lang.Integer" resultMap="ParkingBaseResultMap">
+  select pfm_parking_lot_id,bim_company_id,parking_lot_name,car_number,reserve_car_number,note
+  from pfm_parking_lot where pfm_parking_lot_id=#{pfmParkingLotId,jdbcType=INTEGER}
+  </select>
+  <!-- 根据上级id查找车辆信息 -->
+  <select id="selectByinId" parameterType="java.lang.Integer" resultMap="DtoResultMap">
+  select *
+  from pfm_parking_lot where pfm_parking_lot_id=#{0}
+  </select>
+  <!-- 查询车场具体信息 -->
+  <select id="selectParkInfo" parameterType="java.lang.Integer" resultMap="DtoResultMap">
+  select * from pfm_parking_lot where bim_company_id=#{0}
+  </select>
+  <!-- 根据车场名称查询信息 -->
+  <select id="selectparkInfo" parameterType="java.lang.String" resultMap="DtoResultMap" >
+  select * from pfm_parking_lot where parking_lot_name=#{0}
+  </select>
+  <!-- 查询最大停车场信息 -->
+  <select id="selectMaxParkinglotId" parameterType="java.lang.Integer"  resultType="java.lang.Integer">
+  select count(pfm_parking_lot_id) from pfm_parking_lot 
+  </select>
+  <!-- 查询最大停车场Id -->
+  <select id="selectMaxID" parameterType="java.lang.Integer"  resultType="java.lang.Integer">
+  select max(pfm_parking_lot_id) from pfm_parking_lot where bim_company_id=#{0}
+  </select>
+  <!-- 根据id删除信息 -->
+  <delete id="deleteParkById" parameterType="java.lang.Integer">
+  delete from pfm_parking_lot where pfm_parking_lot_id=#{pfmParkingLotId,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from pfm_parking_lot
+    where pfm_parking_lot_id = #{pfmParkingLotId,jdbcType=INTEGER}
+  </delete>
+  
+  <!-- 添加车场信息 -->
+  <insert id="insertParkingDto" parameterType="com.wadejerry.scms.modules.pfm.model.PfmParkingLotInfo" useGeneratedKeys="true" keyProperty="pfmParkingLotId">
+  insert into pfm_parking_lot(bim_company_id,parking_lot_name,car_number,reserve_car_number,note,in_id,insert_time) values(#{bimCompanyId,jdbcType=INTEGER},#{parkingLotName,jdbcType=VARCHAR},#{carNumber,jdbcType=INTEGER},#{reserveCarNumber,jdbcType=INTEGER},#{note,jdbcType=VARCHAR},#{inId,jdbcType=INTEGER},#{insertTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insert" parameterType="com.wadejerry.scms.modules.pfm.model.PfmParkingLot" >
+    insert into pfm_parking_lot (pfm_parking_lot_id, "parking_lot_code", 
+      bim_company_id, parking_lot_name, car_number, 
+      parking_address, note, reserve_car_number, 
+      in_id, insert_time, update_time, 
+      user_name)
+    values (#{pfmParkingLotId,jdbcType=INTEGER}, #{parkingLotCode,jdbcType=VARCHAR}, 
+      #{bimCompanyId,jdbcType=INTEGER}, #{parkingLotName,jdbcType=VARCHAR}, #{carNumber,jdbcType=INTEGER}, 
+      #{parkingAddress,jdbcType=VARCHAR}, #{note,jdbcType=VARCHAR}, #{reserveCarNumber,jdbcType=INTEGER}, 
+      #{inId,jdbcType=INTEGER}, #{insertTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, 
+      #{userName,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.wadejerry.scms.modules.pfm.model.PfmParkingLot" >
+    insert into pfm_parking_lot
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="pfmParkingLotId != null" >
+        pfm_parking_lot_id,
+      </if>
+      <if test="parkingLotCode != null" >
+        "parking_lot_code",
+      </if>
+      <if test="bimCompanyId != null" >
+        bim_company_id,
+      </if>
+      <if test="parkingLotName != null" >
+        parking_lot_name,
+      </if>
+      <if test="carNumber != null" >
+        car_number,
+      </if>
+      <if test="parkingAddress != null" >
+        parking_address,
+      </if>
+      <if test="note != null" >
+        note,
+      </if>
+      <if test="reserveCarNumber != null" >
+        reserve_car_number,
+      </if>
+      <if test="inId != null" >
+        in_id,
+      </if>
+      <if test="insertTime != null" >
+        insert_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+      <if test="userName != null" >
+        user_name,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="pfmParkingLotId != null" >
+        #{pfmParkingLotId,jdbcType=INTEGER},
+      </if>
+      <if test="parkingLotCode != null" >
+        #{parkingLotCode,jdbcType=VARCHAR},
+      </if>
+      <if test="bimCompanyId != null" >
+        #{bimCompanyId,jdbcType=INTEGER},
+      </if>
+      <if test="parkingLotName != null" >
+        #{parkingLotName,jdbcType=VARCHAR},
+      </if>
+      <if test="carNumber != null" >
+        #{carNumber,jdbcType=INTEGER},
+      </if>
+      <if test="parkingAddress != null" >
+        #{parkingAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="note != null" >
+        #{note,jdbcType=VARCHAR},
+      </if>
+      <if test="reserveCarNumber != null" >
+        #{reserveCarNumber,jdbcType=INTEGER},
+      </if>
+      <if test="inId != null" >
+        #{inId,jdbcType=INTEGER},
+      </if>
+      <if test="insertTime != null" >
+        #{insertTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="userName != null" >
+        #{userName,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.wadejerry.scms.modules.pfm.model.PfmParkingLot" >
+    update pfm_parking_lot
+    <set >
+      <if test="parkingLotCode != null" >
+        "parking lot_code" = #{parkingLotCode,jdbcType=VARCHAR},
+      </if>
+      <if test="bimCompanyId != null" >
+        bim_company_id = #{bimCompanyId,jdbcType=INTEGER},
+      </if>
+      <if test="parkingLotName != null" >
+        parking_lot_name = #{parkingLotName,jdbcType=VARCHAR},
+      </if>
+      <if test="carNumber != null" >
+        car_number = #{carNumber,jdbcType=INTEGER},
+      </if>
+      <if test="parkingAddress != null" >
+        parking_address = #{parkingAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="note != null" >
+        note = #{note,jdbcType=VARCHAR},
+      </if>
+      <if test="reserveCarNumber != null" >
+        reserve_car_number = #{reserveCarNumber,jdbcType=INTEGER},
+      </if>
+      <if test="inId != null" >
+        in_id = #{inId,jdbcType=INTEGER},
+      </if>
+      <if test="insertTime != null" >
+        insert_time = #{insertTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="userName != null" >
+        user_name = #{userName,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where pfm_parking_lot_id = #{pfmParkingLotId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.wadejerry.scms.modules.pfm.model.PfmParkingLot" >
+    update pfm_parking_lot
+    set "parking_lot_code" = #{parkingLotCode,jdbcType=VARCHAR},
+      bim_company_id = #{bimCompanyId,jdbcType=INTEGER},
+      parking_lot_name = #{parkingLotName,jdbcType=VARCHAR},
+      car_number = #{carNumber,jdbcType=INTEGER},
+      parking_address = #{parkingAddress,jdbcType=VARCHAR},
+      note = #{note,jdbcType=VARCHAR},
+      reserve_car_number = #{reserveCarNumber,jdbcType=INTEGER},
+      in_id = #{inId,jdbcType=INTEGER},
+      insert_time = #{insertTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      user_name = #{userName,jdbcType=VARCHAR}
+    where pfm_parking_lot_id = #{pfmParkingLotId,jdbcType=INTEGER}
+  </update>
+  <update id="updateParkingDto"  parameterType="com.wadejerry.scms.modules.pfm.model.PfmParkingLot">
+  update pfm_parking_lot set parking_lot_name=#{parkingLotName,jdbcType=VARCHAR},car_number=#{carNumber,jdbcType=INTEGER},reserve_car_number=#{reserveCarNumber,jdbcType=INTEGER},note=#{note,jdbcType=VARCHAR},update_time=#{updateTime,jdbcType=TIMESTAMP}
+  where pfm_parking_lot_id=#{pfmParkingLotId,jdbcType=INTEGER}
+  </update>
+  <!-- 查询当前企业所有车场 -->
+  <select id="selectAllbyCompanyId" parameterType="int" resultMap="BaseResultMap">
+  
+  		select
+  		 <include refid="Base_Column_List"/>
+  		from pfm_parking_lot
+  		where bim_company_id = #{companyId,jdbcType=INTEGER}
+  
+  </select>
+
+  <!-- 更改一级车场 -->
+   <!-- <update id="updateAttribution" parameterType="java.lang.String">
+  update pfm_parking_lot set attribution=#{1} where attribution=#{0}
+  </update>  -->
+
+  
+ 
+  
+  <select id="select1ParkingLots" parameterType="int" resultMap="BaseResultMap">
+  
+  		select
+  		 <include refid="Base_Column_List"/>
+  		from pfm_parking_lot	
+  		where bim_company_id = #{companyId,jdbcType=INTEGER}
+  		and (in_id is NULL or in_id = 0);<!-- 只查一级车场 -->
+  
+  
+  
+  </select>
+
+</mapper>

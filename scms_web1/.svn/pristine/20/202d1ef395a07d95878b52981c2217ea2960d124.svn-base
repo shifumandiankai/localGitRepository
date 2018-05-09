@@ -1,0 +1,29 @@
+package com.wadejerry.scms.weixin.util.message;
+
+import java.util.List;
+
+public class NewsMesssage extends BaseMessage {
+
+	
+	public NewsMesssage(String toUserName, String fromUserName, long createTime, String msgType, int articleCount,
+			List<Article> articles) {
+		super(toUserName, fromUserName, createTime, msgType);
+		ArticleCount = articleCount;
+		Articles = articles;
+	}
+	private int ArticleCount;
+    private List<Article>Articles;
+    
+    public int getArticleCount() {
+        return ArticleCount;
+    }
+    public void setArticleCount(int articleCount) {
+        ArticleCount = articleCount;
+    }
+    public List<Article> getArticles() {
+        return Articles;
+    }
+    public void setArticles(List<Article> articles) {
+        Articles = articles;
+    }
+}

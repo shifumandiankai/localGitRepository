@@ -1,0 +1,107 @@
+package com.wadejerry.scms.modules.pfm.serviceImpl;
+
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.wadejerry.scms.frame.entity.PageParamsDto;
+import com.wadejerry.scms.frame.entity.ReportPageParamsDto;
+import com.wadejerry.scms.modules.pfm.dao.PfmRecordMapper;
+import com.wadejerry.scms.modules.pfm.dto.PfmRecordDto;
+import com.wadejerry.scms.modules.pfm.model.PfmRecord;
+import com.wadejerry.scms.modules.pfm.service.PfmRecordService;
+@Service("pfmRecordService")
+public class PfmRecordServiceImpl implements PfmRecordService{
+	@Autowired
+	private  PfmRecordMapper pfmRecordMapper;
+	
+	@Override
+	public int selectRecordTotal(PageParamsDto paramsDto) {
+		return pfmRecordMapper.selectRecordTotal(paramsDto);
+		
+	}
+
+	/*@Override
+	public List<pfmRecordDto> selectAllListByPage(PageParamsDto paramsDto) {
+		
+		return pfmRecordMapper.selectAllListByPage(paramsDto);
+	}*/
+
+	@Override
+	public int selectabNormalRecordTotal(PageParamsDto paramsDto) {
+		
+		return pfmRecordMapper.selectabNormalRecordTotal(paramsDto);
+	}
+
+	@Override
+	public List<PfmRecordDto> selectabNormalListByPage(ReportPageParamsDto paramsDto) {
+		// TODO Auto-generated method stub
+		return pfmRecordMapper.selectabNormalListByPage(paramsDto);
+	}
+
+	@Override
+	public int selectRecordTotal(Date startTime, Date endTime, String carNumber, Integer onlyentrance,Integer direction,Integer parkId,List<Integer> entranceId,Integer carriagewayId, List<Integer> listtypeId, String hasPermission, String size) {
+		
+		return pfmRecordMapper.selectRecordTotal(startTime,endTime,carNumber,onlyentrance,direction,parkId,entranceId,carriagewayId,listtypeId,hasPermission,size);
+	}
+
+	@Override
+	public List<PfmRecordDto> selectAllListByPage(ReportPageParamsDto paramsDto) {
+		
+		return pfmRecordMapper.selectAllListByPage(paramsDto);
+	}
+
+	@Override
+	public int selectabNormalRecordTotal(Date startTime, Date endTime, Integer onlyentrance, Integer direction,Integer parkId,List<Integer> entranceId,Integer carriagewayId,List<Integer> listtypeId, String hasPermission, String size) {
+		
+		return pfmRecordMapper.selectabNormalRecordTotal(startTime,endTime,onlyentrance,direction,parkId,entranceId,carriagewayId,listtypeId,hasPermission,size);
+	}
+
+	
+	@Override
+	public List<Map<String, Object>> exportabnormal(List<Integer> list,String size) {
+		
+		return pfmRecordMapper.exportabnormal(list,size);
+	}
+
+	
+	@Override
+	public List<PfmRecordDto> selectAllParkReportListByPage(ReportPageParamsDto paramsDto) {
+		
+		return pfmRecordMapper.selectAllParkReportListByPage(paramsDto);
+	}
+
+	
+
+	@Override
+	public int selectParkReportTotal(Date startTime, Date endTime, String carNumber, Integer parkId, List<Integer> entranceId,
+			Integer carriagewayId, Integer carType, List<Integer> listtypeId, String hasPermission, String size) {
+		
+		return pfmRecordMapper.selectParkReportTotal(startTime,endTime,carNumber,parkId,entranceId,carriagewayId,carType,listtypeId,hasPermission,size);
+	}
+
+	@Override
+	public List<Map<String, Object>> exportNormalCharge(Date startTime, Date endTime, String carNumber,
+			Integer direction, List<Integer> listentranceId, List<Integer> listTypeId, String size,String order) {
+		
+		return pfmRecordMapper.exportNormalCharge(startTime, endTime, carNumber,direction, listentranceId, listTypeId,size,order);
+	}
+
+	@Override
+	public List<Map<String, Object>> exportAbnormalCharge(Date startTime, Date endTime, Integer direction,
+			List<Integer> listentranceId, List<Integer> listTypeId, String size,String order) {
+		
+		return pfmRecordMapper.exportAbnormalCharge(startTime, endTime, direction,listentranceId, listTypeId, size,order);
+	}
+
+	@Override
+	public List<Map<String, Object>> exportParkReport(Date startTime, Date endTime, String carNumber, Integer carType,
+			List<Integer> listTypeId, List<Integer> listentranceId, String size,String order) {
+		
+		return pfmRecordMapper.exportParkReport(startTime, endTime, carNumber, carType,listTypeId, listentranceId, size,order);
+	}
+
+}

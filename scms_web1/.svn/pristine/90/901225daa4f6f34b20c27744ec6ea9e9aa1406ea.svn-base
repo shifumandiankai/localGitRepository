@@ -1,0 +1,257 @@
+package com.wadejerry.scms.modules.pfm.dto;
+
+import java.sql.Time;
+import java.util.Date;
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+
+public class TimeDto {
+private Integer pfmTimeId;
+private String timeCode;
+private String timeName;
+private Time dayBeginTime1;
+private Time dayEndTime1;
+private Time dayBeginTime2;
+private Time dayEndTime2;
+private Time dayBeginTime3;
+private Time dayEndTime3;
+private Time dayBeginTime4;
+private Time dayEndTime4;
+private String enableWeek;//把日期已字符串的形式存到数据库
+private Integer enableIn;
+private Integer enableOut;
+private String strweek;
+private Integer timeId;
+private String entranceName;
+public Integer getEnableOut() {
+	return enableOut;
+}
+public void setEnableOut(Integer enableOut) {
+	this.enableOut = enableOut;
+}
+private String result;
+private List<String> list;
+private Integer dayLimit;
+private Date beginTime;
+private Date endTime;
+private String strBeginTime1;
+private String strEndTime1;
+private String strBeginTime2;
+private String strEndTime2;
+private String strBeginTime3;
+private String strEndTime3;
+private String strBeginTime4;
+private String strEndTime4;
+private String strbeginTime;
+private String strendTime;
+public String getTimeName() {
+	return timeName;
+}
+public void setTimeName(String timeName) {
+	this.timeName = timeName;
+}
+/*public Date getBeginTime() {
+	return beginTime;
+}
+public void setBeginTime(Date beginTime) {
+	this.beginTime = beginTime;
+}
+public Date getEndTime() {
+	return endTime;
+}
+public void setEndTime(Date endTime) {
+	this.endTime = endTime;
+}*/
+
+public Date getDayBeginTime1() {
+	return dayBeginTime1;
+}
+
+
+public String getEnableWeek() {
+	return enableWeek;
+}
+public void setEnableWeek(String enableWeek) {
+	this.enableWeek = enableWeek;
+}
+
+public String getResult() {
+	return result;
+}
+public void setResult(String result) {
+	this.result = result;
+}
+public Integer getPfmTimeId() {
+	return pfmTimeId;
+}
+public void setPfmTimeId(Integer pfmTimeId) {
+	this.pfmTimeId = pfmTimeId;
+}
+
+public String getTimeCode() {
+	return timeCode;
+}
+public void setTimeCode(String timeCode) {
+	this.timeCode = timeCode;
+}
+public Integer getEnableIn() {
+	return enableIn;
+}
+public void setEnableIn(Integer enableIn) {
+	this.enableIn = enableIn;
+}
+public List<String> getList() {
+	return list;
+}
+public void setList(List<String> list) {
+	this.list = list;
+}
+public Integer getDayLimit() {
+	return dayLimit;
+}
+public void setDayLimit(Integer dayLimit) {
+	this.dayLimit = dayLimit;
+}
+
+
+public Date getBeginTime() {
+	return beginTime;
+}
+public void setBeginTime(Date beginTime) {
+	this.beginTime = beginTime;
+}
+public Date getEndTime() {
+	return endTime;
+}
+public void setEndTime(Date endTime) {
+	this.endTime = endTime;
+}
+public String getStrBeginTime1() {
+	return strBeginTime1;
+}
+public void setStrBeginTime1(String strBeginTime1) {
+	this.strBeginTime1 = strBeginTime1;
+}
+public String getStrEndTime1() {
+	return strEndTime1;
+}
+public void setStrEndTime1(String strEndTime1) {
+	this.strEndTime1 = strEndTime1;
+}
+public String getStrBeginTime2() {
+	return strBeginTime2;
+}
+public void setStrBeginTime2(String strBeginTime2) {
+	this.strBeginTime2 = strBeginTime2;
+}
+public String getStrEndTime2() {
+	return strEndTime2;
+}
+public void setStrEndTime2(String strEndTime2) {
+	this.strEndTime2 = strEndTime2;
+}
+public String getStrBeginTime3() {
+	return strBeginTime3;
+}
+public void setStrBeginTime3(String strBeginTime3) {
+	this.strBeginTime3 = strBeginTime3;
+}
+public String getStrEndTime3() {
+	return strEndTime3;
+}
+public void setStrEndTime3(String strEndTime3) {
+	this.strEndTime3 = strEndTime3;
+}
+public String getStrBeginTime4() {
+	return strBeginTime4;
+}
+public void setStrBeginTime4(String strBeginTime4) {
+	this.strBeginTime4 = strBeginTime4;
+}
+public String getStrEndTime4() {
+	return strEndTime4;
+}
+public void setStrEndTime4(String strEndTime4) {
+	this.strEndTime4 = strEndTime4;
+}
+public String getStrbeginTime() {
+	return strbeginTime;
+}
+public void setStrbeginTime(String strbeginTime) {
+	this.strbeginTime = strbeginTime;
+}
+public String getStrendTime() {
+	return strendTime;
+}
+public void setStrendTime(String strendTime) {
+	this.strendTime = strendTime;
+}
+public Time getDayEndTime1() {
+	return dayEndTime1;
+}
+public void setDayEndTime1(Time dayEndTime1) {
+	this.dayEndTime1 = dayEndTime1;
+}
+public Time getDayBeginTime2() {
+	return dayBeginTime2;
+}
+public void setDayBeginTime2(Time dayBeginTime2) {
+	this.dayBeginTime2 = dayBeginTime2;
+}
+public Time getDayEndTime2() {
+	return dayEndTime2;
+}
+public void setDayEndTime2(Time dayEndTime2) {
+	this.dayEndTime2 = dayEndTime2;
+}
+public Time getDayBeginTime3() {
+	return dayBeginTime3;
+}
+public void setDayBeginTime3(Time dayBeginTime3) {
+	this.dayBeginTime3 = dayBeginTime3;
+}
+public Time getDayEndTime3() {
+	return dayEndTime3;
+}
+public void setDayEndTime3(Time dayEndTime3) {
+	this.dayEndTime3 = dayEndTime3;
+}
+public Time getDayBeginTime4() {
+	return dayBeginTime4;
+}
+public void setDayBeginTime4(Time dayBeginTime4) {
+	this.dayBeginTime4 = dayBeginTime4;
+}
+public Time getDayEndTime4() {
+	return dayEndTime4;
+}
+public void setDayEndTime4(Time dayEndTime4) {
+	this.dayEndTime4 = dayEndTime4;
+}
+public void setDayBeginTime1(Time dayBeginTime1) {
+	this.dayBeginTime1 = dayBeginTime1;
+}
+public String getStrweek() {
+	return strweek;
+}
+public void setStrweek(String strweek) {
+	this.strweek = strweek;
+}
+public Integer getTimeId() {
+	return timeId;
+}
+public void setTimeId(Integer timeId) {
+	this.timeId = timeId;
+}
+public String getEntranceName() {
+	return entranceName;
+}
+public void setEntranceName(String entranceName) {
+	this.entranceName = entranceName;
+}
+
+
+
+
+}

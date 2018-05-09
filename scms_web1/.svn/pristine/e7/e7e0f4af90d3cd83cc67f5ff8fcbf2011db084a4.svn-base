@@ -1,0 +1,14 @@
+package com.wadejerry.scms.modules.onecard.service;
+
+import java.util.List;
+
+import com.wadejerry.scms.modules.onecard.dto.BimCardDto;
+import com.wadejerry.scms.modules.onecard.model.BimCard;
+
+public interface BimCardService {
+
+	void insertCardInfo(BimCardDto bimCardDto);
+
+	List<BimCard> selectCardInfoByPage(Integer integer);
+
+}

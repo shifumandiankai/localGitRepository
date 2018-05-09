@@ -1,0 +1,177 @@
+<%@ page contentType="text/html; charset=UTF-8"%>
+<style>
+p{
+color: #353535;
+font-weight: bold;
+}
+.divider {
+height: 1px;
+margin: 9px 1px;
+overflow: hidden;
+background-color: #E5E5E5;
+border-bottom: 1px solid white;
+}
+.span5 {
+   /*  width: 40.42553191489362%; */
+   float: left; 
+}
+ .span2 {
+    width: 14.893617021276595%;
+}
+ .control-label {
+    width: 72px;
+    padding: 2px 1px;
+}
+.form-horizontal label {
+    cursor: default;
+    margin-bottom: 0px;
+}
+input[type="text"]{
+    width: 181px;
+}
+ .btn card {
+    width: 70px;
+    font-size: 12px;
+} 
+
+</style>
+<div class="modal open" id="cardModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content" style=" width: 750px;"><!--  -->
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="exampleModalLabel">卡片操作</h4>
+      </div>
+      <div class="modal-body">
+      
+        <form class="form-horizontal"> 
+        
+         
+        <!--   <div class="form-group">
+            <label for="recipient-name" class="control-label col-lg-3">车场名称</label>
+            <div id="parkName" class="col-lg-9">
+           <div id ="parkNameNotice" class="point-out" style="width: 348px;top:-38px; left:0px; display: none;"></div>
+            <input type="text" class="form-control" id="recipient-name"  name ="parkingLotName">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="recipient-name" class="control-label col-lg-3">车场序号</label>
+            <div id="parkingLotCode" class="col-lg-9">
+           <div id ="parkingLotCodeNotice" class="point-out" style="width: 348px;top:-38px; left:0px; display: none;"></div>
+            <input type="text" class="form-control" id="recipient-name"  name ="parkingLotCode">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="recipient-name" class="control-label col-lg-3">车位数量</label>
+            <div id="carNumber" class="col-lg-9">
+             <div id ="carNumberNotice" class="point-out" style="width: 348px;top:-38px; left:0px; display: none;" name="carNumberNotice"></div>
+            <input type="text" class="form-control" id="recipient-name"  name ="carNumber">
+            </div>
+          </div>
+           <div class="form-group">
+           <label for="message-text" class="control-label col-lg-3" >归属车场</label> 
+           <div class="col-lg-9">
+           
+           	<select name="attribution" class="form-control" id="attribution"> 
+           	</select> 
+           	</div>
+         </div>  
+          <div class="form-group">
+          <label for="message-text" class="control-label col-lg-3">备注</label>
+          <div class="col-lg-9">
+           <div id ="noteNotice" class="point-out" style="width: 348px;top:-38px; left:0px; display: none;" name="noteNotice"></div>
+            <textarea class="form-control" id="message-text" name ="note" maxlength="4" placeholder="长度不能超过4个字"></textarea>
+            </div>
+          </div> -->
+          
+          <div class="form-group">
+          <div class="col-lg-12">
+          <p class="pull-left" style="margin:0px;">人员信息&nbsp;</p>
+          <hr class="divider">
+          </div>
+          </div>
+          <div class="form-group ">
+          <div class="col-sm-5">
+          <label  class="col-sm-6 control-label">持卡人姓名</label>
+					<div class="col-sm-6">
+				<input type="text" class="form-control" name="personName"  />
+				</div>
+		  </div>
+		   <div class="col-sm-5">
+          <label  class="col-sm-6 control-label">部门</label>
+					<div class="col-sm-6">
+				<input type="text" class="form-control" name="deptName" />
+				</div>
+		  </div>
+		  <div class="col-sm-2">
+		  <button id="person-info"  type="button">详细信息</button>
+		  </div>
+          </div>
+           <div class="form-group " style="padding-top:10px;">
+          <div class="col-sm-5">
+          <label  class="col-sm-6 control-label">电话号码</label>
+					<div class="col-sm-6">
+				<input type="text" class="form-control" name="phone"  placeholder=""/>
+				</div>
+		  </div>
+		   <div class="col-sm-5">
+          <label  class="col-sm-6 control-label">证件号码</label>
+					<div class="col-sm-6">
+				<input type="text" class="form-control" name="certId"  placeholder=""/>
+				</div>
+		  </div>
+		  
+          </div>
+         
+         <div class="form-group">
+          <div class="col-lg-12">
+          <p class="pull-left" style="margin:0px;">卡片操作&nbsp;</p>
+          <hr class="divider">
+          </div>
+          </div>
+          
+           <div class="form-group">
+           <div  style="width:600px; height:300px; overflow-y:auto;padding-left: 20px;float:left;" >
+                 <table id="cardtable" class="table table-bordered table-striped" width="300px" height="200px" >
+							<thead >
+								<tr id="tr1">	
+									<th>序号</th>
+									<th >卡号</th>
+									<th >卡状态</th>
+									 
+								</tr>
+								
+							</thead>
+							<tfoot>						
+							</tfoot> 
+						</table>
+                 </div> 
+           <div class="col-lg-2">
+        <button id="card-bind-btn"  type="button" class="cardbtn">开卡</button>
+        <button id="card-swap-btn"  type="button" disabled="disabled" class="cardbtn">换卡</button>
+        <button id="card-loss-btn"  type="button" disabled="disabled" class="cardbtn">挂失</button>
+        <button id="card-unloss-btn"  type="button" class="cardbtn">解挂</button>
+        <button id="card-supplement-btn"  type="button" class="cardbtn">补卡</button>
+        <button id="card-return-btn"  type="button" disabled="disabled" class="cardbtn">退卡</button>
+      </div>
+           </div>
+          
+          
+          
+        </form> 
+        
+        
+        
+        
+        
+        
+        
+        
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+        <button type="button" class="btn btn-primary" id="submit">保存</button>
+      </div>
+    </div>
+  </div>
+</div> 

@@ -1,0 +1,7 @@
+package com.wadejerry.scms.modules.onecard.dao;
+
+import com.wadejerry.scms.modules.onecard.model.BimPersonPhoto;
+
+public interface BimPersonPhotoMapper {
+	public void insertInfo(BimPersonPhoto bimPersonPhoto);
+}

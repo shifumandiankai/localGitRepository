@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.wadejerry.scms.modules.pfm.dao.PfmTaskMessageMapper" >
+  <resultMap id="BaseResultMap" type="com.wadejerry.scms.modules.pfm.model.PfmTaskMessage" >
+    <id column="pfm_task_message_id" property="pfmTaskMessageId" jdbcType="INTEGER" />
+    <result column="bim_company_id" property="bimCompanyId" jdbcType="INTEGER" />
+    <result column="message" property="message" jdbcType="VARCHAR" />
+    <result column="begin_time" property="beginTime" jdbcType="TIMESTAMP" />
+    <result column="end_time" property="endTime" jdbcType="TIMESTAMP" />
+    <result column="insert_time" property="insertTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="user_name" property="userName" jdbcType="VARCHAR" />
+    <result column="device_screen_id_arr" property="deviceScreenIdArr" jdbcType="VARCHAR" />
+    <result column="custom1" property="custom1" jdbcType="INTEGER" />
+    <result column="custom2" property="custom2" jdbcType="INTEGER" />
+    <result column="custom3" property="custom3" jdbcType="VARCHAR" />
+    <result column="custom4" property="custom4" jdbcType="VARCHAR" />
+  </resultMap>
+    <resultMap id="pageMap" type="com.wadejerry.scms.modules.pfm.dto.MessageDto" >
+    <id column="pfm_task_message_id" property="pfmTaskMessageId" jdbcType="INTEGER" />
+    <result column="message" property="message" jdbcType="VARCHAR" />
+    <result column="begin_time" property="beginTime" jdbcType="TIMESTAMP" />
+    <result column="end_time" property="endTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="user_name" property="userName" jdbcType="VARCHAR" />
+    <result column="device_screen_id_arr" property="screenids" jdbcType="VARCHAR" />
+    
+  </resultMap>
+  <sql id="Base_Column_List" >
+    pfm_task_message_id, bim_company_id, message, begin_time, end_time, insert_time, 
+    update_time, user_name, device_screen_id_arr, custom1, custom2, custom3, custom4
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from pfm_task_message
+    where pfm_task_message_id = #{pfmTaskMessageId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from pfm_task_message
+    where pfm_task_message_id = #{pfmTaskMessageId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.wadejerry.scms.modules.pfm.model.PfmTaskMessage" >
+    insert into pfm_task_message (pfm_task_message_id, bim_company_id, message, 
+      begin_time, end_time, insert_time, 
+      update_time, user_name, device_screen_id_arr, 
+      custom1, custom2, custom3, 
+      custom4)
+    values (#{pfmTaskMessageId,jdbcType=INTEGER}, #{bimCompanyId,jdbcType=INTEGER}, #{message,jdbcType=VARCHAR}, 
+      #{beginTime,jdbcType=TIMESTAMP}, #{endTime,jdbcType=TIMESTAMP}, #{insertTime,jdbcType=TIMESTAMP}, 
+      #{updateTime,jdbcType=TIMESTAMP}, #{userName,jdbcType=VARCHAR}, #{deviceScreenIdArr,jdbcType=VARCHAR}, 
+      #{custom1,jdbcType=INTEGER}, #{custom2,jdbcType=INTEGER}, #{custom3,jdbcType=VARCHAR}, 
+      #{custom4,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.wadejerry.scms.modules.pfm.model.PfmTaskMessage" >
+    insert into pfm_task_message
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="pfmTaskMessageId != null" >
+        pfm_task_message_id,
+      </if>
+      <if test="bimCompanyId != null" >
+        bim_company_id,
+      </if>
+      <if test="message != null" >
+        message,
+      </if>
+      <if test="beginTime != null" >
+        begin_time,
+      </if>
+      <if test="endTime != null" >
+        end_time,
+      </if>
+      <if test="insertTime != null" >
+        insert_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+      <if test="userName != null" >
+        user_name,
+      </if>
+      <if test="deviceScreenIdArr != null" >
+        device_screen_id_arr,
+      </if>
+      <if test="custom1 != null" >
+        custom1,
+      </if>
+      <if test="custom2 != null" >
+        custom2,
+      </if>
+      <if test="custom3 != null" >
+        custom3,
+      </if>
+      <if test="custom4 != null" >
+        custom4,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="pfmTaskMessageId != null" >
+        #{pfmTaskMessageId,jdbcType=INTEGER},
+      </if>
+      <if test="bimCompanyId != null" >
+        #{bimCompanyId,jdbcType=INTEGER},
+      </if>
+      <if test="message != null" >
+        #{message,jdbcType=VARCHAR},
+      </if>
+      <if test="beginTime != null" >
+        #{beginTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="endTime != null" >
+        #{endTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="insertTime != null" >
+        #{insertTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="userName != null" >
+        #{userName,jdbcType=VARCHAR},
+      </if>
+      <if test="deviceScreenIdArr != null" >
+        #{deviceScreenIdArr,jdbcType=VARCHAR},
+      </if>
+      <if test="custom1 != null" >
+        #{custom1,jdbcType=INTEGER},
+      </if>
+      <if test="custom2 != null" >
+        #{custom2,jdbcType=INTEGER},
+      </if>
+      <if test="custom3 != null" >
+        #{custom3,jdbcType=VARCHAR},
+      </if>
+      <if test="custom4 != null" >
+        #{custom4,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.wadejerry.scms.modules.pfm.model.PfmTaskMessage" >
+    update pfm_task_message
+    <set >
+      <if test="bimCompanyId != null" >
+        bim_company_id = #{bimCompanyId,jdbcType=INTEGER},
+      </if>
+      <if test="message != null" >
+        message = #{message,jdbcType=VARCHAR},
+      </if>
+      <if test="beginTime != null" >
+        begin_time = #{beginTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="endTime != null" >
+        end_time = #{endTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="insertTime != null" >
+        insert_time = #{insertTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="userName != null" >
+        user_name = #{userName,jdbcType=VARCHAR},
+      </if>
+      <if test="deviceScreenIdArr != null" >
+        device_screen_id_arr = #{deviceScreenIdArr,jdbcType=VARCHAR},
+      </if>
+      <if test="custom1 != null" >
+        custom1 = #{custom1,jdbcType=INTEGER},
+      </if>
+      <if test="custom2 != null" >
+        custom2 = #{custom2,jdbcType=INTEGER},
+      </if>
+      <if test="custom3 != null" >
+        custom3 = #{custom3,jdbcType=VARCHAR},
+      </if>
+      <if test="custom4 != null" >
+        custom4 = #{custom4,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where pfm_task_message_id = #{pfmTaskMessageId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.wadejerry.scms.modules.pfm.model.PfmTaskMessage" >
+    update pfm_task_message
+    set bim_company_id = #{bimCompanyId,jdbcType=INTEGER},
+      message = #{message,jdbcType=VARCHAR},
+      begin_time = #{beginTime,jdbcType=TIMESTAMP},
+      end_time = #{endTime,jdbcType=TIMESTAMP},
+      insert_time = #{insertTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      user_name = #{userName,jdbcType=VARCHAR},
+      device_screen_id_arr = #{deviceScreenIdArr,jdbcType=VARCHAR},
+      custom1 = #{custom1,jdbcType=INTEGER},
+      custom2 = #{custom2,jdbcType=INTEGER},
+      custom3 = #{custom3,jdbcType=VARCHAR},
+      custom4 = #{custom4,jdbcType=VARCHAR}
+    where pfm_task_message_id = #{pfmTaskMessageId,jdbcType=INTEGER}
+  </update>
+  
+  
+  <select id="selectCountByParams" parameterType="com.wadejerry.scms.frame.entity.PageParamsDto" resultType="int">
+  		select count(pfm_task_message_id) from pfm_task_message where bim_company_id=#{companyId}
+  		<if test="searchValue0!=null and searchValue0!=''">
+  		and message like concat('%', #{searchValue0},'%')
+  		</if>
+  		
+  </select>
+    <select id="selectDtoByParams" parameterType="com.wadejerry.scms.frame.entity.PageParamsDto" resultMap="pageMap">
+ 		select * from pfm_task_message where bim_company_id=#{companyId}
+  		<if test="searchValue0!=null and searchValue0!=''">
+  		and message like concat('%', #{searchValue0},'%')
+  		</if>
+ 		 ${order}
+		LIMIT
+		#{length,jdbcType=INTEGER} OFFSET
+		#{start,jdbcType=INTEGER}
+  
+  </select>
+</mapper>

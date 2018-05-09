@@ -1,0 +1,56 @@
+var wade = wade || {};
+wade.role = wade.role || {};
+
+// 保存校验
+$("#submit").click(registerSave);
+function registerSave(event) {
+	var re = /^([0-1]?[0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9])$/;
+	var val = $("#AutoSetTimeTime").val();
+	if (!re.test(val) || val.length == 0) {
+		var msg = '请使用HH:mm:ss格式的时间字符串，如09:10:05';
+		// $("#styleNotice").html('<span class="point-box errorbgTop
+		// dropdown"><i class="sprite icon_arrow_up2 pa"></i>' + msg +
+		// '</span>').show();
+		$("#AutoSetTimeTime").popover('show');
+		$("#no").show();
+		$("#ok").hide();
+		event.stopImmediatePropagation(); // 阻止提交数据
+		return false;
+	}
+
+};
+// 保存按钮
+$("#submit").click(function() {
+	var alarm = $("#AlarmLog option:selected").val();
+	var config = $("#ConfigLog option:selected").val();
+	var common = $("#CommonLog option:selected").val();
+	var work = $("#WorkLog option:selected").val();
+	var monitor = $("#MonitorLog option:selected").val();
+	var validate = $("#validate option:selected").val();
+	var AutoSetTimeTime = $("#AutoSetTimeTime").val();
+	$.ajax({
+		url : '/saveSysParams.do',
+		type : 'post',
+		dataType : 'json',
+		data : {
+			alarm : alarm,
+			config : config,
+			common : common,
+			work : work,
+			monitor : monitor,
+			validate : validate,
+			AutoSetTimeTime : AutoSetTimeTime
+		},
+		success : function(data) {
+			result = eval(data);
+			if (result.success) {
+				wade.libs.alert('保存成功');
+				$("#AutoSetTimeTime").popover('hide');
+				$("#ok").show();
+				$("#no").hide();
+			} else {
+				wade.libs.alert('保存失败', 0);
+			}
+		}
+	});
+});

@@ -1,0 +1,139 @@
+<%@ page contentType="text/html; charset=UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<title>维德杰瑞SCMS管理平台</title>
+<!-- Tell the browser to be responsive to screen width -->
+<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+<%@ include file="../../../common/jsp/common_css.jsp"%>
+<link rel="stylesheet" href="/plugins/datatables/dataTables.bootstrap.css">
+<link rel="stylesheet" href="/pages/pfm/carmanage/css/jquery.shCircleLoader.css">
+<link rel="stylesheet" type="text/css" href="/pages/pfm/carmanage/css/car_manage.css" >
+</head>
+<%@ include file="../../../common/jsp/commonBody.jsp"%>
+<!-- <body class="hold-transition skin-blue sidebar-mini"> -->
+	<div class="wrapper">
+		<%@ include file="../../../common/jsp/top.jsp"%>
+			<%@ include file="/pages/onecard/onecard_menu.jsp"%>
+		<!-- Content Wrapper. Contains page content -->
+		<div class="content-wrapper">
+			<!-- Content Header (Page header) -->
+			 <section class="content-header">
+				<h1>
+					人员管理界面
+				</h1>
+				<ol class="breadcrumb">
+					<li><a href="/index.do"><i class="fa fa-dashboard"></i> 主页</a></li>
+					<li class="active">人员管理</li>
+				</ol>
+			</section>
+			<!-- Main content -->
+			<section class="content">
+			<div class="box">
+			<!-- 	<div class="box-header">
+					<h3 class="box-title"></h3>
+				</div> -->
+				<div class="box-body">
+					<div>
+						<div id="left">
+							
+							<ul id="tree" class="ztree" style="margin-left:10px;"></ul>
+			
+						</div>
+
+						<div id="right">
+
+							<div class="nav-tabs-custom">
+								<ul class="nav nav-tabs">
+									<li class="active"><a href="#carinfo" data-toggle="tab">人员管理</a></li>
+								<!-- 	<li ><a href="#rule" data-toggle="tab">规则配置</a></li> -->
+								</ul>
+								<div class="tab-content">
+
+									<div class="tab-pane active" id="first">
+										<table id="personnelexample" class="table table-bordered table-striped">
+											<thead>
+												<tr>
+													<th>序号</th>
+													<th>部门编号</th>
+													<th>编号</th>
+													<th>姓名</th>
+													<th>性别</th>
+													<th>证件号</th>
+													<th>证件类型</th>
+													<th>拼音代码</th>
+													<th>联系电话</th>
+													
+													
+													
+												
+												</tr>
+											</thead>
+											<tbody>
+											</tbody>
+											<tfoot>
+											</tfoot>
+										</table>
+									</div>
+									<!-- /.carinfo -->
+									<!-- <div class="tab-pane" id="rule">
+									<table id="example2" class="table table-bordered table-striped">
+											<thead>
+												<tr>
+													<th>规则名称</th>
+													<th>临时车是否匹配</th>
+													<th>车辆类型</th>
+													<th>收费类型</th>
+													<th>修改时间</th>
+													<th>最后更新操作员</th>
+													<th></th>
+													<th></th>
+													<th></th>
+													<th></th>
+													</tr>
+											</thead>
+											<tbody>
+											</tbody>
+											<tfoot>
+											</tfoot>
+										</table>
+									</div> -->
+									<!-- rule -->
+								</div>
+								<!-- /.tabcontent -->
+							</div>
+							<!-- /.nav-tabs-custom -->
+						</div>
+						<!-- /.right -->
+
+
+					</div>
+					<!--/. container -->
+
+				</div>
+				<!-- /.box-body -->
+			</div>
+			<!-- /.box -->
+			</section>
+		</div>
+		<!-- /.content -->
+		<%@ include file="../../../common/jsp/footer.jsp"%>
+		<%@ include file="../../../common/jsp/sidebar.jsp"%>
+	</div>
+
+	<%@ include file="personnel_adddeptdialog.jsp"%>
+	<%@ include file="personnel_addpersondialog.jsp"%>
+	<%@ include file="changedeptDialog.jsp"%>
+	<%@ include file="batchcardDialog.jsp"%>
+	<%@ include file="exportDialog.jsp"%>
+	<%@ include file="importDialog.jsp"%>
+	
+
+	<%@ include file="../../../common/jsp/common_js.jsp"%>
+	<!-- <script src="/pages/pfm/carmanage/js/jquery.shCircleLoader.js" type="text/javascript"></script> -->
+	<script src="/pages/personnel/personnel.js" type="text/javascript"></script>
+
+</body>
+</html>

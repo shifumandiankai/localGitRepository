@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.wadejerry.scms.modules.pfm.dao.PfmFeeRecMapper">
+<resultMap type="com.wadejerry.scms.modules.pfm.dto.PfmFeeRecDto" id="DtoResult">
+<id column="pfm_fee_rec_id" property="pfmFeeRecId" jdbcType="INTEGER"/>
+<result column="bim_company_id" property="bimCompanyId" jdbcType="INTEGER"/>
+<result column="car_type_name" property="carTypeName" jdbcType="VARCHAR" />
+<result column="car_type_id" property="carTypeId" jdbcType="INTEGER" />
+<result column="car_number" property="carNumber" jdbcType="VARCHAR" />
+<result column="person_name" property="personName" jdbcType="VARCHAR"  />
+<result column="card_id" property="cardId" jdbcType="INTEGER"  />
+<result column="fee" property="fee" jdbcType="VARCHAR" />
+<result column="last_fee" property="lastFee" jdbcType="NUMERIC" />
+<result column="disable_time" property="disableTime" jdbcType="TIMESTAMP" />
+<result column="last_disable_time" property="lastDisableTime" jdbcType="TIMESTAMP" />
+<result column="type_id" property="typeId" jdbcType="INTEGER" />
+<result column="time" property="time" jdbcType="TIMESTAMP" />
+<result column="user_name" property="userName" jdbcType="VARCHAR" />
+<result column="insert_time" property="insertTime" jdbcType="TIMESTAMP" />
+<result column="merchant_id" property="merchantId" jdbcType="INTEGER" />
+<result column="merchant_name" property="merchantName" jdbcType="INTEGER" />
+<result column="app_id" property="appId" jdbcType="INTEGER" />
+<result column="app_code" property="appCode" jdbcType="VARCHAR" />
+<result column="trade_id" property="tradeId" jdbcType="INTEGER" />
+<result column="pay_method" property="payMethod" jdbcType="INTEGER" />
+<result column="note" property="note" jdbcType="VARCHAR" />
+<result column="before_disable_time" property="beforeDisableTime" jdbcType="TIMESTAMP" />
+<result column="car_id" property="carId" jdbcType="INTEGER" />
+</resultMap>
+
+<resultMap type="com.wadejerry.scms.modules.pfm.model.PfmFeeRec" id="BaseResultMap">
+<id column="pfm_fee_rec_id" property="pfmFeeRecId" jdbcType="INTEGER"/>
+<result column="bim_company_id" property="bimCompanyId" jdbcType="INTEGER"/>
+<result column="car_type_name" property="carTypeName" jdbcType="VARCHAR" />
+<result column="car_type_id" property="carTypeId" jdbcType="INTEGER" />
+<result column="car_number" property="carNumber" jdbcType="VARCHAR" />
+<result column="person_name" property="personName" jdbcType="VARCHAR"  />
+<result column="card_id" property="cardId" jdbcType="VARCHAR"  />
+<result column="fee" property="fee" jdbcType="VARCHAR" />
+<result column="last_fee" property="lastFee" jdbcType="NUMERIC" />
+<result column="disable_time" property="disableTime" jdbcType="TIMESTAMP" />
+<result column="last_disable_time" property="lastDisableTime" jdbcType="TIMESTAMP" />
+<result column="type_id" property="typeId" jdbcType="VARCHAR" />
+<result column="time" property="time" jdbcType="TIMESTAMP" />
+<result column="user_name" property="userName" jdbcType="VARCHAR" />
+<result column="insert_time" property="insertTime" jdbcType="TIMESTAMP" />
+<result column="merchant_id" property="merchantId" jdbcType="INTEGER" />
+<result column="merchant_name" property="merchantName" jdbcType="INTEGER" />
+<result column="app_id" property="appId" jdbcType="INTEGER" />
+<result column="app_code" property="appCode" jdbcType="VARCHAR" />
+<result column="trade_id" property="tradeId" jdbcType="INTEGER" />
+<result column="pay_method" property="payMethod" jdbcType="INTEGER" />
+<result column="note" property="note" jdbcType="VARCHAR" />
+<result column="before_disable_time" property="beforeDisableTime" jdbcType="TIMESTAMP" />
+<result column="car_id" property="carId" jdbcType="INTEGER" />
+</resultMap>
+
+
+
+
+
+
+
+<!-- 查询账户消费记录，用来显示前10条记录 -->
+<select id="selectRecording" parameterType="int" resultMap="DtoResult" >
+select * from pfm_fee_rec where car_id=#{0} and bim_company_id=#{1} order by time desc limit 10
+</select>
+<!-- 查询最大流水号 -->
+<select id="selectMaxTradeId" resultType="java.lang.Integer" >
+select max(trade_id) from pfm_fee_rec where car_id=#{0} 
+</select>
+<!-- 根据消费类型查询最大流水号 -->
+<select id="selectMaxTradeIdByType" resultType="java.lang.Integer" >
+<!-- select max(trade_id) from pfm_fee_rec where car_id=#{0} and type_id=#{1} -->
+select max(trade_id) from pfm_fee_rec where  type_id=#{0}
+</select>
+<!-- 查询最大到期时间 -->
+
+<select id="SelectMaxDisableTime" resultType="java.util.Date">
+	<!-- select max(disable_time) from (select disable_time from  pfm_fee_rec where car_id=#{0} and type_id=#{1} )as a  -->
+	select max(disable_time) from  pfm_fee_rec where car_id=#{0} and type_id=#{1} 
+</select>
+
+<!-- 根据carInfoId和流水号查询信息 -->
+<select id="selectInfo" resultMap="DtoResult">
+select * from pfm_fee_rec where car_id=#{0} and trade_id=#{1}
+</select>
+<!-- 充值信息，添加消费记录 -->
+<insert id="insertchongInfo" parameterType="com.wadejerry.scms.modules.pfm.dto.PfmFeeRecDto">
+insert into pfm_fee_rec(bim_company_id,car_type_name,car_type_id,person_name,car_number,card_id,fee,last_fee,disable_time,last_disable_time,type_id,time,car_id,trade_id,app_id,app_code,pay_method,insert_time) values (#{bimCompanyId,jdbcType=INTEGER},#{carTypeName,jdbcType=VARCHAR},#{carTypeId,jdbcType=INTEGER},#{personName,jdbcType=VARCHAR},#{carNumber, jdbcType=VARCHAR},#{cardId, jdbcType=VARCHAR},#{fee, jdbcType=DECIMAL},#{lastFee, jdbcType=DECIMAL},#{disableTime, jdbcType=TIMESTAMP},#{lastDisableTime, jdbcType=TIMESTAMP},#{typeId,jdbcType=INTEGER},#{time, jdbcType=TIMESTAMP},#{carId,jdbcType=INTEGER},#{tradeId,jdbcType=INTEGER},#{appId,jdbcType=INTEGER},#{appCode, jdbcType=VARCHAR},#{payMethod,jdbcType=INTEGER},#{insertTime, jdbcType=TIMESTAMP})
+</insert>
+<!-- 查询最后一次充值时间 -->
+<select id="selectMaxTime" parameterType="java.lang.Integer">
+select max(time) from pfm_fee_rec where type_id=0 and car_id=#{0}
+</select>
+<!-- 所有充值金额(不算本次的) -->
+<select id="selectFeeTatal"  parameterType="java.lang.Integer" resultType="java.lang.String">
+select sum(fee) from pfm_fee_rec where car_id=#{0} and type_id=0
+</select>
+<!-- 查找car_id在pfm_fee_rec是否存在这条记录 -->
+<select id="selectPFRInfo" parameterType="java.lang.Integer"  resultMap="DtoResult" >
+select * from pfm_fee_rec where car_id=#{0} and bim_company_id=#{1}
+</select>
+<!-- 查找pfm_fee_rec是否存在记录 -->
+<select id="selectPFRAllInfo"   resultMap="DtoResult" >
+select * from pfm_fee_rec  
+<!-- select * from pfm_fee_rec where car_id=#{0} and type_id={1} and bim_company_id=#{2} -->
+</select>
+<!-- 所有金额(不算本次的) -->
+<select id="selectAllFeeTatal"  parameterType="java.lang.Integer" resultType="java.lang.Double">
+select sum(fee) from pfm_fee_rec where car_id=#{0} and type_id=#{1} and bim_company_id=#{2} 
+</select>
+<!-- 根据类型查询记录表 -->
+<select id="selectInfoByType"   resultType="java.lang.Integer">
+select count(*) from pfm_fee_rec where car_id=#{0} and type_id=#{1} and bim_company_id=#{2} and fee!=null
+</select>
+
+
+<select id="getFeeReportCount"   resultType="java.lang.Integer">
+select count(*) from pfm_fee_rec <where>
+<if test="startTime!=null"> and insert_time &gt;=#{startTime}  </if>
+<if test="endTime!=null">and  insert_time  &lt;=#{endTime}</if>
+<if test="carNumber!=null">and car_number like CONCAT('%',#{carNumber},'%')</if>
+<if test="listtypeId!=null">and car_type_id in <foreach item="item" index="index" collection="listtypeId" open="(" separator="," close=")">
+#{item,jdbcType=INTEGER}
+</foreach>
+</if>
+<if test="accountType!=null">
+<choose>
+<when test="accountType==0">  
+                and disable_time is not null
+ </when >
+<otherwise>  
+                and disable_time is null
+       </otherwise>  
+</choose>
+</if>
+<if test="typeId!=null"> and type_id=#{typeId}  </if>
+<if test="size!=null">and 1=-1</if></where>
+
+</select>
+
+
+<select id="getFeeReportListByPage"   resultMap="BaseResultMap">
+select car_number,person_name,car_type_name,(case type_id when 0 then '充值' when 1 then '退款' end )type_id,fee,disable_time,insert_time
+from pfm_fee_rec <where>
+<if test="searchValue0=null"> and insert_time &gt;=#{searchValue0,jdbcType=TIMESTAMP}  </if>
+<if test="searchValue1!=null">and  insert_time  &lt;=#{searchValue1,jdbcType=TIMESTAMP}</if>
+<if test="searchValue2!=null">and car_number like CONCAT('%',#{searchValue2,jdbcType=VARCHAR},'%')</if>
+<if test="listType!=null">and car_type_id in <foreach item="item" index="index" collection="listType" open="(" separator="," close=")">
+#{item,jdbcType=INTEGER}
+</foreach>
+</if>
+<if test="intValue6!=-1">
+<choose>
+<when test="intValue6==0">  
+                and disable_time is not null
+ </when >
+<otherwise>  
+                and disable_time is null
+       </otherwise>  
+</choose>
+</if>
+<if test="intValue5!=-1"> and type_id=#{intValue5,jdbcType=INTEGER}  </if>
+<if test="size!=null">and 1=-1</if></where>
+ ${order} 
+LIMIT  #{length,jdbcType=INTEGER} OFFSET  #{start,jdbcType=INTEGER} 
+</select>
+
+<select id="exportaccount"   resultType="java.util.HashMap">
+select car_number,person_name,car_type_name,(case type_id when 0 then '充值' when 1 then '退款' end )type_id,fee,disable_time,insert_time from pfm_fee_rec
+<where>
+<if test="startTime!=null"> and insert_time &gt;=#{startTime}  </if>
+<if test="endTime!=null">and  insert_time  &lt;=#{endTime}</if>
+<if test="carNumber!=null">and car_number like CONCAT('%',#{carNumber},'%')</if>
+<if test="listTypeId!=null">and car_type_id in <foreach item="item" index="index" collection="listTypeId" open="(" separator="," close=")">
+#{item,jdbcType=INTEGER}
+</foreach>
+</if>
+<if test="accountType!=-1">
+<choose>
+<when test="accountType==0">  
+                and disable_time is not null
+ </when >
+<otherwise>  
+                and disable_time is null
+       </otherwise>  
+</choose>
+</if>
+<if test="typeId!=-1"> and type_id=#{typeId}  </if>
+
+</where>
+<if test="order!=null">${order}</if>
+</select>
+
+</mapper>

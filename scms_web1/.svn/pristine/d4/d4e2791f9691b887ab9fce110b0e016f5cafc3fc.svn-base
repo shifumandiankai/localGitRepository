@@ -1,0 +1,19 @@
+package com.wadejerry.scms.modules.onecard.serviceImpl;
+
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.wadejerry.scms.modules.onecard.dao.BimPersonPhotoMapper;
+import com.wadejerry.scms.modules.onecard.model.BimPersonPhoto;
+import com.wadejerry.scms.modules.onecard.service.BimPersonPhotoService;
+
+public class BimPersonPhotoServiceImpl implements BimPersonPhotoService{
+	@Autowired
+	private BimPersonPhotoMapper bimPersonPhotoMapper; 
+	
+	@Override
+	public void insertInfo(BimPersonPhoto bimPersonPhoto) {
+		bimPersonPhotoMapper.insertInfo(bimPersonPhoto);
+		
+	}
+
+}

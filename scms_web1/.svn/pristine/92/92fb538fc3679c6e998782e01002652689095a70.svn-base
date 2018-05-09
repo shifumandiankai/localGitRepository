@@ -1,0 +1,95 @@
+package com.wadejerry.scms.modules.onecard.dto;
+
+public class PersonManagerDto {
+	private Integer personId;
+	private String personCode;
+	private String personName;
+	private Integer sex;
+	private String certId;
+	private String certtype;
+	private String pinyin;
+	private String phone;
+	private Integer deptLevel;
+	private Integer bimDeptId;
+	private String strsex;
+	private String deptName;
+	public Integer getPersonId() {
+		return personId;
+	}
+	public void setPersonId(Integer personId) {
+		this.personId = personId;
+	}
+	public String getPersonName() {
+		return personName;
+	}
+	public void setPersonName(String personName) {
+		this.personName = personName;
+	}
+	public String  getSex() {
+		String result=null;
+		if(sex==0){
+			result="男";
+		}else{
+			result="女";
+		}
+		return result;
+	}
+	public void setSex(Integer sex) {
+		this.sex = sex;
+	}
+	public String getCertId() {
+		return certId;
+	}
+	public void setCertId(String certId) {
+		this.certId = certId;
+	}
+	public String getCerttype() {
+		return certtype;
+	}
+	public void setCerttype(String certtype) {
+		this.certtype = certtype;
+	}
+	public String getPinyin() {
+		return pinyin;
+	}
+	public void setPinyin(String pinyin) {
+		this.pinyin = pinyin;
+	}
+	public String getPhone() {
+		return phone;
+	}
+	public void setPhone(String phone) {
+		this.phone = phone;
+	}
+	public String getPersonCode() {
+		return personCode;
+	}
+	public void setPersonCode(String personCode) {
+		this.personCode = personCode;
+	}
+	public Integer getDeptLevel() {
+		return deptLevel;
+	}
+	public void setDeptLevel(Integer deptLevel) {
+		this.deptLevel = deptLevel;
+	}
+	public Integer getBimDeptId() {
+		return bimDeptId;
+	}
+	public void setBimDeptId(Integer bimDeptId) {
+		this.bimDeptId = bimDeptId;
+	}
+	public String getStrsex() {
+		return strsex;
+	}
+	public void setStrsex(String strsex) {
+		this.strsex = strsex;
+	}
+	public String getDeptName() {
+		return deptName;
+	}
+	public void setDeptName(String deptName) {
+		this.deptName = deptName;
+	}
+	
+}

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper  namespace="com.wadejerry.scms.modules.pfm.dao.PfmCarriagewayDeviceRelMapper">
+<resultMap type="com.wadejerry.scms.modules.pfm.model.PfmCarriagewayDeviceRel" id="BaseMap">
+    <id column="carriageway_device_rel_id" property="carriagewayDeviceRelId" jdbcType="INTEGER" /> 
+    <result column="device_id" property="deviceId" jdbcType="INTEGER" /> 
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="user_name" property="userName" jdbcType="VARCHAR" />
+    <result column="carriageway_id" property="carriagewayId" jdbcType="INTEGER" />
+</resultMap>
+<!-- 更新信息 -->
+<update id="update" parameterType="com.wadejerry.scms.modules.pfm.model.PfmCarriagewayDeviceRel" >
+update pfm_carriageway_device_rel set device_id=#{deviceId,jdbcType=INTEGER},update_time=#{updateTime,jdbcType=TIMESTAMP} where carriageway_id=#{carriagewayId,jdbcType=INTEGER}
+</update>
+<!-- 插入信息 -->
+<insert id="insertInfo" parameterType="com.wadejerry.scms.modules.pfm.model.PfmCarriagewayDeviceRel">
+insert into pfm_carriageway_device_rel(device_id,update_time,carriageway_id) values(#{deviceId,jdbcType=INTEGER},#{updateTime,jdbcType=TIMESTAMP},#{carriagewayId,jdbcType=INTEGER})
+</insert>
+<!-- 查询信息 -->
+<select id="selectDeviceId"  resultMap="BaseMap">
+select * from pfm_carriageway_device_rel where  device_id=#{0}
+</select>
+<!-- 根据车道id查询信息 -->
+<select id="selectByCaId"  resultMap="BaseMap">
+select * from pfm_carriageway_device_rel where carriageway_id=#{0}
+</select>
+<!-- 删除信息 -->
+<delete id="deleteInfo" parameterType="int">
+delete from pfm_carriageway_device_rel where carriageway_id=#{0}
+</delete>
+<!-- 根据deviceid删除信息 -->
+<delete id="deleteByDeviceId" parameterType="int">
+delete from pfm_carriageway_device_rel where device_id=#{0}
+</delete>
+</mapper>

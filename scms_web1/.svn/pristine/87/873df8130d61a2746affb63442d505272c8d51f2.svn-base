@@ -1,0 +1,156 @@
+package com.wadejerry.scms.modules.sysconfig.controller;
+
+import java.rmi.RemoteException;
+import java.util.Date;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.axis2.AxisFault;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.wadejerry.scms.frame.AppContext;
+import com.wadejerry.scms.frame.constant.user.ConstParamSysConfig;
+import com.wadejerry.scms.frame.entity.OperateResult;
+import com.wadejerry.scms.frame.web.SystemParams;
+import com.wadejerry.scms.modules.device.model.PfmServer;
+import com.wadejerry.scms.modules.device.service.ServerService;
+import com.wadejerry.scms.modules.sysconfig.dto.BimSysParamsDto;
+import com.wadejerry.scms.modules.sysconfig.service.BimSysParamsService;
+import com.wadejerry.scms.task.QuartzSchedulerTask;
+import com.wadejerry.scms.utils.AjaxUtil;
+import com.wadejerry.scms.utils.Log.LogManager;
+import com.wadejerry.scms.utils.json.JacksonUtil;
+import com.wadejerry.scms.webservice.client.PfmWebServiceStub;
+import com.wadejerry.scms.webservice.client.PfmWebServiceStub.CalibratingTime;
+import com.wadejerry.scms.webservice.client.PfmWebServiceStub.CalibratingTimeResponse;
+
+@Controller
+public class BimSysParamController {
+	@Autowired
+	private HttpServletResponse response;
+	@Autowired
+	private HttpServletRequest request;
+	@Autowired
+	private BimSysParamsService bimSysParamService;  //参数Service
+	@Autowired
+	private ServerService serverService;	//服务Service
+
+	/**
+	* 更新系统参数
+	* @author zhanying 2017年6月6日 下午1:16:39
+	* @param   
+	* @modificationHistory=========================逻辑或功能性重大变更记录
+	* @modify by user: 
+	* @modify by reason:
+	 */
+	@RequestMapping("/saveSysParams.do")
+	@ResponseBody
+	public void SaveParams() {
+		OperateResult result = new OperateResult(true,"");
+		try {
+			BimSysParamsDto paramDto = JacksonUtil.toObject(request.getParameter("sysparams"), BimSysParamsDto.class);
+			bimSysParamService.UpdateParams(ConstParamSysConfig.LOG_ALARM_PARAM_ID,paramDto.getAlarmLogPreserveMonths());
+			bimSysParamService.UpdateParams(ConstParamSysConfig.LOG_CONFIG_PARAM_ID,paramDto.getConfigLogPreserveMonths());
+			bimSysParamService.UpdateParams(ConstParamSysConfig.LOG_CONTROL_PARAM_ID,paramDto.getCommonLogPreserveMonths());
+			bimSysParamService.UpdateParams(ConstParamSysConfig.LOG_WORD_PARAM_ID,paramDto.getWorkLogPreserveMonths());
+			bimSysParamService.UpdateParams(ConstParamSysConfig.LOG_NET_PARAM_ID,paramDto.getMonitorLogPreserveMonths());
+			bimSysParamService.UpdateParams(ConstParamSysConfig.LOG_AUTO_SET_TIME_STYLE_WEEK_ID,paramDto.getAutoSetTimeStyleWeek());
+			bimSysParamService.UpdateParams(ConstParamSysConfig.LOG_AUTO_SET_TIME_STYLE_ID,paramDto.getAutoSetTimeStyle());
+			bimSysParamService.UpdateParams(ConstParamSysConfig.PFM_PHOTO_SAVE_TIME,paramDto.getPfmPhotoSaveTime());
+			SystemParams.lprPhotoSaveTime =paramDto.getPfmPhotoSaveTime(); //更新图片保存时间
+			//触发定时校时任务
+			try{
+				QuartzSchedulerTask quartzSchedulerTask = (QuartzSchedulerTask)AppContext.getBean("quartzSchedulerTask");
+				if (!quartzSchedulerTask.enableTimeCalibratingTask()) {
+					result.setResult(false);
+					result.setMsg("数据库");
+					LogManager.logInfo("服务设备定时校时计划启动失败");
+				}	
+			}catch(Exception e){
+				LogManager.logException(e);
+				result.setResult(false);
+				result.setMsg("服务设备定时校时计划启动失败");
+			}
+		} catch (Exception e) {
+			LogManager.logException(e);
+			result.setResult(false);
+			result.setMsg("数据保存失败");
+		}
+		AjaxUtil.ajaxWrite(result, response); // 返回成功
+	}
+	
+	/**
+	* 获取系统参数
+	* @author zhanying 2017年6月7日 上午10:17:10
+	* @param   
+	* @modificationHistory=========================逻辑或功能性重大变更记录
+	* @modify by user: 
+	* @modify by reason:
+	 */
+	@RequestMapping("/getSysParams.do")
+	@ResponseBody
+	public void GetSysParams() {
+		BimSysParamsDto paramDto = null; 
+		OperateResult operateResult = new OperateResult(true,"");
+		try {
+			paramDto = new BimSysParamsDto();
+			paramDto.setAlarmLogPreserveMonths(bimSysParamService.GetParamByKey(ConstParamSysConfig.LOG_ALARM_PARAM_ID).getIntValue());
+			paramDto.setConfigLogPreserveMonths(bimSysParamService.GetParamByKey(ConstParamSysConfig.LOG_CONFIG_PARAM_ID).getIntValue());
+			paramDto.setCommonLogPreserveMonths(bimSysParamService.GetParamByKey(ConstParamSysConfig.LOG_CONTROL_PARAM_ID).getIntValue());
+			paramDto.setWorkLogPreserveMonths(bimSysParamService.GetParamByKey(ConstParamSysConfig.LOG_WORD_PARAM_ID).getIntValue());
+			paramDto.setMonitorLogPreserveMonths(bimSysParamService.GetParamByKey(ConstParamSysConfig.LOG_NET_PARAM_ID).getIntValue());
+			paramDto.setAutoSetTimeStyle(bimSysParamService.GetParamByKey(ConstParamSysConfig.LOG_AUTO_SET_TIME_STYLE_ID).getStrValue());
+			paramDto.setAutoSetTimeStyleWeek(bimSysParamService.GetParamByKey(ConstParamSysConfig.LOG_AUTO_SET_TIME_STYLE_WEEK_ID).getIntValue());
+			paramDto.setPfmPhotoSaveTime(bimSysParamService.GetParamByKey(ConstParamSysConfig.PFM_PHOTO_SAVE_TIME).getIntValue());
+		} catch (Exception e) {
+			LogManager.logException(e);
+			operateResult.setResult(false);
+			operateResult.setMsg("获取参数失败");
+		}
+		AjaxUtil.ajaxWriteObject(operateResult,paramDto, response);	//返回数据
+	}
+	
+	/**
+	* 设备服务器校时
+	* @author zhanying 2017年6月7日 上午11:36:44
+	* @param   
+	* @modificationHistory=========================逻辑或功能性重大变更记录
+	* @modify by user: 
+	* @modify by reason:
+	 */
+	@RequestMapping("/timeCalibrating.do")
+	@ResponseBody
+	public void timeCalibrating(){
+		String serverName ="";
+		try {
+			List<PfmServer> serverList =  serverService.selectAllServer(); //获取所有服务
+			for(PfmServer server: serverList) {
+				serverName = server.getServerName();
+				PfmWebServiceStub stub = new PfmWebServiceStub("http://"+server.getIp()+
+						":"+server.getPort()+"/PfmWebService/service");
+				CalibratingTime calibratingTime = new  CalibratingTime();
+				calibratingTime.setTime((new Date()).getTime());
+				CalibratingTimeResponse  calibratingTimeResponse= stub.calibratingTime(calibratingTime);
+				Integer iRet = calibratingTimeResponse.getCalibratingTimeResult().getIRet();
+				if(iRet != 0)
+				{
+					AjaxUtil.ajaxWrite(false,"服务器["+serverName+ "]校时失败！", response); // 返回失败
+					return;
+				}
+			}
+			AjaxUtil.ajaxWrite(true,"", response); // 返回成功
+		} catch (AxisFault e) {
+			LogManager.logException(e);
+			AjaxUtil.ajaxWrite(false,"服务器["+serverName+ "]校时失败！", response); // 返回失败
+		} catch (RemoteException e) {
+			LogManager.logException(e);
+			AjaxUtil.ajaxWrite(false,"服务器["+serverName+ "]校时失败！", response); // 返回失败
+		}
+	}
+	
+}

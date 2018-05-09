@@ -1,0 +1,310 @@
+<%@ page contentType="text/html; charset=UTF-8"%>
+<!DOCTYPE html>
+<html>
+<style>
+.bd {
+    background-color: rgba(187, 224, 222, 0.51);
+    box-shadow: 0 0 1px #CCCCCC;
+    height: 24px;
+    width: 101%;
+}
+ .bd1 {
+padding-top:30px; 
+	
+}	
+.bd2{
+ padding-top:28px; 
+	
+}	
+.bd3{
+ padding-top:32px; 
+	
+}	
+.top{
+padding-top:13px;	
+}	
+.entranceGap{
+	margin: 10px 0px 0px 0px;
+}
+ 
+.bdFooter{
+	margin-right: 50%;
+} 
+
+.bdSelect{
+	width: 30px;
+	height: 30px;
+}
+ 
+/* .col-lg-12{
+	
+} */
+
+</style>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<title>维德杰瑞SCMS管理平台</title>
+<!-- Tell the browser to be responsive to screen width -->
+<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+<%@ include file="../../../common/jsp/common_css.jsp"%>
+<link rel="stylesheet" href="/plugins/datatables/dataTables.bootstrap.css">
+<link rel="stylesheet" href="/pages/pfm/carmanage/css/jquery.shCircleLoader.css">
+<link rel="stylesheet" type="text/css" href="/pages/pfm/carmanage/css/car_manage.css" >
+</head>
+<%@ include file="../../../common/jsp/commonBody.jsp"%>
+<!-- <body class="hold-transition skin-blue sidebar-mini"> -->
+	<div class="wrapper">
+		<%@ include file="../../../common/jsp/top.jsp"%>
+		<%@ include file="/pages/pfm/pfm_menu.jsp"%>
+		<!-- Content Wrapper. Contains page content -->
+		<div class="content-wrapper">
+			<!-- Content Header (Page header) -->
+			<section class="content-header">
+				<h1>
+					出入口管理界面
+				</h1>
+				<ol class="breadcrumb">
+					<li><a href="/index.do"><i class="fa fa-dashboard"></i>主页</a></li>
+					<li class="active">出入口管理</li>
+				</ol>
+			</section>
+			<!-- Main content -->
+			<section class="content">
+			<div class="box">
+				<div class="box-body">
+					<div>
+						<div id="left">
+							
+							<ul id="tree" class="ztree" style="margin-left:10px;"></ul>
+			
+						</div>
+
+						<div id="right">
+						<form id="form1">
+						<input type="hidden" name ="custom1">
+						<!-- <input type="hidden" name ="parkId"> -->
+						<!-- <input type="hidden" name ="carriagewayNamedto"> -->
+						<!-- <input type="hidden" name ="modeldto"> -->
+						<!-- <input type="hidden" name ="carriagewayTypedto"> -->
+						<input type="hidden" name ="selectId">
+						<input type="hidden" name ="parentId">
+						<input type="hidden" name ="etenabled">
+						<input type="hidden" name ="htimeId">
+						<input type="hidden" name ="hentranceName">
+						<input type="hidden" name ="hcarriagewayName">
+						<input type="hidden" name ="hcarriagewayType">
+						<input type="hidden" name ="hinOut">
+						<input type="hidden" name ="hcustom3">
+						<input type="hidden" name ="hreleaseFixed">
+						<input type="hidden" name ="hreleaseTemp">
+						<input type="hidden" name ="hautoReleaseFixed">
+						<input type="hidden" name ="hautoReleaseTemp">
+						<input type="hidden" name ="hdeviceId">
+						<input type="hidden" name ="htimeInterval">
+						<input type="hidden" name ="hcarriageTimeInterval">
+						<input type="hidden" name ="hautoCharge">
+                       <div class="row">
+                       
+               <!--增加间隔， aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa -->
+               	<div class="entranceGap"></div>        
+               <!-- aaaaaaaaaaaaaaaaaaaaa -->
+                       <div class="form-group ">
+						<div class="col-lg-6">
+                        <div class="col-lg-6" ><label for="recipient-name" class="control-label" style="padding-left:15px;">出入口名称</label></div>
+                        <div class="col-lg-6">
+                        <div id ="entranceNameNotice" class="point-out" style="width: 348px;top:-38px; left:0px; display: none;" ></div>
+                        <input type="text" name="entranceName" disabled="disabled"/>
+                        </div>
+                        </div>
+                        <div class="col-lg-6">
+                        <input type="checkbox" name="enabled" value="0" disabled="disabled"><label for="recipient-name" class="control-label" >启用</label>
+                        </div>		
+						</div> 
+						<div class="form-group bd3">
+						<div class="col-lg-6">
+						<div class="col-lg-6"><label for="recipient-name" class="control-label" style="padding-left:15px;">选择时段</label></div>
+						<div class="col-lg-6">
+					    <select  class="form-control" disabled="disabled" name="timeId" style="width:173px;">
+									<option value="-1" selected="true">无</option>
+						</select>
+										 
+						</div>
+						</div>	
+						</div> 
+						<div class="form-group bd2">
+						<div class="col-lg-6">
+                        <div class="col-lg-6"><label for="recipient-name" class="control-label " style="padding-left:14px;">出入口车牌间隔时间(秒)</label></div>
+                        <div class="col-lg-6">
+                        <div id ="timeIntervalNotice" class="point-out" style="width: 348px;top:-38px; left:0px; display: none;" ></div>
+                        <input type="text" name="timeInterval" disabled="disabled"/>
+                        </div>
+                        </div>		
+						</div> 
+						</div>
+                        <div class="form-group top">
+							<div class="nav-tabs-custom">
+								<ul class="nav nav-tabs" id="myTab">
+									<li class="active" name="li1" id="l1"><a href="#lane1" data-toggle="tab">车道1</a></li>
+									<li name="li1" id="l2"><a href="#lane2" data-toggle="tab">车道2</a></li> 
+									<li name="li1" id="l3"><a href="#lane3" data-toggle="tab">车道3</a></li>
+									<li name="li1" id="l4"><a href="#lane4" data-toggle="tab">车道4</a></li>  
+								</ul>
+								<div class="tab-content">
+
+									<!-- <div class="tab-pane active" id="lane1"> -->
+									  
+										<div class="row" style="height:40px">
+										<div class="col-lg-6">
+										<div class="col-lg-6"><label for="recipient-name" class="control-label ">车道名称</label></div>
+										<div class="col-lg-6"  style="padding-left:3px;">
+										<div id ="carriagewayNameNotice" class="point-out" style="width: 348px;top:-38px; left:0px; display: none;" ></div>
+                                        <input type="text" disabled="disabled" name="carriagewayName" style="padding-left:1px;"/>
+                                        </div>
+										</div>
+										<div class="col-lg-6">
+										<input type="checkbox" name="awayenabled" disabled="disabled" value="0"><label for="recipient-name" class="control-label">启用</label>
+										</div>
+										</div>
+										<!-- </div> -->
+										<div class="row bd">
+										<div class="col-lg-12"><label for="recipient-name" class="control-label col-lg-12">车道信息</label></div>
+										</div>
+										<!-- 车道信息 -->
+										<div class="row bd1" >
+										<!-- left -->
+										<div class="col-lg-6">
+										<!-- left1 -->
+										 <div class="form-group">
+										<label for="recipient-name" class="control-label col-lg-6">车卡模式</label> 
+									   <div class="col-lg-6"  style="padding-left:3px;">
+										<select  class="form-control " disabled="disabled" name="model" style="width:173px;">
+										<option value="1">车牌模式</option>
+										</select>
+										</div> 
+										</div> 
+										<!-- /left1 -->
+										<!-- /left1 -->
+										<div class="form-group bd2">
+										<label for="recipient-name" class="control-label col-lg-6">车道类型</label> 
+									   <div class="col-lg-6"  style="padding-left:3px;">
+										<select  class="form-control" name="carriagewayType" disabled="disabled" style="width:173px;">
+										<option value="1">入口</option>
+										<option value="2">出口-不收费</option>
+										<option value="3">出口-收费</option>
+										</select>
+										</div> 
+										</div>
+										<!-- /left3 -->
+										<div class="form-group bd2">
+										<label for="recipient-name" class="control-label col-lg-6">放行模式</label> 
+									   <div class="col-lg-6" id="in1" name="dv"  style="padding-left:3px;">
+										<!-- <input type="checkbox"  /><label for="recipient-name" class="control-label ">车卡一致</label>  -->
+										<input type="checkbox" disabled="disabled" name="inOut" value="0"/><label for="recipient-name" class="control-label " >一进一出</label>
+										</div>
+										</div>
+										
+										<div class="form-group bd2">
+										<label for="recipient-name" class="control-label col-lg-6">军警车辆</label> 
+									   <div class="col-lg-6"   style="padding-left:3px;">
+										<!-- <input type="checkbox"  /><label for="recipient-name" class="control-label ">车卡一致</label>  -->
+										<input type="checkbox" disabled="disabled" name="custom3" value="0"/><label for="recipient-name" class="control-label " >免费放行</label>
+										</div>
+										</div>
+										
+										<div class="form-group bd2" style="height:50px">
+										<label for="recipient-name" class="control-label col-lg-6">车道同车牌间隔时间(秒)</label> 
+									   <div class="col-lg-6"  style="padding-left:3px;">
+										<div id ="carriageTimeIntervalNotice" class="point-out" style="width: 348px;top:-38px; left:0px; display: none;" ></div>
+                                        <input type="text" disabled="disabled" name="carriageTimeInterval"/>
+										</div>
+										</div>
+										
+										<!-- /left3 -->
+										</div>
+										<!-- /left -->
+										<!-- right -->
+										<div class="col-lg-6" id="div1">
+										<div class="form-group">
+										<div class="col-lg-4" style="padding-left:0px;">
+										<label for="recipient-name" class="control-label ">自动放行规则</label>
+										</div>
+										<div class="col-lg-8" style="padding-left:0px;">
+										<div><input type="checkbox" name="releaseFixed" disabled="disabled" value="0"/><label for="recipient-name" class="control-label ">固定车放行</label></div> 
+										<div><input type="checkbox" name="releaseTemp" disabled="disabled" value="0"/><label for="recipient-name" class="control-label ">临时车放行</label></div> 
+										</div>
+										</div> 
+										
+										</div>
+										<div class="col-lg-6" style="display:none;" id="div2">
+										<div class="form-group">
+										<div class="col-lg-4" style="padding-left:0px;">
+										<label for="recipient-name" class="control-label ">自动放行规则</label>
+										</div>
+										<div class="col-lg-8">
+						 				
+										<div><input type="checkbox" name="autoReleaseFixed" disabled="disabled" value="0"/><label for="recipient-name" class="control-label ">固定车若免费则自动放行</label></div>
+										<div><input type="checkbox" name="autoReleaseTemp" disabled="disabled" value="0"/><label for="recipient-name" class="control-label ">临时车若免费则自动放行</label></div> 
+										<div><input type="checkbox" name="autoCharge" disabled="disabled" value="0"/><label for="recipient-name" class="control-label ">储值车自动扣费放行</label></div> 
+										</div>
+										</div> 
+										</div>  
+										<!-- /right -->
+										</div>
+							
+									<div class="row bd">
+										<div class="col-lg-12  "><label for="recipient-name" class="control-label col-lg-12">设备绑定</label></div>
+										</div>
+										
+										<div class="row bd1">
+										<div class="col-lg-12">
+										<label for="recipient-name" class="control-label col-lg-3">选择设备</label>
+										<div class="col-lg-9"  style="padding-left:0px;">
+										<select  class="form-control" disabled="disabled" name="deviceId">
+										</select>
+										 
+										</div>
+										 </div>
+										</div>
+								</div>
+								<!-- /.tabcontent -->
+							</div>
+							</div>
+							</div>
+							<!-- /.nav-tabs-custom -->
+						
+						<!-- /.right -->
+                         </form>
+
+					</div>
+					<!--/. container -->
+                   
+				</div>
+				 
+				<!-- /.box-body -->
+				<div class="modal-footer bdFooter">
+                    <button type="button" class="btn btn-primary" id="btnsmt">
+                        保存修改
+                    </button>
+                </div>
+			</div>
+			<!-- /.box -->
+			
+			</section>
+			
+		</div>
+		<!-- /.content -->
+		 
+		<%@ include file="../../../common/jsp/footer.jsp"%>
+		<%@ include file="../../../common/jsp/sidebar.jsp"%>
+	</div>
+
+	
+	<%-- <%@ include file="importDialog.jsp"%> --%>
+	
+
+	<%@ include file="../../../common/jsp/common_js.jsp"%>
+	 <script src="entrance.js" type="text/javascript"></script> 
+
+</body>
+</html>

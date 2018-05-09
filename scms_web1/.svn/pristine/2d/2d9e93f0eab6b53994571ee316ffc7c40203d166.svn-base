@@ -1,0 +1,14 @@
+package com.wadejerry.scms.modules.sysconfig.dao;
+
+public interface BimsysParamMapper {
+	//public void SaveParams(int alarm,int config,int common,int work,int monitor,int validate,String AutoSetTimeTime);
+	public void updateTimeStyle(String AutoSetTime);
+	public void updateTimeWeek( int validate);
+	public void updateAlarm( int Alarm);
+	public void updateConfig( int Config);
+	public void updateCommon( int Common);
+	public void updateWork( int Work);
+	public void updateMonitor( int Monitor);
+	
+	
+}

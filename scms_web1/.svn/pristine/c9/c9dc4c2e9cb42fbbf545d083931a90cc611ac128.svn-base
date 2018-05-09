@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.wadejerry.scms.modules.device.dao.PfmServerMapper">
+	<resultMap id="BaseResultMap"
+		type="com.wadejerry.scms.modules.device.model.PfmServer">
+		<id column="pfm_server_id" property="pfmServerId" jdbcType="INTEGER" />
+		<result column="bim_company_id" property="bimCompanyId"
+			jdbcType="INTEGER" />
+		<result column="server_name" property="serverName" jdbcType="VARCHAR" />
+		<result column="ip" property="ip" jdbcType="VARCHAR" />
+		<result column="port" property="port" jdbcType="VARCHAR" />
+		<result column="insert_time" property="insertTime" jdbcType="TIMESTAMP" />
+		<result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+		<result column="user_name" property="userName" jdbcType="VARCHAR" />
+		<result column="net_zone_id" property="netZoneId" jdbcType="INTEGER" />
+		<result column="park_id" property="parkId" jdbcType="INTEGER" />
+		<result column="pfm_device_lpr_id" property="pfmDeviceLprId" jdbcType="INTEGER" />
+		<result column="device_name" property="deviceName" jdbcType="VARCHAR" />
+	</resultMap>
+	<sql id="Base_Column_List">
+		pfm_server_id, bim_company_id, server_name, ip, port, insert_time, update_time,
+		user_name,net_zone_id,park_id
+	</sql>
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap"
+		parameterType="java.lang.Integer">
+		select
+		<include refid="Base_Column_List" />
+		from pfm_server
+		where pfm_server_id = #{pfmServerId,jdbcType=INTEGER}
+	</select>
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+		delete from pfm_server
+		where pfm_server_id = #{pfmServerId,jdbcType=INTEGER}
+	</delete>
+	<insert id="insert" parameterType="com.wadejerry.scms.modules.device.model.PfmServer">
+		insert into pfm_server (pfm_server_id, bim_company_id, server_name,
+		ip, port, insert_time,	update_time, user_name,net_zone_id,park_id)
+		values (#{pfmServerId,jdbcType=INTEGER}, #{bimCompanyId,jdbcType=INTEGER},
+		#{serverName,jdbcType=VARCHAR},
+		#{ip,jdbcType=VARCHAR}, #{port,jdbcType=VARCHAR}, #{insertTime,jdbcType=TIMESTAMP},
+		#{updateTime,jdbcType=TIMESTAMP}, #{userName,jdbcType=VARCHAR}, #{netZoneId,jdbcType=INTEGER}, #{parkId,jdbcType=INTEGER}))
+	</insert>
+	<insert id="insertSelective" parameterType="com.wadejerry.scms.modules.device.model.PfmServer">
+		insert into pfm_server
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="pfmServerId != null">
+				pfm_server_id,
+			</if>
+			<if test="bimCompanyId != null">
+				bim_company_id,
+			</if>
+			<if test="serverName != null">
+				server_name,
+			</if>
+			<if test="ip != null">
+				ip,
+			</if>
+			<if test="port != null">
+				port,
+			</if>
+			<if test="insertTime != null">
+				insert_time,
+			</if>
+			<if test="updateTime != null">
+				update_time,
+			</if>
+			<if test="userName != null">
+				user_name,
+			</if>
+			<if test="netZoneId != null">
+				net_zone_id,
+			</if>
+			<if test="parkId != null">
+				park_id,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="pfmServerId != null">
+				#{pfmServerId,jdbcType=INTEGER},
+			</if>
+			<if test="bimCompanyId != null">
+				#{bimCompanyId,jdbcType=INTEGER},
+			</if>
+			<if test="serverName != null">
+				#{serverName,jdbcType=VARCHAR},
+			</if>
+			<if test="ip != null">
+				#{ip,jdbcType=VARCHAR},
+			</if>
+			<if test="port != null">
+				#{port,jdbcType=VARCHAR},
+			</if>
+			<if test="insertTime != null">
+				#{insertTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="updateTime != null">
+				#{updateTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="userName != null">
+				#{userName,jdbcType=VARCHAR},
+			</if>
+			<if test="netZoneId != null">
+				#{netZoneId,jdbcType=INTEGER},
+			</if>
+			<if test="parkId != null">
+				#{parkId,jdbcType=INTEGER},
+			</if>
+			
+		</trim>
+	</insert>
+	<update id="updateByPrimaryKeySelective" parameterType="com.wadejerry.scms.modules.device.model.PfmServer">
+		update pfm_server
+		<set>
+			<if test="bimCompanyId != null">
+				bim_company_id = #{bimCompanyId,jdbcType=INTEGER},
+			</if>
+			<if test="serverName != null">
+				server_name = #{serverName,jdbcType=VARCHAR},
+			</if>
+			<if test="ip != null">
+				ip = #{ip,jdbcType=VARCHAR},
+			</if>
+			<if test="port != null">
+				port = #{port,jdbcType=VARCHAR},
+			</if>
+			<if test="insertTime != null">
+				insert_time = #{insertTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="updateTime != null">
+				update_time = #{updateTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="userName != null">
+				user_name = #{userName,jdbcType=VARCHAR},
+			</if>
+			<if test="netZoneId != null">
+				net_zone_id = #{netZoneId,jdbcType=INTEGER},
+			</if>
+				<if test="parkId != null">
+				park_id = #{parkId,jdbcType=INTEGER},
+			</if>
+		</set>
+		where pfm_server_id = #{pfmServerId,jdbcType=INTEGER}
+	</update>
+	<update id="updateByPrimaryKey" parameterType="com.wadejerry.scms.modules.device.model.PfmServer">
+		update pfm_server
+		set bim_company_id = #{bimCompanyId,jdbcType=INTEGER},
+		server_name = #{serverName,jdbcType=VARCHAR},
+		ip = #{ip,jdbcType=VARCHAR},
+		port = #{port,jdbcType=VARCHAR},
+		insert_time = #{insertTime,jdbcType=TIMESTAMP},
+		update_time = #{updateTime,jdbcType=TIMESTAMP},
+		user_name = #{userName,jdbcType=VARCHAR},
+		net_zone_id=#{netZoneId,jdbcType=INTEGER},
+		park_id = #{parkId,jdbcType=INTEGER}
+		where pfm_server_id = #{pfmServerId,jdbcType=INTEGER}
+	</update>
+
+	<select id="selectCountByTable" resultType="int">
+		select count(pfm_server_id)
+		from pfm_server
+		where bim_company_id=#{companyId}
+
+	</select>
+
+	<select id="selectByTable" resultMap="BaseResultMap">
+		<!-- select
+		<include refid="Base_Column_List" />
+		from pfm_server 
+		where bim_company_id=#{companyId}
+		${pageParam.order}
+		LIMIT
+		#{pageParam.length,jdbcType=INTEGER} OFFSET
+		#{pageParam.start,jdbcType=INTEGER} -->
+		
+		select *
+		from pfm_server s left join pfm_device_lpr l on
+		s.bim_company_id=#{companyId} and s.pfm_server_id=l.pfm_server_id
+		${pageParam.order}
+		LIMIT
+		#{pageParam.length,jdbcType=INTEGER} OFFSET
+		#{pageParam.start,jdbcType=INTEGER}
+		
+
+	</select>
+	<select id="selectCountByIpANDPort" resultType="int">
+		select count(pfm_server_id) from pfm_server where ip=#{ip} and port=#{port} and bim_company_id =#{companyId} 
+	</select>
+	<select id="selectCountByIpANDPortExceptself" resultType="int">
+		select count(pfm_server_id) from pfm_server where ip=#{ip} and port=#{port} and bim_company_id =#{companyId} and pfm_server_id!= #{id}
+	
+	</select>
+	<select id="selectAllTopLot" resultType="java.util.HashMap" parameterType="int">
+		select pfm_parking_lot_id,parking_lot_name from pfm_parking_lot where bim_company_id =#{id} and (in_id is null or in_id=0)
+	
+	</select>
+	<select id="selectParkLotByparkId" resultType="int" >
+		select count(pfm_server_id) from pfm_server where bim_company_id =#{companyId} and park_id=#{parkId}
+	
+	</select>
+	<select id="selectParkLotByparkIdExceptSelf" resultType="int" >
+		select count(pfm_server_id) from pfm_server where bim_company_id =#{companyId} and park_id=#{parkId} and pfm_server_id!=#{id}
+	</select>
+	
+	<select id="selectAllServer" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from pfm_server
+		<!-- where bim_company_id=#{companyId} -->
+	</select>
+</mapper>

@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.wadejerry.scms.modules.pfm.dao.pfmTimeMapper" >
+<resultMap type="com.wadejerry.scms.modules.pfm.dto.TimeDto" id="DtoResultMap">
+<id column="pfm_time_id" property="pfmTimeId" jdbcType="INTEGER"/>
+<result column="time_code" property="timeCode" jdbcType="VARCHAR"/>
+<result column="time_name" property="timeName" jdbcType="VARCHAR"/>
+<result column="begin_time" property="beginTime" jdbcType="TIMESTAMP" />
+<result column="end_time" property="endTime" jdbcType="TIMESTAMP" />
+<result column="day_begin_time1" property="dayBeginTime1" jdbcType="TIME" javaType="java.sql.Time"/>
+<result column="day_end_time1" property="dayEndTime1" jdbcType="TIME" javaType="java.sql.Time" />
+<result column="day_begin_time2" property="dayBeginTime2" jdbcType="TIME" javaType="java.sql.Time"/>
+<result column="day_end_time2" property="dayEndTime2" jdbcType="TIME" javaType="java.sql.Time" />
+<result column="day_begin_time3" property="dayBeginTime3" jdbcType="TIME" javaType="java.sql.Time"/>
+<result column="day_end_time3" property="dayEndTime3" jdbcType="TIME" javaType="java.sql.Time" />
+<result column="day_begin_time4" property="dayBeginTime4" jdbcType="TIME" javaType="java.sql.Time"/>
+<result column="day_end_time4" property="dayEndTime4" jdbcType="TIME" javaType="java.sql.Time" />
+<result column="enable_week" property="enableWeek" jdbcType="VARCHAR"/>
+<!-- <result column="enable_week" property="strweek" jdbcType="VARCHAR"/> -->
+<result column="day_limit" property="dayLimit" jdbcType="INTEGER"/>
+<result column="enable_in" property="enableIn" jdbcType="INTEGER"/>
+<result column="enable_out" property="enableOut" jdbcType="INTEGER"/>
+
+</resultMap>
+<resultMap type="com.wadejerry.scms.modules.pfm.model.PfmTime" id="BasicResultMap">
+<id column="pfm_time_id" property="pfmTimeId" jdbcType="INTEGER"/>
+<result column="bim_company_id" property="bimCompanyId" jdbcType="INTEGER"/>
+<result column="time_code" property="timeCode" jdbcType="VARCHAR"/>
+<result column="time_name" property="timeName" jdbcType="VARCHAR"/>
+<result column="day_limit" property="dayLimit" jdbcType="SMALLINT"/>
+<result column="begin_time" property="beginTime" jdbcType="TIMESTAMP" />
+<result column="end_time" property="endTime" jdbcType="TIMESTAMP" />
+<result column="day_begin_time1" property="dayBeginTime1" jdbcType="TIME" />
+<result column="day_end_time1" property="dayEndTime1" jdbcType="TIME"/>
+<result column="day_begin_time2" property="dayBeginTime2" jdbcType="TIME" javaType="java.sql.Time"/>
+<result column="day_end_time2" property="dayEndTime2" jdbcType="TIME" javaType="java.sql.Time"/>
+<result column="day_begin_time3" property="dayBeginTime3" jdbcType="TIME" javaType="java.sql.Time"/>
+<result column="day_end_time3" property="dayEndTime3" jdbcType="TIME" javaType="java.sql.Time"/>
+<result column="day_begin_time4" property="dayBeginTime4" jdbcType="TIME" javaType="java.sql.Time"/>
+<result column="day_end_time4" property="dayEndTime4" jdbcType="TIME" javaType="java.sql.Time"/>
+<result column="enable_week" property="enableWeek" jdbcType="VARCHAR"/>
+<result column="insert_time" property="insertTime" jdbcType="TIMESTAMP"/>
+<result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+<result column="user_name" property="userName" jdbcType="VARCHAR"/>
+</resultMap>
+<!-- 获取记录总数 -->
+<select id="getRecordTotal" parameterType="com.wadejerry.scms.frame.entity.PageParamsDto" resultType="java.lang.Integer">
+select count(pfm_time_id) from pfm_time where
+  <!-- 如果不是企业操作员，就只有当前用户创建的操作员权限  -->
+  (#{loginUserLevel,jdbcType=INTEGER}=1) and 
+  <!--用户或角色名称模糊查询-->
+  	(#{searchValue0,jdbcType=VARCHAR}='' or time_name like CONCAT('%',#{searchValue0,jdbcType=VARCHAR},'%' ))
+  	<!-- 过滤企业 -->
+  	and bim_company_id = #{companyId,jdbcType=INTEGER}
+</select>
+<!-- 分页获取信息 -->
+  <select id="getTimeListByPage" parameterType="com.wadejerry.scms.frame.entity.PageParamsDto" resultMap="DtoResultMap" >
+   <!--  select pfm_time_id, time_code,time_name,begin_time,end_time,day_begin_time1,day_end_time1,day_begin_time2,day_end_time2,day_begin_time3,day_end_time3,day_begin_time4,day_end_time4,enable_week,day_limit from pfm_time
+	  	where 
+		如果不是企业操作员，就只有当前用户创建的操作员权限 
+	  	(#{loginUserLevel,jdbcType=INTEGER} = 1) and
+	  	用户或角色名称模糊查询
+	  	(#{searchValue0,jdbcType=VARCHAR}='' or time_name like CONCAT('%',#{searchValue0,jdbcType=VARCHAR},'%' )) 
+	  	
+	  	过滤企业
+	  	and (bim_company_id = #{companyId,jdbcType=INTEGER}) ${order} 
+	  	LIMIT  #{length,jdbcType=INTEGER} OFFSET  #{start,jdbcType=INTEGER}   -->
+	  	 select * from pfm_time
+	  	where 
+		<!-- 如果不是企业操作员，就只有当前用户创建的操作员权限  -->
+	  	(#{loginUserLevel,jdbcType=INTEGER} = 1) and
+	  	<!-- 用户或角色名称模糊查询 -->
+	  	(#{searchValue0,jdbcType=VARCHAR}='' or time_name like CONCAT('%',#{searchValue0,jdbcType=VARCHAR},'%' )) 
+	  	
+	  <!-- 	过滤企业 -->
+	  	and (bim_company_id = #{companyId,jdbcType=INTEGER}) ${order} 
+	  	LIMIT  #{length,jdbcType=INTEGER} OFFSET  #{start,jdbcType=INTEGER}  
+  </select>
+  <!-- 查询时段名称是否已经存在 -->
+  <select id="findByTimeName" resultMap="BasicResultMap">
+  select pfm_time_id,bim_company_id,time_code,time_name,day_limit,begin_time,end_time,day_begin_time1,day_end_time1,day_begin_time2,day_end_time2,day_begin_time3,day_end_time3,day_begin_time4,day_end_time4,enable_week,insert_time,update_time,user_name from pfm_time where time_code=#{0} and bim_company_id=#{1}
+  </select>
+  <select id="selectByTimeName" resultMap="BasicResultMap">
+  select * from pfm_time where time_name=#{0} and bim_company_id=#{1}
+  </select>
+  <!-- 添加信息 -->
+  <insert id="insertTimeDto" parameterType="com.wadejerry.scms.modules.pfm.model.PfmTime">
+  insert into pfm_time(time_code,bim_company_id,time_name,day_limit,begin_time,end_time,day_begin_time1,day_end_time1,day_begin_time2,day_end_time2,day_begin_time3,day_end_time3,day_begin_time4,day_end_time4,enable_in,enable_out,enable_week,insert_time ) values(#{timeCode,jdbcType=VARCHAR},1,#{timeName,jdbcType=VARCHAR},#{dayLimit,jdbcType=SMALLINT},#{beginTime,jdbcType=TIMESTAMP},#{endTime,jdbcType=TIMESTAMP},#{dayBeginTime1,jdbcType=TIME},#{dayEndTime1,jdbcType=TIME},#{dayBeginTime2,jdbcType=TIME},#{dayEndTime2,jdbcType=TIME},#{dayBeginTime3,jdbcType=TIME},#{dayEndTime3,jdbcType=TIME},#{dayBeginTime4,jdbcType=TIME},#{dayEndTime4,jdbcType=TIME},#{enableIn,jdbcType=INTEGER},#{enableOut,jdbcType=INTEGER},#{enableWeek,jdbcType=VARCHAR},#{insertTime,jdbcType=TIMESTAMP}) 
+  </insert>
+  <!-- 更新信息 -->
+  <update id="updateTimeDto" parameterType="com.wadejerry.scms.modules.pfm.model.PfmTime">
+  update pfm_time <set> <if test="timeCode != null">time_code=#{timeCode,jdbcType=VARCHAR},</if><if test="timeName != null">time_name=#{timeName, jdbcType=VARCHAR},</if><if test="beginTime != null">begin_time=#{beginTime,jdbcType=TIMESTAMP},</if><if test="endTime != null">end_time=#{endTime,jdbcType=TIMESTAMP},</if><if test="dayBeginTime1 != null">day_begin_time1=#{dayBeginTime1, jdbcType=TIME},</if><if test="dayEndTime1 != null">day_end_time1=#{dayEndTime1,jdbcType=TIME},</if><if test="dayBeginTime2 != null">day_begin_time2=#{dayBeginTime2, jdbcType=TIME},</if><if test="dayEndTime2 != null">day_end_time2=#{dayEndTime2,jdbcType=TIME},</if><if test="dayBeginTime3 != null">day_begin_time3=#{dayBeginTime3, jdbcType=TIME},</if><if test="dayEndTime3 != null">day_end_time3=#{dayEndTime3,jdbcType=TIME},</if><if test="dayBeginTime4 != null">day_begin_time4=#{dayBeginTime4,jdbcType=TIME},</if><if test="dayEndTime4 != null">day_end_time4=#{dayEndTime4,jdbcType=TIME},</if><if test="enableWeek != null">enable_week=#{enableWeek,jdbcType=VARCHAR},</if><if test="updateTime != null">update_time=#{updateTime,jdbcType=TIMESTAMP},</if><if test="enableIn != null">enable_in=#{enableIn,jdbcType=INTEGER},</if><if test="enableOut != null">enable_out=#{enableOut,jdbcType=INTEGER}</if></set> 
+  where pfm_time_id=#{pfmTimeId, jdbcType=INTEGER}
+  </update>
+  <!-- 删除信息 -->
+  <delete id="deleteTimeById" parameterType="java.lang.Integer">
+  delete from pfm_time where pfm_time_id=#{pfmTimeId,jdbcType=INTEGER}
+  </delete>
+  <!-- 绑定时段 -->
+  <select id="configTime"  resultMap="DtoResultMap">
+  select pfm_time_id,time_name from pfm_time where bim_company_id=#{0}
+  </select>
+  </mapper>

@@ -1,0 +1,102 @@
+package com.wadejerry.scms.modules.onecard.controller;
+
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.wadejerry.scms.frame.entity.OperateResult;
+import com.wadejerry.scms.modules.onecard.model.BimCard;
+import com.wadejerry.scms.modules.onecard.service.BimCardService;
+import com.wadejerry.scms.utils.AjaxUtil;
+
+@Controller
+public class BimCardController {
+	@Autowired
+	private HttpServletResponse response;
+	@Autowired
+	private HttpServletRequest request;
+	@Autowired
+	private BimCardService bimCardService;
+	
+	@RequestMapping("/Card/cardInfo.do")
+	@ResponseBody
+	private void GetCardInfoByPage() {
+		String personId=request.getParameter("personId");
+		List<BimCard> list=bimCardService.selectCardInfoByPage(Integer.valueOf(personId));
+		AjaxUtil.ajaxWriteObject(list, response);
+	}
+	/*
+	 * 换卡
+	 */
+	@RequestMapping("/Card/updateswapCardInfo.do")
+	@ResponseBody
+	private void UpdateCardInfo() {
+		OperateResult operateResult=new OperateResult();
+		try{
+			String cardId=request.getParameter("cardId");
+			String bimCardId=request.getParameter("bimCardId");
+			bimCardService.updateCardInfo(Integer.valueOf(bimCardId),cardId);
+			operateResult.setResult(true);
+			operateResult.setMsg("换卡成功");
+		}catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+			operateResult.setResult(false);
+			operateResult.setMsg("换卡失败");
+		}
+		AjaxUtil.ajaxWrite(operateResult,response);
+		
+	}
+	/*
+	 * 挂失
+	 */
+	@RequestMapping("/Card/updatelossCardInfo.do")
+	@ResponseBody
+	private void UpdatelossCardInfo() {
+		OperateResult operateResult=new OperateResult();
+		Integer type=0;
+		try{
+			String bimCardId=request.getParameter("bimCardId");
+			bimCardService.updateStatusCardInfo(Integer.valueOf(bimCardId),type);
+			operateResult.setResult(true);
+			operateResult.setMsg("挂失成功");
+		}catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+			operateResult.setResult(false);
+			operateResult.setMsg("挂失失败");
+		}
+		AjaxUtil.ajaxWrite(operateResult,response);
+		
+	}
+	
+	/*
+	 * 解挂
+	 */
+	@RequestMapping("/Card/updateunlossCardInfo.do")
+	@ResponseBody
+	private void UpdateunlossCardInfo() {
+		OperateResult operateResult=new OperateResult();
+		Integer type=1;
+		try{
+			String bimCardId=request.getParameter("bimCardId");
+			bimCardService.updateStatusCardInfo(Integer.valueOf(bimCardId),type);
+			operateResult.setResult(true);
+			operateResult.setMsg("解挂成功");
+		}catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+			operateResult.setResult(false);
+			operateResult.setMsg("解挂失败");
+		}
+		AjaxUtil.ajaxWrite(operateResult,response);
+		
+	}
+	 
+}

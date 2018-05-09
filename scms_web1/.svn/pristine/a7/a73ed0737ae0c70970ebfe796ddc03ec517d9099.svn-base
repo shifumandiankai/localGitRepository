@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.wadejerry.scms.modules.auth.dao.BimRoleAuthMapper" >
+  <resultMap id="BaseResultMap" type="com.wadejerry.scms.modules.auth.model.BimRoleAuth" >
+    <id column="bim_role_auth_id" property="bimRoleAuthId" jdbcType="INTEGER" />
+    <result column="role_id" property="roleId" jdbcType="INTEGER" />
+    <result column="bim_authorization_id" property="bimAuthorizationId" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    bim_role_auth_id, role_id, bim_authorization_id, create_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from bim_role_auth
+    where bim_role_auth_id = #{bimRoleAuthId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from bim_role_auth
+    where bim_role_auth_id = #{bimRoleAuthId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.wadejerry.scms.modules.auth.model.BimRoleAuth" >
+    insert into bim_role_auth (bim_role_auth_id, role_id, bim_authorization_id, 
+      create_time)
+    values (#{bimRoleAuthId,jdbcType=INTEGER}, #{roleId,jdbcType=INTEGER}, #{bimAuthorizationId,jdbcType=INTEGER}, 
+      #{createTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.wadejerry.scms.modules.auth.model.BimRoleAuth" >
+    insert into bim_role_auth
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="bimRoleAuthId != null" >
+        bim_role_auth_id,
+      </if>
+      <if test="roleId != null" >
+        role_id,
+      </if>
+      <if test="bimAuthorizationId != null" >
+        bim_authorization_id,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="bimRoleAuthId != null" >
+        #{bimRoleAuthId,jdbcType=INTEGER},
+      </if>
+      <if test="roleId != null" >
+        #{roleId,jdbcType=INTEGER},
+      </if>
+      <if test="bimAuthorizationId != null" >
+        #{bimAuthorizationId,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.wadejerry.scms.modules.auth.model.BimRoleAuth" >
+    update bim_role_auth
+    <set >
+      <if test="roleId != null" >
+        role_id = #{roleId,jdbcType=INTEGER},
+      </if>
+      <if test="bimAuthorizationId != null" >
+        bim_authorization_id = #{bimAuthorizationId,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where bim_role_auth_id = #{bimRoleAuthId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.wadejerry.scms.modules.auth.model.BimRoleAuth" >
+    update bim_role_auth
+    set role_id = #{roleId,jdbcType=INTEGER},
+      bim_authorization_id = #{bimAuthorizationId,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=TIMESTAMP}
+    where bim_role_auth_id = #{bimRoleAuthId,jdbcType=INTEGER}
+  </update>
+  
+  <delete id="deleteByRoleId" parameterType="int">
+  
+  delete  from bim_role_auth where role_id=#{id}
+  </delete>
+</mapper>

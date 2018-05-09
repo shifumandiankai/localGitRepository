@@ -1,0 +1,641 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.wadejerry.scms.modules.pfm.dao.PfmCarInfoMapper">
+	<resultMap id="BaseResultMap"
+		type="com.wadejerry.scms.modules.pfm.model.PfmCarInfo">
+		<id column="car_info_id" property="carInfoId" jdbcType="INTEGER" />	
+		<result column="person_id" property="personId" jdbcType="INTEGER" />
+		<result column="bim_company_id" property="bimCompanyId" jdbcType="INTEGER" />		
+		<result column="car_number" property="carNumber" jdbcType="VARCHAR" />
+		<result column="person_name" property="personName" jdbcType="VARCHAR" />
+		<result column="card_id" property="cardId" jdbcType="VARCHAR" />
+		<result column="cert_id" property="certId" jdbcType="VARCHAR" />
+		<result column="addres" property="addres" jdbcType="VARCHAR" />
+		<result column="phone" property="phone" jdbcType="VARCHAR" />
+		<result column="sex" property="sex" jdbcType="SMALLINT" />
+		<result column="photo" property="photo" jdbcType="VARCHAR" />
+		<result column="status" property="status" jdbcType="INTEGER"/>
+		<result column="enable_time" property="enableTime" jdbcType="TIMESTAMP"/>
+		<result column="disable_time" property="disableTime" jdbcType="TIMESTAMP" />
+		<result column="insert_time" property="insertTime" jdbcType="TIMESTAMP" />
+		<result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+		<result column="note" property="note" jdbcType="VARCHAR"/>
+		<result column="user_name" property="userName" jdbcType="VARCHAR" />
+		<result column="custom1" property="custom1" jdbcType="INTEGER" />
+		<result column="custom2" property="custom2" jdbcType="INTEGER" />
+		<result column="custom3" property="custom3" jdbcType="VARCHAR" />
+		<result column="custom4" property="custom4" jdbcType="VARCHAR" />
+		<result column="is_del" property="isDel" jdbcType="INTEGER" />
+	</resultMap>
+	<resultMap id="dtoResultMap" type="com.wadejerry.scms.modules.pfm.dto.CarInfoDto">
+		<id column="car_info_id" property="carInfoId" jdbcType="INTEGER" />
+		<result column="person_id" property="personId" jdbcType="INTEGER" />
+		<result column="car_number" property="carNumber" jdbcType="VARCHAR" />
+		<result column="person_name" property="personName" jdbcType="VARCHAR" />
+		<result column="phone" property="phone" jdbcType="VARCHAR" />
+		<result column="card_id" property="cardId" jdbcType="VARCHAR" />
+		<result column="addres" property="addres" jdbcType="VARCHAR" />
+		<result column="note" property="note" jdbcType="VARCHAR" />
+		<result column="cert_id" property="certId" jdbcType="VARCHAR"/>
+		<result column="type_name" property="typeName" jdbcType="VARCHAR"/>
+		<result column="user_name" property="userName" jdbcType="VARCHAR" />
+		<result column="rule_name" property="ruleName" jdbcType="VARCHAR" />
+		<result column="enable_time" property="enableTime" jdbcType="DATE" />
+		<result column="disable_time" property="disableTime" jdbcType="DATE" />
+		<result column="sex" property="sex" jdbcType="SMALLINT" />
+		<result column="status" property="status" jdbcType="INTEGER"/>
+		<result column="pfm_parking_lot_id" property="pfmParkingLotId" jdbcType="INTEGER" />
+		<result column="pfm_park_space" property="pfmParkSpace" jdbcType="INTEGER" />
+		<result column="car_type_id" property="carTypeId" jdbcType="INTEGER" />
+		<result column="car_type_rel_id" property="carTypeRelId"
+			jdbcType="INTEGER" />
+
+
+		<result column="pfm_park_space_car_rel_id" property="parkSpaceCarRelId"
+			jdbcType="INTEGER" />
+		<result column="park_space_code" property="parkSpaceCode"
+			jdbcType="VARCHAR" />
+
+
+
+
+
+	</resultMap>
+	<sql id="Base_Column_List">
+		car_info_id, person_id, bim_company_id,
+		 car_number, person_name,
+		card_id,
+		cert_id, addres, phone,
+		sex, photo, status, enable_time, disable_time,
+		insert_time,
+		update_time, note, user_name, custom1, custom2, custom3, custom4,is_del
+	</sql>
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap"
+		parameterType="java.lang.Integer">
+		select
+		<include refid="Base_Column_List" />
+		from pfm_car_info
+		where car_info_id = #{carInfoId,jdbcType=INTEGER}
+	</select>
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+		delete from
+		pfm_car_info
+		where car_info_id = #{carInfoId,jdbcType=INTEGER}
+	</delete>
+
+	<insert id="insert" parameterType="com.wadejerry.scms.modules.pfm.model.PfmCarInfo">
+		insert into pfm_car_info
+		(car_info_id, person_id,
+		bim_company_id,
+		
+		car_number, person_name,
+		card_id, cert_id, addres,
+		phone, sex, photo,
+		status, enable_time, disable_time,
+		insert_time, update_time, note,
+		user_name, custom1, custom2,
+		custom3, custom4,is_del)
+		values
+		(#{carInfoId,jdbcType=INTEGER},
+		#{personId,jdbcType=INTEGER}, #{bimCompanyId,jdbcType=INTEGER},
+		 #{carNumber,jdbcType=VARCHAR},
+		#{personName,jdbcType=VARCHAR},
+		#{cardId,jdbcType=VARCHAR},
+		#{certId,jdbcType=VARCHAR}, #{addres,jdbcType=VARCHAR},
+		#{phone,jdbcType=VARCHAR}, #{sex,jdbcType=SMALLINT},
+		#{photo,jdbcType=VARCHAR},
+		#{status,jdbcType=INTEGER},
+		#{enableTime,jdbcType=TIMESTAMP}, #{disableTime,jdbcType=TIMESTAMP},
+		#{insertTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP},
+		#{note,jdbcType=VARCHAR},
+		#{userName,jdbcType=VARCHAR},
+		#{custom1,jdbcType=INTEGER}, #{custom2,jdbcType=INTEGER},
+		#{custom3,jdbcType=VARCHAR}, #{custom4,jdbcType=VARCHAR},#{isDel,jdbcType=INTEGER})
+	</insert>
+	<insert id="insertSelective" parameterType="com.wadejerry.scms.modules.pfm.model.PfmCarInfo"
+		useGeneratedKeys="true" keyProperty="carInfoId">
+		insert into pfm_car_info
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="carInfoId != null">
+				car_info_id,
+			</if>
+			
+			<if test="personId != null">
+				person_id,
+			</if>
+			<if test="bimCompanyId != null">
+				bim_company_id,
+			</if>
+			
+			<if test="carNumber != null">
+				car_number,
+			</if>
+			<if test="personName != null">
+				person_name,
+			</if>
+			<if test="cardId != null">
+				card_id,
+			</if>
+			<if test="certId != null">
+				cert_id,
+			</if>
+			<if test="addres != null">
+				addres,
+			</if>
+			<if test="phone != null">
+				phone,
+			</if>
+			<if test="sex != null">
+				sex,
+			</if>
+			<if test="photo != null">
+				photo,
+			</if>
+			<if test="status != null">
+				status,
+			</if>
+			<if test="enableTime != null">
+				enable_time,
+			</if>
+			<if test="disableTime != null">
+				disable_time,
+			</if>
+			<if test="insertTime != null">
+				insert_time,
+			</if>
+			<if test="updateTime != null">
+				update_time,
+			</if>
+			<if test="note != null">
+				note,
+			</if>
+			<if test="userName != null">
+				user_name,
+			</if>
+			<if test="custom1 != null">
+				custom1,
+			</if>
+			<if test="custom2 != null">
+				custom2,
+			</if>
+			<if test="custom3 != null">
+				custom3,
+			</if>
+			<if test="custom4 != null">
+				custom4,
+			</if>
+			<if test="isDel != null">
+				is_del,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="carInfoId != null">
+				#{carInfoId,jdbcType=INTEGER},
+			</if>
+			
+			<if test="personId != null">
+				#{personId,jdbcType=INTEGER},
+			</if>
+			<if test="bimCompanyId != null">
+				#{bimCompanyId,jdbcType=INTEGER},
+			</if>
+			
+			<if test="carNumber != null">
+				#{carNumber,jdbcType=VARCHAR},
+			</if>
+			<if test="personName != null">
+				#{personName,jdbcType=VARCHAR},
+			</if>
+			<if test="cardId != null">
+				#{cardId,jdbcType=VARCHAR},
+			</if>
+			<if test="certId != null">
+				#{certId,jdbcType=VARCHAR},
+			</if>
+			<if test="addres != null">
+				#{addres,jdbcType=VARCHAR},
+			</if>
+			<if test="phone != null">
+				#{phone,jdbcType=VARCHAR},
+			</if>
+			<if test="sex != null">
+				#{sex,jdbcType=SMALLINT},
+			</if>
+			<if test="photo != null">
+				#{photo,jdbcType=VARCHAR},
+			</if>
+			<if test="status != null">
+				#{status,jdbcType=INTEGER},
+			</if>
+			<if test="enableTime != null">
+				#{enableTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="disableTime != null">
+				#{disableTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="insertTime != null">
+				#{insertTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="updateTime != null">
+				#{updateTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="note != null">
+				#{note,jdbcType=VARCHAR},
+			</if>
+			<if test="userName != null">
+				#{userName,jdbcType=VARCHAR},
+			</if>
+			<if test="custom1 != null">
+				#{custom1,jdbcType=INTEGER},
+			</if>
+			<if test="custom2 != null">
+				#{custom2,jdbcType=INTEGER},
+			</if>
+			<if test="custom3 != null">
+				#{custom3,jdbcType=VARCHAR},
+			</if>
+			<if test="custom4 != null">
+				#{custom4,jdbcType=VARCHAR},
+			</if>
+			<if test="isDel != null">
+				#{isDel,jdbcType=INTEGER},
+			</if>
+		</trim>
+	</insert>
+	<update id="updateByPrimaryKeySelective" parameterType="com.wadejerry.scms.modules.pfm.model.PfmCarInfo">
+		update pfm_car_info
+		<set>
+			
+			<if test="personId != null">
+				person_id = #{personId,jdbcType=INTEGER},
+			</if>
+			<if test="bimCompanyId != null">
+				bim_company_id = #{bimCompanyId,jdbcType=INTEGER},
+			</if>
+			
+			<if test="carNumber != null">
+				car_number = #{carNumber,jdbcType=VARCHAR},
+			</if>
+			<if test="personName != null">
+				person_name = #{personName,jdbcType=VARCHAR},
+			</if>
+			<if test="cardId != null">
+				card_id = #{cardId,jdbcType=VARCHAR},
+			</if>
+			<if test="certId != null">
+				cert_id = #{certId,jdbcType=VARCHAR},
+			</if>
+			<if test="addres != null">
+				addres = #{addres,jdbcType=VARCHAR},
+			</if>
+			<if test="phone != null">
+				phone = #{phone,jdbcType=VARCHAR},
+			</if>
+			<if test="sex != null">
+				sex = #{sex,jdbcType=SMALLINT},
+			</if>
+			<if test="photo != null">
+				photo = #{photo,jdbcType=VARCHAR},
+			</if>
+			<if test="status != null">
+				status = #{status,jdbcType=INTEGER},
+			</if>
+			<if test="enableTime != null">
+				enable_time = #{enableTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="disableTime != null">
+				disable_time = #{disableTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="insertTime != null">
+				insert_time = #{insertTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="updateTime != null">
+				update_time = #{updateTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="note != null">
+				note = #{note,jdbcType=VARCHAR},
+			</if>
+			<if test="userName != null">
+				user_name = #{userName,jdbcType=VARCHAR},
+			</if>
+			<if test="custom1 != null">
+				custom1 = #{custom1,jdbcType=INTEGER},
+			</if>
+			<if test="custom2 != null">
+				custom2 = #{custom2,jdbcType=INTEGER},
+			</if>
+			<if test="custom3 != null">
+				custom3 = #{custom3,jdbcType=VARCHAR},
+			</if>
+			<if test="custom4 != null">
+				custom4 = #{custom4,jdbcType=VARCHAR},
+			</if>
+			<if test="isDel != null">
+				is_del = #{isDel,jdbcType=INTEGER},
+			</if>
+		</set>
+		where car_info_id = #{carInfoId,jdbcType=INTEGER}
+	</update>
+	
+	<update id="deleteCarinfo" parameterType="int">
+		update
+		pfm_car_info
+		set 
+		is_del='1'
+		where car_info_id =
+		#{carInfoId,jdbcType=INTEGER}
+	</update>
+	<update id="updateByPrimaryKey" parameterType="com.wadejerry.scms.modules.pfm.model.PfmCarInfo">
+		update
+		pfm_car_info
+		set 
+		person_id =
+		#{personId,jdbcType=INTEGER},
+		bim_company_id =
+		#{bimCompanyId,jdbcType=INTEGER},
+		car_number =
+		#{carNumber,jdbcType=VARCHAR},
+		person_name =
+		#{personName,jdbcType=VARCHAR},
+		card_id = #{cardId,jdbcType=VARCHAR},
+		cert_id = #{certId,jdbcType=VARCHAR},
+		addres =
+		#{addres,jdbcType=VARCHAR},
+		phone = #{phone,jdbcType=VARCHAR},
+		sex =
+		#{sex,jdbcType=SMALLINT},
+		photo = #{photo,jdbcType=VARCHAR},
+		status =
+		#{status,jdbcType=INTEGER},
+		enable_time =
+		#{enableTime,jdbcType=TIMESTAMP},
+		disable_time =
+		#{disableTime,jdbcType=TIMESTAMP},
+		insert_time =
+		#{insertTime,jdbcType=TIMESTAMP},
+		update_time =
+		#{updateTime,jdbcType=TIMESTAMP},
+		note = #{note,jdbcType=VARCHAR},
+		user_name = #{userName,jdbcType=VARCHAR},
+		custom1 =
+		#{custom1,jdbcType=INTEGER},
+		custom2 = #{custom2,jdbcType=INTEGER},
+		custom3 = #{custom3,jdbcType=VARCHAR},
+		custom4 =#{custom4,jdbcType=VARCHAR},
+		is_del =#{isDel,jdbcType=INTEGER}
+		where car_info_id =
+		#{carInfoId,jdbcType=INTEGER}
+	</update>
+	<!-- 查询符合条件的数据总条数 -->
+	<select id="selectAllCount" resultType="int">
+		select count(a.car_info_id)
+		FROM <!--子查询  -->(select * from(
+		
+		select * from pfm_car_info where person_id is null
+		union all
+		
+		select x.car_info_id,x.person_id,x.bim_company_id,x.car_number,y.person_name,x.card_id,y.cert_id,y.address,y.phone,y.sex,x.photo,x.status,x.enable_time,x.disable_time,x.insert_time,x.update_time,x.note,x.user_name,x.custom1,x.custom2,x.custom3,x.custom4 ,x.is_del from pfm_car_info x inner join bim_person y on x.person_id=y.person_id
+		
+				
+		) z
+		where (z.car_number like
+		CONCAT('%',#{pageParam.searchValue0,jdbcType=VARCHAR},'%'
+		)or z.phone like
+		CONCAT('%',#{pageParam.searchValue0,jdbcType=VARCHAR},'%' ) or
+		z.person_name like
+		CONCAT('%',#{pageParam.searchValue0,jdbcType=VARCHAR},'%' ))
+		And z.bim_company_id=#{companyId,jdbcType=INTEGER} and z.is_del=0
+		)  a
+		LEFT JOIN pfm_car_type_rel b on
+		a.car_info_id=b.car_info_id
+		LEFT JOIN pfm_car_type c ON
+		b.car_type_id=c.car_type_id 
+		LEFT JOIN pfm_park_space_car_rel d on
+		a.car_info_id = d.car_info_id
+		LEFT JOIN pfm_park_space e on
+		e."pfm_park_space"=d."pfm_park_space"
+		left join pfm_charge_rule g on
+			g.bim_company_id=#{companyId,jdbcType=INTEGER} and c.car_type_id=g.car_type_id		
+		<where>
+		<if test="pageParam.searchValue1!=''.toString()">
+		 to_char(c.car_type_id,'FM999999999MI')=#{pageParam.searchValue1,jdbcType=INTEGER}
+		</if>
+		and (#{pageParam.loginUserLevel}=1<if test="carTypeIds!=null and carTypeIds.size()!=0">  or c.car_type_id in<foreach collection="carTypeIds" item="item" open="(" close=")" separator=",">#{item}</foreach> </if>)
+		</where>
+
+	</select>
+
+	<!-- 按需查询所有数据 -->
+	<select id="selectAllDataBypage" resultMap="dtoResultMap">
+		select
+		a.car_info_id,
+		a.person_id,
+		a.car_number,
+		a.person_name,
+		a.phone,
+		a.note,
+		a.addres,
+       a.user_name,
+       a.card_id,
+       a.cert_id,
+       c.type_name,
+		case a.sex when '0'
+		then '男' when '1' then '女' else '其他' end sex,
+		case a.status when '0'
+		then '正常' when '1' then '挂失' when '2' then '白名单' when '3' then '黑名单'
+		else '' end status,
+		e."park_space_code",d.pfm_park_space_car_rel_id,b.car_type_rel_id,e.pfm_parking_lot_id,e.pfm_park_space,c.car_type_id,
+		g.rule_name,a.enable_time,a.disable_time 
+		FROM <!--子查询  -->(select * from(
+		
+		select * from pfm_car_info where person_id is null
+		union all
+		
+		select x.car_info_id,x.person_id,x.bim_company_id,x.car_number,y.person_name,x.card_id,y.cert_id,y.address,y.phone,y.sex,x.photo,x.status,x.enable_time,x.disable_time,x.insert_time,x.update_time,x.note,x.user_name,x.custom1,x.custom2,x.custom3,x.custom4 ,x.is_del from pfm_car_info x inner join bim_person y on x.person_id=y.person_id
+		
+				
+		) z
+		where (z.car_number like
+		CONCAT('%',#{pageParam.searchValue0,jdbcType=VARCHAR},'%'
+		)or z.phone like
+		CONCAT('%',#{pageParam.searchValue0,jdbcType=VARCHAR},'%' ) or
+		z.person_name like
+		CONCAT('%',#{pageParam.searchValue0,jdbcType=VARCHAR},'%' ))
+		And z.bim_company_id=#{companyId,jdbcType=INTEGER} and z.is_del=0
+		) a
+		LEFT JOIN pfm_car_type_rel b on
+		a.car_info_id=b.car_info_id
+		LEFT JOIN pfm_car_type c ON
+		b.car_type_id=c.car_type_id
+		LEFT JOIN pfm_park_space_car_rel d on
+		a.car_info_id = d.car_info_id
+		LEFT JOIN pfm_park_space e on
+		e."pfm_park_space"=d."pfm_park_space"
+		left join pfm_charge_rule g on
+			g.bim_company_id=#{companyId,jdbcType=INTEGER} and c.car_type_id=g.car_type_id		
+		<where>
+		<if test="pageParam.searchValue1!=''.toString()">
+		 to_char(c.car_type_id,'FM999999999MI')=#{pageParam.searchValue1,jdbcType=INTEGER}
+		</if>
+		and (#{pageParam.loginUserLevel}=1<if test="carTypeIds!=null and carTypeIds.size()!=0">  or c.car_type_id in<foreach collection="carTypeIds" item="item" open="(" close=")" separator=",">#{item}</foreach> </if>)
+		</where>
+		${pageParam.order}
+		LIMIT
+		#{pageParam.length,jdbcType=INTEGER} OFFSET #{pageParam.start,jdbcType=INTEGER}
+
+	</select>
+	<select id="selectifExistbyCarNumber" resultType="int">
+
+		select COUNT(car_info_id)
+		From pfm_car_info
+		where car_number=#{carNumber}
+		AND bim_company_id=#{companyId} and is_del=0
+		
+
+	</select>
+
+
+<select id="selectifExistbyCarNumberExcepself" resultType="int">
+
+		select COUNT(car_info_id)
+		From pfm_car_info
+		where car_number=#{carNumber}
+		AND bim_company_id=#{companyId}
+		AND car_info_id!=#{carInfoId} and is_del=0
+		
+
+	</select>
+	
+	<select id="selectifExistbyCardIdExcepself" resultType="int">
+
+		select COUNT(car_info_id)
+		From pfm_car_info
+		where card_id=#{cardid}
+		AND bim_company_id=#{companyId}
+		AND car_info_id!=#{carInfoId} and is_del=0
+		
+
+	</select>
+	<select id="selectifExistByCardId"  resultType="int">
+	
+		select Count(car_info_id) from pfm_car_info 
+		where bim_company_id=#{companyId} 
+		and card_id=#{cardId}	and is_del=0
+	
+	
+	</select>
+	<select id="selectifExistByCarnum"  resultType="int">
+	
+		select Count(car_info_id) from pfm_car_info 
+		where bim_company_id=#{companyId} 
+		and car_number=#{carnum}	and is_del=0
+	
+	
+	</select>
+		<select id="selectExcel"  resultType="java.util.HashMap" >
+	
+		select a.car_number,a.person_name,case a.sex when '0' then '男' when '1' then '女'  end sex ,
+		a.phone,c.type_name,a.card_id,a.cert_id,a.addres,case a.status when '0' then '正常' when '1' then '挂失' when '2' then '白名单' when '3' then
+		'黑名单' end status,a.enable_time,a.disable_time,a.note
+		from pfm_car_info a
+		left join pfm_car_type_rel b on a.car_info_id = b.car_info_id
+		left join pfm_car_type c on b.car_type_id=c.car_type_id
+		where a.bim_company_id=#{companyId} and a.person_id is null and a.is_del=0
+		<if test="carType!=null">and c.car_type_id = #{carType}</if>
+		<if test="carTypeIds!=null and carTypeIds.size()!=0">
+		and c.car_type_id in
+		<foreach open="(" close=")" separator="," collection="carTypeIds" item="item">
+		#{item}
+		</foreach>
+		</if>
+		<if test="carTypeIds!=null and carTypeIds.size()==0">
+		and 1=-1
+		</if>
+	</select>
+	
+	<select id="selectByCarNum" resultMap="BaseResultMap">
+	select a.* from
+		(select * from pfm_car_info where person_id is null
+			union all
+		 select x.car_info_id,x.person_id,x.bim_company_id,x.car_number,y.person_name,x.card_id,y.cert_id,y.address,y.phone,y.sex,x.photo,x.status,x.enable_time,x.disable_time,x.insert_time,x.update_time,x.note,x.user_name,x.custom1,x.custom2,x.custom3,x.custom4,x.is_del from pfm_car_info x inner join bim_person y on x.person_id=y.person_id
+		)a
+		where a.car_number=#{searchValue,jdbcType=VARCHAR}
+		
+		And a.bim_company_id=#{companyId,jdbcType=INTEGER} 
+		and a.is_del=0
+	
+	</select>
+	
+	<select id="selectCarNumByCarNum"  resultType="String">
+		select a.car_number from (select * from pfm_car_info where person_id is null
+			union all
+		 select x.car_info_id,x.person_id,x.bim_company_id,x.car_number,y.person_name,x.card_id,y.cert_id,y.address,y.phone,y.sex,x.photo,x.status,x.enable_time,x.disable_time,x.insert_time,x.update_time,x.note,x.user_name,x.custom1,x.custom2,x.custom3,x.custom4,x.is_del from pfm_car_info x inner join bim_person y on x.person_id=y.person_id
+		)a where a.car_number like
+		CONCAT('%',#{carNum,jdbcType=VARCHAR},'%'
+		) And a.bim_company_id=#{companyId,jdbcType=INTEGER} 
+		and a.is_del=0
+	</select>
+	<select id="selectCarNumByKaHao"  resultType="String">
+	select a.car_number from (select * from pfm_car_info where person_id is null
+			union all
+		 select x.car_info_id,x.person_id,x.bim_company_id,x.car_number,y.person_name,x.card_id,y.cert_id,y.address,y.phone,y.sex,x.photo,x.status,x.enable_time,x.disable_time,x.insert_time,x.update_time,x.note,x.user_name,x.custom1,x.custom2,x.custom3,x.custom4,x.is_del from pfm_car_info x inner join bim_person y on x.person_id=y.person_id
+		)a where a.card_id like
+		CONCAT('%',#{kahao,jdbcType=VARCHAR},'%'
+		) And a.bim_company_id=#{companyId,jdbcType=INTEGER} 
+		and a.is_del=0
+	</select>
+	<select id="selectCarNumByPhone" resultType="String">
+	select a.car_number from (select * from pfm_car_info where person_id is null
+			union all
+		 select x.car_info_id,x.person_id,x.bim_company_id,x.car_number,y.person_name,x.card_id,y.cert_id,y.address,y.phone,y.sex,x.photo,x.status,x.enable_time,x.disable_time,x.insert_time,x.update_time,x.note,x.user_name,x.custom1,x.custom2,x.custom3,x.custom4,x.is_del from pfm_car_info x inner join bim_person y on x.person_id=y.person_id
+		)a where a.phone like
+		CONCAT('%',#{phone,jdbcType=VARCHAR},'%'
+		) And a.bim_company_id=#{companyId,jdbcType=INTEGER} 
+		and a.is_del=0
+	</select>
+	  
+	  	<select id="selectCarInfoByCarNum"  resultMap="BaseResultMap">
+		select a.* from (select * from pfm_car_info where person_id is null
+			union all
+		 select x.car_info_id,x.person_id,x.bim_company_id,x.car_number,y.person_name,x.card_id,y.cert_id,y.address,y.phone,y.sex,x.photo,x.status,x.enable_time,x.disable_time,x.insert_time,x.update_time,x.note,x.user_name,x.custom1,x.custom2,x.custom3,x.custom4,x.is_del from pfm_car_info x inner join bim_person y on x.person_id=y.person_id
+		)a where a.car_number like
+		CONCAT('%',#{carNum,jdbcType=VARCHAR},'%'
+		) And a.bim_company_id=#{companyId,jdbcType=INTEGER} 
+		and a.is_del=0
+	</select>
+	<select id="selectCarInfoByKaHao"  resultMap="BaseResultMap">
+	select a.* from (select * from pfm_car_info where person_id is null
+			union all
+		 select x.car_info_id,x.person_id,x.bim_company_id,x.car_number,y.person_name,x.card_id,y.cert_id,y.address,y.phone,y.sex,x.photo,x.status,x.enable_time,x.disable_time,x.insert_time,x.update_time,x.note,x.user_name,x.custom1,x.custom2,x.custom3,x.custom4,x.is_del from pfm_car_info x inner join bim_person y on x.person_id=y.person_id
+		)a where a.card_id like
+		CONCAT('%',#{kahao,jdbcType=VARCHAR},'%'
+		) And a.bim_company_id=#{companyId,jdbcType=INTEGER} 
+		and a.is_del=0
+	</select>
+	<select id="selectCarInfoByPhone" resultMap="BaseResultMap">
+	select a.* from (select * from pfm_car_info where person_id is null
+			union all
+		 select x.car_info_id,x.person_id,x.bim_company_id,x.car_number,y.person_name,x.card_id,y.cert_id,y.address,y.phone,y.sex,x.photo,x.status,x.enable_time,x.disable_time,x.insert_time,x.update_time,x.note,x.user_name,x.custom1,x.custom2,x.custom3,x.custom4,x.is_del from pfm_car_info x inner join bim_person y on x.person_id=y.person_id
+		)a where a.phone like
+		CONCAT('%',#{phone,jdbcType=VARCHAR},'%'
+		) And a.bim_company_id=#{companyId,jdbcType=INTEGER} 
+		and a.is_del=0
+	</select>
+	
+	
+  <select id="selectAllCarNum" parameterType="int" resultType="String">
+  select a.car_number from (select * from pfm_car_info where person_id is null
+			union all
+		 select x.car_info_id,x.person_id,x.bim_company_id,x.car_number,y.person_name,x.card_id,y.cert_id,y.address,y.phone,y.sex,x.photo,x.status,x.enable_time,x.disable_time,x.insert_time,x.update_time,x.note,x.user_name,x.custom1,x.custom2,x.custom3,x.custom4,x.is_del from pfm_car_info x inner join bim_person y on x.person_id=y.person_id
+		)a where a.bim_company_id=#{companyId,jdbcType=INTEGER} 
+		and a.is_del=0
+  
+  </select>
+  <select id="selectByCardID" resultMap="BaseResultMap">
+   select a.* from (select * from pfm_car_info where person_id is null
+			union all
+		 select x.car_info_id,x.person_id,x.bim_company_id,x.car_number,y.person_name,x.card_id,y.cert_id,y.address,y.phone,y.sex,x.photo,x.status,x.enable_time,x.disable_time,x.insert_time,x.update_time,x.note,x.user_name,x.custom1,x.custom2,x.custom3,x.custom4,x.is_del from pfm_car_info x inner join bim_person y on x.person_id=y.person_id
+		)a where a.bim_company_id=#{companyId,jdbcType=INTEGER} 
+		and a.is_del=0 and a.card_id = #{cardId}
+		</select>
+</mapper>

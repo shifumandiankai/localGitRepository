@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.wadejerry.scms.modules.pfm.dao.pfmCzReportMapper" >
+<resultMap id="resultDto" type="com.wadejerry.scms.modules.pfm.dto.CzReportDto" >
+<id column="pfm_fee_rec_id" property="pfmFeeRecId" jdbcType="INTEGER"/>
+<result column="insert_time" property="insertTime" jdbcType="TIMESTAMP" />
+<result column="car_type_name" property="carTypeName" jdbcType="VARCHAR" />
+<result column="countNum" property="countNum" jdbcType="INTEGER" />
+<result column="czfee" property="czfee" jdbcType="NUMERIC" />
+<!-- <result column="month_inserttime" property="monthInserttime" jdbcType="TIMESTAMP" /> -->
+</resultMap>
+<select id="selectDoubleRecordTotal"   resultMap="resultDto" >
+
+  	    
+  	    select car_type_name from pfm_fee_rec 
+<where>
+        type_id=0
+        <if test="startTime!=null"> and insert_time &gt;=#{startTime}  </if>
+  	    <if test="endTime!=null">and  insert_time  &lt;=#{endTime}</if>
+  		<if test="carNumber!=null">and car_number=#{carNumber}</if>
+  	    <if test="listtype!=null">and car_type_id =#{listtype,jdbcType=INTEGER}
+        </if>
+        <if test="listcarType!=null">and car_type_id in
+        <foreach item="item" index="index" collection="listcarType" open="(" separator="," close=")">
+            #{item,jdbcType=INTEGER}
+        </foreach>
+        </if>
+        <if test="size!=null">and 1=-1</if>
+  	    </where>
+  	    group by car_type_name
+</select> 
+
+<select id="selectDoubleListByPage"  resultMap="resultDto" >
+
+  	    
+  	    <!-- select car_type_name,<choose><when test="result==null">0  as countNum,sum(0) as czfee from pfm_fee_rec <where>type_id=0<if test="listtype!=null">and car_type_id=#{listtype,jdbcType=INTEGER}</if></where>   group by car_type_name</when><otherwise> count(1) as countNum,sum(fee) as czfee from pfm_fee_rec<where>
+  	    type_id=0 
+  	    <if test="startTime!=null"> and insert_time &gt;=#{startTime}  </if>
+  	    <if test="endTime!=null">and  insert_time  &lt;=#{endTime}</if>
+  		<if test="carNumber!=null">and car_number=#{carNumber}</if>
+  		<if test="listtype!=null">and car_type_id=#{listtype,jdbcType=INTEGER}</if>
+        <if test="size!=null">and 1=-1</if>
+  	    group by car_type_name
+  	    </where> </otherwise></choose> -->
+  	  select car_type_name,count(1) as countNum,sum(fee) as czfee from pfm_fee_rec<where>
+  	   type_id=0 
+  	    <if test="startTime!=null"> and insert_time &gt;=#{startTime}  </if>
+  	    <if test="endTime!=null">and  insert_time  &lt;=#{endTime}</if>
+  		<if test="carNumber!=null">and car_number=#{carNumber}</if>
+  		<if test="listtype!=null">and car_type_id=#{listtype,jdbcType=INTEGER}</if>
+  		<if test="listcarType!=null">and car_type_id in
+        <foreach item="item" index="index" collection="listcarType" open="(" separator="," close=")">
+            #{item,jdbcType=INTEGER}
+        </foreach>
+        </if>
+        <if test="size!=null">and 1=-1</if>
+  	    group by car_type_name 
+	  	LIMIT  #{length,jdbcType=INTEGER} OFFSET  #{start,jdbcType=INTEGER} 
+  	  </where>
+  	     
+</select> 
+
+<select id="selectInserttime"   resultType="java.util.Date" >
+
+  	    
+  	    select insert_time from pfm_fee_rec 
+<where>
+        type_id=0
+        <if test="startTime!=null"> and insert_time &gt;=#{startTime}  </if>
+  	    <if test="endTime!=null">and  insert_time  &lt;=#{endTime}</if>
+  		<if test="carNumber!=null">and car_number=#{carNumber}</if>
+  	    <if test="listtype!=null">and car_type_id =#{listtype,jdbcType=INTEGER}
+        </if>
+        <if test="listcarType!=null">and car_type_id in
+        <foreach item="item" index="index" collection="listcarType" open="(" separator="," close=")">
+            #{item,jdbcType=INTEGER}
+        </foreach>
+        </if>
+        <if test="size!=null">and 1=-1</if>
+  	    </where>
+  	    limit 1
+</select> 
+
+<select id="selectCarTypeName" resultType="java.util.Date">
+select insert_time from pfm_car_type where car_type_id=#{0}
+</select>
+
+<select id="selectByTypeList" resultType="java.util.List">
+select distinct car_type_name from pfm_fee_rec where  type_id=0
+</select>
+
+<select id="exportDay" resultType="java.util.HashMap">
+  select car_type_name,count(1) as countNum,sum(fee) as czfee from pfm_fee_rec<where>
+  	   type_id=0 
+  	    <if test="startTime!=null"> and insert_time &gt;=#{startTime}  </if>
+  	    <if test="endTime!=null">and  insert_time  &lt;=#{endTime}</if>
+  		<if test="listtype!=null">and car_type_id in
+  <foreach item="item" index="index" collection="listtype" open="(" separator="," close=")">
+            #{item,jdbcType=INTEGER}
+        </foreach></if>
+        
+        
+        <if test="size!=null">and 1=-1</if>
+  	    group by car_type_name 
+	   
+  	  </where>
+  </select>
+  
+  <!-- 月报表查询 -->
+<select id="selectMonthRecordTotal" resultMap="resultDto">
+ select car_type_name from pfm_fee_rec 
+ 
+ 
+<where>
+        type_id=0  
+         <if test="nowMonth!=null">and EXTRACT (month from insert_time)=#{month}</if>
+         <if test="carNumber!=null">and car_number=#{carNumber}</if>
+  	    <if test="listtype!=null">and car_type_id =#{listtype,jdbcType=INTEGER}
+        </if>
+        <if test="listcarType!=null">and car_type_id in
+  <foreach item="item" index="index" collection="listcarType" open="(" separator="," close=")">
+            #{item,jdbcType=INTEGER}
+        </foreach></if>
+        <if test="size!=null">and 1=-1</if>
+        <choose>
+        <when test="startTime!=null and endTime!=null">
+           <!-- and ((EXTRACT (month from insert_time)=#{month} and insert_time&gt;=#{startTime})
+           and (EXTRACT (month from insert_time)=#{endMonth} and insert_time&lt;=#{endTime})) -->
+           and insert_time&gt;=#{startTime} and insert_time&lt;=#{endTime}
+        </when>
+        <otherwise>
+        and EXTRACT (year from insert_time)=#{year}
+        <if test="startTime!=null">and (EXTRACT (month from insert_time)=#{month} and insert_time&gt;=#{startTime})</if>
+  	    <if test="endTime!=null">and  (EXTRACT (month from insert_time) =#{month} and insert_time&lt;=#{endTime})</if>
+        </otherwise>
+    </choose>
+         
+  	    </where>
+  	    group by car_type_name	
+</select>
+<select id="selectMonthListByPage"  resultMap="resultDto" >
+
+  	  select car_type_name,car_type_id,count(1) as countNum,sum(fee) as czfee from pfm_fee_rec
+  	  <where>
+  	  type_id=0 
+         <if test="nowMonth!=null">and EXTRACT (month from insert_time)=#{month}</if>
+         <if test="carNumber!=null">and car_number=#{carNumber}</if>
+  	    <if test="listtype!=null">and car_type_id =#{listtype,jdbcType=INTEGER}
+        </if>
+        <if test="listcarType!=null">and car_type_id in
+  <foreach item="item" index="index" collection="listcarType" open="(" separator="," close=")">
+            #{item,jdbcType=INTEGER}
+        </foreach></if>
+        <if test="size!=null">and 1=-1</if>
+        <choose>
+        <when test="startTime!=null and endTime!=null">
+         <!-- and ((EXTRACT (month from insert_time)=#{month} and insert_time&gt;=#{startTime})
+         and (EXTRACT (month from insert_time)=#{endMonth} and insert_time&lt;=#{endTime})) -->  
+        
+        and insert_time&gt;=#{startTime} and insert_time&lt;=#{endTime}
+        
+       
+        </when>
+        <otherwise>
+        and EXTRACT (year from insert_time)=#{year} 
+        <if test="startTime!=null">and EXTRACT (month from insert_time)=#{month} and insert_time&gt;=#{startTime}</if>
+  	    <if test="endTime!=null">and  EXTRACT (month from insert_time) =#{month} and insert_time&lt;=#{endTime}</if>
+        </otherwise>
+    </choose>
+        
+  		 group by car_type_name,car_type_id 
+	  	LIMIT  #{length,jdbcType=INTEGER} OFFSET  #{start,jdbcType=INTEGER} 
+  	    </where>
+  	  
+  	     
+</select> 
+<!-- <select id="selectMonthInserttime"   resultType="resultDto" >
+
+  	    
+  	    select * from pfm_fee_rec 
+<where>
+        type_id=0 and EXTRACT (year from insert_time)=#{year} 
+        <if test="nowMonth!=null">and EXTRACT (month from insert_time)=#{month}</if>
+         <if test="startTime!=null">and EXTRACT (month from insert_time)&gt;=#{month}</if>
+  	    <if test="endTime!=null">and  EXTRACT (month from insert_time) &lt;=#{month}</if>
+  		<if test="carNumber!=null">and car_number=#{carNumber}</if>
+  	    <if test="listtype!=null">and car_type_id =#{listtype,jdbcType=INTEGER}
+        </if>
+        <if test="size!=null">and 1=-1</if>
+  	    </where>
+  	     
+</select>  -->
+
+<!-- 年报表查询 -->
+<select id="selectYearRecordTotal" resultMap="resultDto">
+select car_type_name from pfm_fee_rec 
+ 
+ 
+<where>
+        type_id=0
+        <if test="nowyear!=null">and EXTRACT (year from insert_time)=#{nowyear}</if>
+         <if test="carNumber!=null">and car_number=#{carNumber}</if>
+  	    <if test="listtype!=null">and car_type_id =#{listtype,jdbcType=INTEGER}
+        </if>
+        <if test="listcarType!=null">and car_type_id in
+  <foreach item="item" index="index" collection="listcarType" open="(" separator="," close=")">
+            #{item,jdbcType=INTEGER}
+        </foreach></if>
+        <if test="size!=null">and 1=-1</if>
+        <choose>
+        <when test="startTime!=null and endTime!=null">
+           <!-- and ((EXTRACT (month from insert_time)=#{month} and insert_time&gt;=#{startTime})
+           and (EXTRACT (month from insert_time)=#{endMonth} and insert_time&lt;=#{endTime})) -->
+           and insert_time&gt;=#{startTime} and insert_time&lt;=#{endTime}
+        </when>
+        <otherwise>
+        <if test="startTime!=null">and (EXTRACT (year from insert_time)=#{nowyear} and insert_time&gt;=#{startTime})</if>
+  	    <if test="endTime!=null">and  (EXTRACT (year from insert_time) =#{nowyear} and insert_time&lt;=#{endTime})</if>
+        </otherwise>
+    </choose>
+         
+  	    </where>
+  	    group by car_type_name	
+
+
+</select>
+
+<select id="selectYearListByPage"  resultMap="resultDto" >
+
+  	  select car_type_name,car_type_id,count(1) as countNum,sum(fee) as czfee from pfm_fee_rec
+  	  <where>
+  	  type_id=0  
+        <if test="nowyear!=null">and EXTRACT (year from insert_time)=#{nowyear}</if>
+         <if test="carNumber!=null">and car_number=#{carNumber}</if>
+  	    <if test="listtype!=null">and car_type_id =#{listtype,jdbcType=INTEGER}
+        </if>
+        <if test="listcarType!=null">and car_type_id in
+  <foreach item="item" index="index" collection="listcarType" open="(" separator="," close=")">
+            #{item,jdbcType=INTEGER}
+        </foreach></if>
+        <if test="size!=null">and 1=-1</if>
+        <choose>
+        <when test="startTime!=null and endTime!=null">
+         <!-- and ((EXTRACT (month from insert_time)=#{month} and insert_time&gt;=#{startTime})
+         and (EXTRACT (month from insert_time)=#{endMonth} and insert_time&lt;=#{endTime})) -->  
+        
+        and insert_time&gt;=#{startTime} and insert_time&lt;=#{endTime}
+        
+       
+        </when>
+        <otherwise>
+       <if test="startTime!=null">and (EXTRACT (year from insert_time)=#{nowyear} and insert_time&gt;=#{startTime})</if>
+  	    <if test="endTime!=null">and  (EXTRACT (year from insert_time) =#{nowyear} and insert_time&lt;=#{endTime})</if>
+        </otherwise>
+    </choose>
+        
+  		 group by car_type_name,car_type_id 
+	  	LIMIT  #{length,jdbcType=INTEGER} OFFSET  #{start,jdbcType=INTEGER} 
+  	    </where>
+  	  
+  	     
+</select> 
+</mapper>

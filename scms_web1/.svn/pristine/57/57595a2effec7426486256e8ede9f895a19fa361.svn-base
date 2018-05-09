@@ -1,0 +1,4 @@
+config.user.user.add = 添加操作员: %s
+config.user.user.delete = 删除操作员: %s
+config.user.user.update = 修改操作员信息: %s
+config.user.user.other = 修改操作员密码: %s

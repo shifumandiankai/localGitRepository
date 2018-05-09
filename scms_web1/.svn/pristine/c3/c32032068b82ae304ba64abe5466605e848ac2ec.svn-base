@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.wadejerry.scms.modules.acm.dao.AcmServerMapper" >
+  <resultMap id="BaseResultMap" type="com.wadejerry.scms.modules.acm.model.AcmServer" >
+    <id column="acm_server_id" property="acmServerId" jdbcType="INTEGER" />
+    <result column="bim_company_id" property="bimCompanyId" jdbcType="INTEGER" />
+    <result column="server_name" property="serverName" jdbcType="VARCHAR" />
+    <result column="ip" property="ip" jdbcType="VARCHAR" />
+    <result column="port" property="port" jdbcType="VARCHAR" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="user_name" property="userName" jdbcType="VARCHAR" />
+    <result column="net_zone_id" property="netZoneId" jdbcType="INTEGER" />
+  </resultMap>
+  <resultMap id="ServerMap"
+		type="com.wadejerry.scms.modules.device.model.Server">
+		<id column="acm_server_id" property="serverId" jdbcType="INTEGER" />
+		<result column="bim_company_id" property="bimCompanyId"
+			jdbcType="INTEGER" />
+		<result column="server_name" property="serverName" jdbcType="VARCHAR" />
+		<result column="ip" property="ip" jdbcType="VARCHAR" />
+		<result column="port" property="port" jdbcType="VARCHAR" />
+		<result column="insert_time" property="insertTime" jdbcType="TIMESTAMP" />
+		<result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+		<result column="user_name" property="userName" jdbcType="VARCHAR" />
+		<result column="net_zone_id" property="netZoneId" jdbcType="INTEGER" />
+		<result column="belongto" property="belongto" jdbcType="VARCHAR" />
+	</resultMap>
+  <sql id="Base_Column_List" >
+    acm_server_id, bim_company_id, server_name, ip, port, update_time, user_name, net_zone_id
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from acm_server
+    where acm_server_id = #{acmServerId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from acm_server
+    where acm_server_id = #{acmServerId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.wadejerry.scms.modules.acm.model.AcmServer" >
+    insert into acm_server (acm_server_id, bim_company_id, server_name, 
+      ip, port, update_time, 
+      user_name, net_zone_id)
+    values (#{acmServerId,jdbcType=INTEGER}, #{bimCompanyId,jdbcType=INTEGER}, #{serverName,jdbcType=VARCHAR}, 
+      #{ip,jdbcType=VARCHAR}, #{port,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP}, 
+      #{userName,jdbcType=VARCHAR}, #{netZoneId,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" parameterType="com.wadejerry.scms.modules.acm.model.AcmServer" >
+    insert into acm_server
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="acmServerId != null" >
+        acm_server_id,
+      </if>
+      <if test="bimCompanyId != null" >
+        bim_company_id,
+      </if>
+      <if test="serverName != null" >
+        server_name,
+      </if>
+      <if test="ip != null" >
+        ip,
+      </if>
+      <if test="port != null" >
+        port,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+      <if test="userName != null" >
+        user_name,
+      </if>
+      <if test="netZoneId != null" >
+        net_zone_id,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="acmServerId != null" >
+        #{acmServerId,jdbcType=INTEGER},
+      </if>
+      <if test="bimCompanyId != null" >
+        #{bimCompanyId,jdbcType=INTEGER},
+      </if>
+      <if test="serverName != null" >
+        #{serverName,jdbcType=VARCHAR},
+      </if>
+      <if test="ip != null" >
+        #{ip,jdbcType=VARCHAR},
+      </if>
+      <if test="port != null" >
+        #{port,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="userName != null" >
+        #{userName,jdbcType=VARCHAR},
+      </if>
+      <if test="netZoneId != null" >
+        #{netZoneId,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.wadejerry.scms.modules.acm.model.AcmServer" >
+    update acm_server
+    <set >
+      <if test="bimCompanyId != null" >
+        bim_company_id = #{bimCompanyId,jdbcType=INTEGER},
+      </if>
+      <if test="serverName != null" >
+        server_name = #{serverName,jdbcType=VARCHAR},
+      </if>
+      <if test="ip != null" >
+        ip = #{ip,jdbcType=VARCHAR},
+      </if>
+      <if test="port != null" >
+        port = #{port,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="userName != null" >
+        user_name = #{userName,jdbcType=VARCHAR},
+      </if>
+      <if test="netZoneId != null" >
+        net_zone_id = #{netZoneId,jdbcType=INTEGER},
+      </if>
+    </set>
+    where acm_server_id = #{acmServerId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.wadejerry.scms.modules.acm.model.AcmServer" >
+    update acm_server
+    set bim_company_id = #{bimCompanyId,jdbcType=INTEGER},
+      server_name = #{serverName,jdbcType=VARCHAR},
+      ip = #{ip,jdbcType=VARCHAR},
+      port = #{port,jdbcType=VARCHAR},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      user_name = #{userName,jdbcType=VARCHAR},
+      net_zone_id = #{netZoneId,jdbcType=INTEGER}
+    where acm_server_id = #{acmServerId,jdbcType=INTEGER}
+  </update>
+  <select id="selectCountByTable" resultType="int">
+		select count(acm_server_id)
+		from acm_server
+		where bim_company_id=#{companyId}
+
+	</select>
+
+	<select id="selectByTable" resultMap="ServerMap">
+		select
+		<include refid="Base_Column_List" />,'acm' as belongto
+		from acm_server 
+		where bim_company_id=#{companyId}
+	<!-- 	${pageParam.order}
+		LIMIT
+		#{pageParam.length,jdbcType=INTEGER} OFFSET
+		#{pageParam.start,jdbcType=INTEGER} -->
+		
+
+
+	</select>
+	<select id="selectCountByIpANDPort" resultType="int">
+		select count(acm_server_id) from acm_server where ip=#{ip} and port=#{port} and bim_company_id =#{companyId} 
+	</select>
+	<select id="selectCountByIpANDPortExceptself" resultType="int">
+		select count(acm_server_id) from acm_server where ip=#{ip} and port=#{port} and bim_company_id =#{companyId} and acm_server_id!= #{id}
+	
+	</select>
+</mapper>

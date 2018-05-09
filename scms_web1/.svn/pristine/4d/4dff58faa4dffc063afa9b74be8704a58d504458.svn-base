@@ -1,0 +1,71 @@
+package com.wadejerry.scms.webservice.server.support.pay.dto;
+
+import java.math.BigDecimal;
+
+public class ParkInfoDto {
+	//车牌
+	private String carNumber;
+	//收费金额
+	private BigDecimal chargeFee;
+	//入场时间
+	private long inTime;
+	//出场时间
+	private long outTime; 
+	//备注信息
+	private String note;
+	//客户端名称
+	private String clientName;
+	//支付码 
+	private String payCode;
+	//减免金额
+	private BigDecimal jianmianFee;
+	
+	public String getCarNumber() {
+		return carNumber;
+	}
+	public void setCarNumber(String carNumber) {
+		this.carNumber = carNumber;
+	}
+	public BigDecimal getChargeFee() {
+		return chargeFee;
+	}
+	public void setChargeFee(BigDecimal chargeFee) {
+		this.chargeFee = chargeFee;
+	}
+	public long getInTime() {
+		return inTime;
+	}
+	public void setInTime(long inTime) {
+		this.inTime = inTime;
+	}
+	public long getOutTime() {
+		return outTime;
+	}
+	public void setOutTime(long outTime) {
+		this.outTime = outTime;
+	}
+	public String getNote() {
+		return note;
+	}
+	public void setNote(String note) {
+		this.note = note;
+	}
+	public String getClientName() {
+		return clientName;
+	}
+	public void setClientName(String clientName) {
+		this.clientName = clientName;
+	}
+	public String getPayCode() {
+		return payCode;
+	}
+	public void setPayCode(String payCode) {
+		this.payCode = payCode;
+	}
+	public BigDecimal getJianmianFee() {
+		return jianmianFee;
+	}
+	public void setJianmianFee(BigDecimal jianmianFee) {
+		this.jianmianFee = jianmianFee;
+	}
+}

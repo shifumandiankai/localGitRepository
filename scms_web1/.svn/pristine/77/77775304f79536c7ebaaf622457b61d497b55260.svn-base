@@ -1,0 +1,7 @@
+package com.wadejerry.scms.modules.onecard.service;
+
+import com.wadejerry.scms.modules.onecard.model.BimPersonPhoto;
+
+public interface BimPersonPhotoService {
+	public void insertInfo(BimPersonPhoto bimPersonPhoto);
+}

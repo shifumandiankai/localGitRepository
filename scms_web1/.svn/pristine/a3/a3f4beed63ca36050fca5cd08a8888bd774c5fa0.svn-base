@@ -1,0 +1,42 @@
+package com.wadejerry.scms.task;
+
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.wadejerry.scms.modules.sysconfig.service.DBManageConfigService;
+import com.wadejerry.scms.utils.Log.LogManager;
+import com.wadejerry.scms.utils.quartz.QuartzManager;
+import com.wadejerry.scms.utils.quartz.QuartzTaskJob;
+
+/**
+* 调度器任务执行辅助类
+* @ClassName: QuartzSchedulerTask
+* @Description: TODO
+* @author zhanying
+* @date 2016年12月28日 上午11:24:23
+*
+ */
+public class QuartzSchedulerTask {
+	
+	@Autowired(required = false)
+	private DBManageConfigService dbManageConfigService;
+
+	/**
+	* 启动数据库自动备份任务
+	* @author zhanying 2016年12月28日 上午11:24:36
+	* @param  @return 
+	 * @throws Exception 
+	* @modificationHistory=========================逻辑或功能性重大变更记录
+	* @modify by user: 
+	* @modify by reason:
+	 */
+	public boolean enableDatabaseBackUpTask() throws Exception {
+		boolean isSuccess = false;
+		
+			LogManager.logInfo("启动数据库自动备份任务");
+			QuartzTaskJob quartzTaskJob = dbManageConfigService.getQuartzTaskJob();
+			isSuccess = QuartzManager.enableCronSchedule(quartzTaskJob);
+		 
+		return isSuccess;
+	}
+}
+	

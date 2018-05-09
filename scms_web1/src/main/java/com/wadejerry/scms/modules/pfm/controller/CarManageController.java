@@ -1,0 +1,372 @@
+package com.wadejerry.scms.modules.pfm.controller;
+
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.text.ParseException;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.ServletRequest;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.shiro.SecurityUtils;
+import org.apache.xmlbeans.impl.piccolo.io.FileFormatException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.wadejerry.scms.frame.constant.ConstParamLog;
+import com.wadejerry.scms.frame.constant.user.ConstUser;
+import com.wadejerry.scms.frame.entity.DataTableDto;
+import com.wadejerry.scms.frame.entity.LoginInfo;
+import com.wadejerry.scms.frame.entity.OperateResult;
+import com.wadejerry.scms.frame.entity.PageParamsDto;
+import com.wadejerry.scms.frame.log.LogRecord;
+import com.wadejerry.scms.modules.pfm.dto.AddCarinfoDto;
+import com.wadejerry.scms.modules.pfm.dto.CarInfoDto;
+import com.wadejerry.scms.modules.pfm.model.PfmParkSpace;
+import com.wadejerry.scms.modules.pfm.model.PfmParkingLot;
+import com.wadejerry.scms.modules.pfm.service.PfmCarInfoService;
+import com.wadejerry.scms.modules.pfm.serviceImpl.ExcelReader;
+import com.wadejerry.scms.modules.pfm.serviceImpl.ExcelWriter;
+import com.wadejerry.scms.utils.AjaxUtil;
+import com.wadejerry.scms.utils.Log.LogManager;
+import com.wadejerry.scms.utils.json.JacksonUtil;
+
+@Controller
+public class CarManageController {
+	@Autowired
+	private PfmCarInfoService pcis;
+    @Autowired
+    private LogRecord logRecord;
+	// 车辆管理首页显示全部
+	@RequestMapping(value = "/pfm/carmanage/getcarmanageinfo.do")
+	public void toCarManage(HttpServletRequest request, HttpServletResponse response) {
+		PageParamsDto paramsDto =new PageParamsDto(request);
+		paramsDto.setIntValue1(ConstUser.CONST_ROLE_TYPE); // 角色类型
+		int iTotal=0;
+		List<CarInfoDto> dtoList = null;
+		if(!SecurityUtils.getSubject().isPermitted("CarSee")){
+			
+		}
+		else{
+			
+		iTotal = pcis.getCarInfoCount(paramsDto); // 获取记录总数
+		if (iTotal > 0) {
+			if (paramsDto.getLength() == -1) { // 查询所有记录
+				paramsDto.setLength(iTotal);
+			}
+			dtoList = pcis.getCarInfoListByPage(paramsDto); // 获取分页记录
+
+		}
+		}
+		DataTableDto data = new DataTableDto(); // 返回数据封装
+		data.setDataList(dtoList);
+		data.setDraw(paramsDto.getDraw());
+		data.setRecordsFiltered(iTotal);
+		data.setRecordsTotal(iTotal);
+		AjaxUtil.ajaxWriteDataTable(data, response);
+
+	}
+
+	@RequestMapping(value = "/pfm/carmanage/delete.do")
+	@ResponseBody
+	public void deleteRecord(HttpServletResponse response, HttpServletRequest request) {
+		String jsonArrayStr = request.getParameter("condition");
+		OperateResult result =null;
+		try {
+			List<CarInfoDto> delDtoList = JacksonUtil.json2list(jsonArrayStr, CarInfoDto.class);
+
+				result = pcis.deleteCarInfobyIsDel(delDtoList);
+			
+		} catch (Exception e) {
+			LogManager.logException(e);
+			AjaxUtil.ajaxWrite(false, e.getMessage(), response); // 返回失败
+			return;
+		}
+		AjaxUtil.ajaxWrite(result, response); // 返回成功
+
+	}
+
+
+	// 获取车位信息
+	@RequestMapping(value = "pfm/carmanage/getparkspacelist.do")
+	@ResponseBody
+	public void getCarSpaceList(HttpServletResponse response, HttpServletRequest request) {
+
+		String parkinglotidtemp = request.getParameter("parkingLotId");
+
+
+		int parkinglotid = Integer.valueOf(parkinglotidtemp).intValue();
+
+		List<PfmParkSpace> list = pcis.getParkSpaceList(parkinglotid);//所有可用车位
+
+
+		OperateResult o = new OperateResult();
+		o.setResult(true);
+
+		AjaxUtil.ajaxWriteObject(o, list, response);
+
+	}
+
+	// 获取车场信息
+	@RequestMapping(value = "pfm/carmanage/getparklot.do")
+	@ResponseBody
+	public void getParkLot(HttpServletResponse response) {
+		int companyid = LoginInfo.getCompanyId();
+		List<PfmParkingLot> list = pcis.getParkingLots(companyid);
+		OperateResult o = new OperateResult();
+		o.setResult(true);
+
+		AjaxUtil.ajaxWriteObject(o, list, response);
+	}
+
+	@RequestMapping(value = "pfm/carmanage/saveCarInfo.do")
+	@ResponseBody
+	public void saveCarInfo(HttpServletResponse response, @RequestParam("condition") String condition) throws ParseException {
+
+		AddCarinfoDto carinfo = JacksonUtil.toObject(condition, AddCarinfoDto.class);
+		OperateResult result = pcis.addCarInfo(carinfo);
+		AjaxUtil.ajaxWrite(result, response);
+
+	}
+
+
+	@RequestMapping(value = "/pfm/carmanage/changecartype.do")
+	@ResponseBody
+	public void changeType(HttpServletResponse response, @RequestParam("condition") String condition,@RequestParam("cartypeid")String cartypeid) throws Exception {
+
+		List<Integer> carInfoIds = JacksonUtil.toCollection(condition, new TypeReference<List<Integer>>() {
+		});
+
+
+		OperateResult result=pcis.changtCarType(carInfoIds, Integer.parseInt(cartypeid));
+
+		AjaxUtil.ajaxWrite(result, response);
+	}
+
+
+	@RequestMapping(value = "pfm/carmanage/upload.do")
+	@ResponseBody
+	public void uploadHandler(HttpServletResponse response,HttpServletRequest request)  {
+
+
+		MultipartHttpServletRequest multipartRequest =(MultipartHttpServletRequest) (ServletRequest)request;
+		// 得到上传的文件
+		MultipartFile mFile = multipartRequest.getFile("file");
+		// 得到上传服务器的路径
+
+		String path = request.getSession().getServletContext()
+				.getRealPath("/WEB-INF/upload");
+		File file= new File(path);
+		if(!file.exists()){
+			file.mkdir();
+		}
+		// 得到上传的文件的文件名
+		String filename = mFile.getOriginalFilename();
+		InputStream inputStream=null;
+		FileOutputStream outputStream=null;
+		try{
+			inputStream = mFile.getInputStream();
+			byte[] b = new byte[1048576];
+			int length = inputStream.read(b);
+
+			path += ("\\" + filename);
+			// 文件流写到服务器端
+			outputStream = new FileOutputStream(path);
+			outputStream.write(b, 0, length);
+
+			List<Map<String,String>> list = ExcelReader.ReadExcel(path);
+			if(list.isEmpty()){
+				OperateResult result = new OperateResult();
+				result.setResult(false);;
+				result.setMsg("excel表格为空！或者服务器异常，请重新上传文件。");
+				AjaxUtil.ajaxWrite(result, response);
+			}
+			else{
+				OperateResult result=null;
+				try {
+					result = pcis.validateAndInsert(list);
+					logRecord.recordLog(ConstParamLog.LOG_MODULE_PFM_CAR_INFO,ConstParamLog.LOG_OPER_IMPORT, ConstParamLog.LOG_TYPE_CONFIG);
+
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					result = new OperateResult();
+					result.setResult(false);
+					result.setMsg(e.getMessage());
+				}
+
+				AjaxUtil.ajaxWrite(result, response);
+			}
+		}
+		
+		catch(IOException e){
+
+			e.printStackTrace();
+			OperateResult result = new OperateResult();
+			if(e instanceof FileFormatException){
+				result.setResult(false);;
+				result.setMsg("文件格式错误！");
+			}else{
+				result.setResult(false);;
+				result.setMsg("服务器读写数据异常");
+			}
+			AjaxUtil.ajaxWrite(result, response);
+
+		}
+		finally{
+
+			if(inputStream!=null)
+				try {
+					inputStream.close();
+
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			if(outputStream!=null)
+				try {
+					outputStream.close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+		}
+
+	}
+	@RequestMapping(value = "/pfm/carmanage/download.do")
+	@ResponseBody
+	public void  download(HttpServletResponse response,HttpServletRequest request,@RequestParam("cartypeid")String carTypeId,@RequestParam("orderby")String orderby,@RequestParam("searchval")String searchval)  {
+
+		OperateResult o = new OperateResult();
+		String path = request.getSession().getServletContext().getRealPath("\\WEB-INF\\download");
+		File file= new File(path);
+		if(!file.exists()){
+			file.mkdir();
+		}
+		path+="\\";
+		path+=new Date().getTime();
+		path+=".xls";
+		file= new File(path);
+		if(file.exists()){
+			file.delete();
+		}
+
+		List<Map<String,Object>> data = pcis.download(LoginInfo.getCompanyId(),carTypeId,"order by "+orderby,searchval);
+		String[] head = {"车牌号*","姓名*","性别*","手机号","车辆类型*","卡号","状态*","证件ID","启用时间*","停用时间*","备注","地址"};
+		Workbook  wb =null;
+		OutputStream out = null;
+		try{
+			file.createNewFile();
+			out = new FileOutputStream(file);
+			wb =ExcelWriter.write(data, head);
+			wb.write(out);
+
+		}
+		catch(Exception e){
+			//			o.setResult(false);
+			//			o.setMsg("Excel导出失败！");
+			//			AjaxUtil.ajaxWrite(o, response);
+			return ;
+
+		}
+		finally{
+			if(out!=null)
+				try {
+					out.close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+		}
+		InputStream input = null;
+		try {
+			input = new BufferedInputStream(new FileInputStream(file));
+			response.reset();
+			// 先去掉文件名称中的空格,然后转换编码格式为utf-8,保证不出现乱码,这个文件名称用于浏览器的下载框中自动显示的文件名
+			response.addHeader("Content-Disposition", "attachment;filename=" + new String((new Date().getTime()+".xls").replaceAll(" ", "").getBytes("utf-8"),"iso8859-1"));
+			response.addHeader("Content-Length", "" + file.length());
+			response.setContentType("application/octet-stream");
+			out = new BufferedOutputStream(response.getOutputStream());
+			byte[] bytes = new byte[1024];
+			int length=0;
+			while((length=input.read(bytes))!=-1){
+				out.write(bytes, 0, length);
+			}
+			
+
+		} catch (IOException e) {
+			//			o.setResult(false);
+			//			o.setMsg("Excel导出失败！");
+			//			AjaxUtil.ajaxWrite(o, response);
+			e.printStackTrace();
+		}
+		finally{
+			if(out!=null)
+				try {
+					out.close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			if(input!=null)
+				try {
+					input.close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			file.delete();
+		}
+
+
+
+	}
+
+
+	@RequestMapping(value = "pfm/carmanage/validatecardid")
+	@ResponseBody
+	public void validateCard(HttpServletResponse response,@RequestParam("cardId")String cardId,@RequestParam("flag")String flag,@RequestParam("carinfoid")String carInfoId)  {
+
+		AjaxUtil.ajaxWrite(pcis.validateCardId(cardId,LoginInfo.getCompanyId(),Integer.parseInt(flag),carInfoId), response);
+
+
+	}
+	@RequestMapping(value = "pfm/carmanage/validatecarnum")
+	@ResponseBody
+	public void validateCarnum(HttpServletResponse response,@RequestParam("carNum")String carnum,@RequestParam("flag")String flag,@RequestParam("carinfoid")String carInfoId)  {
+
+		AjaxUtil.ajaxWrite(pcis.validateCarnum(carnum, LoginInfo.getCompanyId(),Integer.parseInt(flag),carInfoId), response);
+
+
+	}
+	@RequestMapping(value = "/pfm/carmanage/getrelatedcarno")
+	@ResponseBody
+	public void getRelatedCarNo(HttpServletResponse response,@RequestParam("carNum")String carnum)  {
+
+		AjaxUtil.ajaxWriteObject( pcis.selectSubsidiaryCarNumByCarInfoId(Integer.parseInt(carnum)), response);
+
+
+	}
+
+}
+
+
+
+
+

@@ -1,0 +1,245 @@
+<%@ page contentType="text/html; charset=UTF-8"%>
+<div class="modal open" id="dataconf" tabindex="-1" role="dialog"
+	aria-labelledby="exampleModalLabel">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal"
+					aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<h4 class="modal-title">数据库配置</h4>
+			</div>
+			<div class="modal-body">
+				<form>
+					<div class="control-group">
+						<div>数据库备份限制</div>
+						<div class="divider"></div>
+					</div>
+					<div class="control-group">
+						<div class="label1">备份文件数量限制</div>
+						<div style="position: relative">
+							<div id="maxFileQuantityNotice" class="point-out"
+								style="width: 348px; top: -38px; left: 0px; display: none;"></div>
+							<input name="maxFileQuantity" type="text" />
+						</div>
+					</div>
+					<div class="control-group">
+						<div class="label1">备份文件总大小限制（MB）</div>
+						<div style="position: relative">
+							<div id="maxFileTotalSizeNotice" class="point-out"
+								style="width: 348px; top: -38px; left: 0px; display: none;"></div>
+							<input name="maxFileTotalSize" type="text" />
+						</div>
+					</div>
+					<div class="control-group">
+						<div>自动备份计划</div>
+						<div class="divider"></div>
+					</div>
+					<div class="control-group">
+						<div class="label2">计划类型</div>
+						<div class="span1">
+							<input name="planType" type="radio" value="1" checked="checked" />天计划
+						</div>
+						<div class="span1">
+							<input name="planType" type="radio" value="2" />周计划
+						</div>
+						<div class="span1">
+							<input name="planType" type="radio" value="3" />月计划
+						</div>
+						<div class="span1">
+							<input name="planType" type="radio" value="4" />间隔计划
+						</div>
+					</div>
+					<div class="control-group">
+						<div class="label2">开始日期</div>
+						<div style="position:relative;">
+							<div id="bankUpStartTimeNotice" class="point-out"
+								style="width: 348px; top: -38px; left: 0px; display: none;"></div>
+							<input name="bankUpStartTime"  onClick="WdatePicker({dateFmt:'yyyy-MM-dd',maxDate:'#F{$dp.$D(\'endtime\')}'})"  class='timepicker' type="text"
+								/>
+						</div>
+					</div>
+					<div class="control-group">
+						<div class="label2">结束日期</div>
+						<div style="position:relative;">
+							<div id="bankUpEndTimeNotice" class="point-out"
+								style="width: 348px; top: -38px; left: 0px; display: none;"></div>
+							<input name="bankUpEndTime"  onClick="WdatePicker({dateFmt:'yyyy-MM-dd',minDate:'#F{$dp.$D(\'begintime\')}'})"   class='timepicker' type="text"
+							  />
+						</div>
+					</div>
+					<div class="control-group">
+						<div class="label2">时分秒</div>
+						<div style="position:relative;">
+						<div id="bankUpExecuteTimeNotice" class="point-out"
+								style="width: 348px; top: -38px; left: 0px; display: none;"></div>
+							<div class="bootstrap-timepicker">
+								<input name="bankUpExecuteTime" type="text"  />
+							</div>
+						</div>
+					</div>
+					<div id="interval" class="control-group" style="display: none;">
+						<div class="label2"
+							style="display: block; float: left; padding-top: 3px; margin-right: 5px;">执行间隔</div>
+						<div style="position:relative;">
+						<div id="intervalPlanExecuteTimeNotice" class="point-out"
+								style="width: 348px; top: -38px; left: 0px; display: none;"></div>
+							<input name="intervalPlanExecuteTime" type="text" />
+							<div style="color: #8e8e8e; display: block;">单位:小时</div>
+						</div>
+					</div>
+					<div id="cycle" class="control-group">
+						<div class="label2"
+							style="display: block; float: left; padding-top: 3px; margin-right: 5px;">执行周期</div>
+						<div style="position:relative;">
+						<div id="dayPlanExecuteIntervalNotice" class="point-out"
+								style="width: 348px; top: -38px; left: 0px; display: none;"></div>
+							<input name="dayPlanExecuteInterval" type="text" />
+							<div style="color: #8e8e8e; display: block;">单位:天（表示每多少天发生一次）
+							</div>
+						</div>
+					</div>
+					<div id="week" class="control-group" style="display: none;">
+						<div class="label3">
+							<div class="span1">
+								<input name="weekPlanExecuteTime" type="checkbox" value="7"/>星期日
+							</div>
+							<div class="span1">
+								<input name="weekPlanExecuteTime" type="checkbox" value="1" />星期一
+							</div>
+							<div class="span1">
+								<input name="weekPlanExecuteTime" type="checkbox" value="2"/>星期二
+							</div>
+							<div class="span1">
+								<input name="weekPlanExecuteTime" type="checkbox" value="3"/>星期三
+							</div>
+							<div class="span1">
+								<input name="weekPlanExecuteTime" type="checkbox" value="4"/>星期四
+							</div>
+							<div class="span1">
+								<input name="weekPlanExecuteTime" type="checkbox" value="5"/>星期五
+							</div>
+							<div class="span1">
+								<input name="weekPlanExecuteTime" type="checkbox" value="6"/>星期六
+							</div>
+						</div>
+					</div>
+					<div id="day" class="control-group" style="display: none;">
+						<div class="label3">
+							<div style="display: block;">
+								<input id="all" type="checkbox" name="monthPlanExecuteTime" value="-1"/>全选
+							</div>
+							<div class="span1">
+								<input type="checkbox" name="monthPlanExecuteTime" value="1" />1日
+							</div>
+							<div class="span1">
+								<input type="checkbox" name="monthPlanExecuteTime" value="2" />2日
+							</div>
+							<div class="span1">
+								<input type="checkbox" name="monthPlanExecuteTime" value="3" />3日
+							</div>
+							<div class="span1">
+								<input type="checkbox" name="monthPlanExecuteTime" value="4" />4日
+							</div>
+							<div class="span1">
+								<input type="checkbox" name="monthPlanExecuteTime" value="5" />5日
+							</div>
+							<div class="span1">
+								<input type="checkbox" name="monthPlanExecuteTime" value="6" />6日
+							</div>
+							<div class="span1">
+								<input type="checkbox" name="monthPlanExecuteTime" value="7" />7日
+							</div>
+							<div class="span1">
+								<input type="checkbox" name="monthPlanExecuteTime" value="8" />8日
+							</div>
+							<div class="span1">
+								<input type="checkbox" name="monthPlanExecuteTime" value="9" />9日
+							</div>
+							<div class="span1">
+								<input type="checkbox" name="monthPlanExecuteTime" value="10" />10日
+							</div>
+							<div class="span1">
+								<input type="checkbox" name="monthPlanExecuteTime" value="11" />11日
+							</div>
+							<div class="span1">
+								<input type="checkbox" name="monthPlanExecuteTime" value="12" />12日
+							</div>
+							<div class="span1">
+								<input type="checkbox" name="monthPlanExecuteTime" value="13" />13日
+							</div>
+							<div class="span1">
+								<input type="checkbox" name="monthPlanExecuteTime" value="14" />14日
+							</div>
+							<div class="span1">
+								<input type="checkbox" name="monthPlanExecuteTime" value="15" />15日
+							</div>
+							<div class="span1">
+								<input type="checkbox" name="monthPlanExecuteTime" value="16" />16日
+							</div>
+							<div class="span1">
+								<input type="checkbox" name="monthPlanExecuteTime" value="17" />17日
+							</div>
+							<div class="span1">
+								<input type="checkbox" name="monthPlanExecuteTime" value="18" />18日
+							</div>
+							<div class="span1">
+								<input type="checkbox" name="monthPlanExecuteTime" value="19" />19日
+							</div>
+							<div class="span1">
+								<input type="checkbox" name="monthPlanExecuteTime" value="20" />20日
+							</div>
+							<div class="span1">
+								<input type="checkbox" name="monthPlanExecuteTime" value="21" />21日
+							</div>
+							<div class="span1">
+								<input type="checkbox" name="monthPlanExecuteTime" value="22" />22日
+							</div>
+							<div class="span1">
+								<input type="checkbox" name="monthPlanExecuteTime" value="23" />23日
+							</div>
+							<div class="span1">
+								<input type="checkbox" name="monthPlanExecuteTime" value="24" />24日
+							</div>
+							<div class="span1">
+								<input type="checkbox" name="monthPlanExecuteTime" value="25" />25日
+							</div>
+							<div class="span1">
+								<input type="checkbox" name="monthPlanExecuteTime" value="26" />26日
+							</div>
+							<div class="span1">
+								<input type="checkbox" name="monthPlanExecuteTime" value="27" />27日
+							</div>
+							<div class="span1">
+								<input type="checkbox" name="monthPlanExecuteTime" value="28" />28日
+							</div>
+							<div class="span1">
+								<input type="checkbox" name="monthPlanExecuteTime" value="29" />29日
+							</div>
+							<div class="span1">
+								<input type="checkbox" name="monthPlanExecuteTime" value="30" />30日
+							</div>
+							<div class="span1">
+								<input type="checkbox" name="monthPlanExecuteTime" value="31" />31日
+							</div>
+							<div class="span1">
+								<input type="checkbox" name="monthPlanExecuteTime" value="32" />最后一天
+							</div>
+						</div>
+					</div>
+
+
+
+				</form>
+
+
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+				<button type="button" id="submit" class="btn btn-primary">确认</button>
+			</div>
+		</div>
+	</div>
+</div>
+

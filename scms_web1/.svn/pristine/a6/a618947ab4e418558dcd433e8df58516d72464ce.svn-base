@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.wadejerry.scms.modules.auth.dao.BimRoleDeptAuthMapper" >
+  <resultMap id="BaseResultMap" type="com.wadejerry.scms.modules.auth.model.BimRoleDeptAuth" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="bim_role_id" property="bimRoleId" jdbcType="INTEGER" />
+    <result column="bim_dept_id" property="bimDeptId" jdbcType="INTEGER" />
+    <result column="update_time" property="updateTime" jdbcType="DATE" />
+  </resultMap>
+     <resultMap id="TreeResultMap" type="com.wadejerry.scms.modules.auth.dto.AuthTreeDto" >
+    <id column="bim_dept_id" property="id" jdbcType="INTEGER" />
+    <result column="in_code" property="pId" jdbcType="INTEGER" />
+    <result column="dept_name" property="name" jdbcType="VARCHAR" />
+    <!-- <result column="identity" property="identity" jdbcType="VARCHAR" /> -->
+     <result column="checked" property="checked" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, bim_role_id, bim_dept_id, update_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from bim_role_dept_auth
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from bim_role_dept_auth
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.wadejerry.scms.modules.auth.model.BimRoleDeptAuth" >
+    insert into bim_role_dept_auth (id, bim_role_id, bim_dept_id, 
+      update_time)
+    values (#{id,jdbcType=INTEGER}, #{bimRoleId,jdbcType=INTEGER}, #{bimDeptId,jdbcType=INTEGER}, 
+      #{updateTime,jdbcType=DATE})
+  </insert>
+  <insert id="insertSelective" parameterType="com.wadejerry.scms.modules.auth.model.BimRoleDeptAuth" >
+    insert into bim_role_dept_auth
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="bimRoleId != null" >
+        bim_role_id,
+      </if>
+      <if test="bimDeptId != null" >
+        bim_dept_id,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="bimRoleId != null" >
+        #{bimRoleId,jdbcType=INTEGER},
+      </if>
+      <if test="bimDeptId != null" >
+        #{bimDeptId,jdbcType=INTEGER},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=DATE},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.wadejerry.scms.modules.auth.model.BimRoleDeptAuth" >
+    update bim_role_dept_auth
+    <set >
+      <if test="bimRoleId != null" >
+        bim_role_id = #{bimRoleId,jdbcType=INTEGER},
+      </if>
+      <if test="bimDeptId != null" >
+        bim_dept_id = #{bimDeptId,jdbcType=INTEGER},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=DATE},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.wadejerry.scms.modules.auth.model.BimRoleDeptAuth" >
+    update bim_role_dept_auth
+    set bim_role_id = #{bimRoleId,jdbcType=INTEGER},
+      bim_dept_id = #{bimDeptId,jdbcType=INTEGER},
+      update_time = #{updateTime,jdbcType=DATE}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+   <select id="selectDeptAuthTree" resultMap="TreeResultMap">
+		 SELECT
+			*, CASE
+		WHEN bim_dept_id IN (
+			SELECT
+				bim_dept_id
+			FROM
+				bim_role_dept_auth
+			WHERE
+				bim_role_id = #{roleId}
+		) THEN
+			'true'
+		ELSE
+			'false'
+		END AS checked
+		FROM
+			bim_dept where bim_company_id =  #{companyId} 
+	
+  </select>
+  
+    <delete id="deleteByRoleId" parameterType="int">
+  
+  			delete  from bim_role_dept_auth where bim_role_id=#{id}
+  </delete>
+</mapper>

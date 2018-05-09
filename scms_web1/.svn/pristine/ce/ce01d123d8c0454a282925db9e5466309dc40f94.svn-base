@@ -1,0 +1,25 @@
+package com.wadejerry.scms.webservice.server.support.weixin;
+
+import com.wadejerry.scms.webservice.server.support.CommonResult;
+import com.wadejerry.scms.webservice.server.support.weixin.dto.WeixinOrderDto;
+
+/**
+* 二维码支付结果
+* @ClassName: QRCodePayResult
+* @Description: TODO
+* @author zhanying
+* @date 2017年6月19日 上午8:47:08
+*
+ */
+public class QRCodePayResult extends CommonResult {
+	private WeixinOrderDto weixinOrderDto; //微信订单信息
+
+	public WeixinOrderDto getWeixinOrderDto() {
+		return weixinOrderDto;
+	}
+
+	public void setWeixinOrderDto(WeixinOrderDto weixinOrderDto) {
+		this.weixinOrderDto = weixinOrderDto;
+	}
+}
+

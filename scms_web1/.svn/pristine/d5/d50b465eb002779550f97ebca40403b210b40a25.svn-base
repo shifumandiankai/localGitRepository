@@ -1,0 +1,159 @@
+package com.wadejerry.scms.modules.pfm.serviceImpl;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.sun.syndication.feed.rss.Item;
+import com.wadejerry.scms.frame.constant.ConstParamLog;
+import com.wadejerry.scms.frame.entity.LoginInfo;
+import com.wadejerry.scms.frame.entity.OperateResult;
+import com.wadejerry.scms.frame.entity.SelectDataDto;
+import com.wadejerry.scms.frame.log.LogRecord;
+import com.wadejerry.scms.modules.auth.dao.BimUserMapper;
+import com.wadejerry.scms.modules.auth.dao.BimUserRoleMapper;
+import com.wadejerry.scms.modules.auth.dto.UserRoleRelDto;
+import com.wadejerry.scms.modules.auth.model.BimUser;
+import com.wadejerry.scms.modules.device.model.PfmDeviceScreen;
+import com.wadejerry.scms.modules.pfm.dao.PfmCarTypeMapper;
+import com.wadejerry.scms.modules.pfm.dao.PfmCarTypeRelMapper;
+import com.wadejerry.scms.modules.pfm.dao.PfmChargeRuleMapper;
+import com.wadejerry.scms.modules.pfm.dao.PfmParkingLotMapper;
+import com.wadejerry.scms.modules.pfm.dto.ParkingLotDto;
+import com.wadejerry.scms.modules.pfm.dto.ZTreeDto;
+import com.wadejerry.scms.modules.pfm.model.PfmCarType;
+import com.wadejerry.scms.modules.pfm.model.PfmParkingLot;
+import com.wadejerry.scms.modules.pfm.service.PfmCarTypeService;
+@Service("PfmCarTypeService")
+public class PfmCarTypeServiceImpl implements PfmCarTypeService {
+
+	@Autowired
+	private PfmCarTypeMapper pctm;
+	@Autowired
+	private PfmCarTypeRelMapper pctrm;
+	@Autowired
+	private PfmParkingLotMapper ppl;
+	@Autowired
+	private PfmChargeRuleMapper pcrm;
+	@Autowired
+	private BimUserMapper userMapper;
+	@Autowired
+	private BimUserRoleMapper bimUserRoleMapper;
+	@Autowired
+	private LogRecord logRecord;
+	@Override
+	@Transactional
+	public OperateResult deleteNode(int companyid, int nodeid) {
+		OperateResult o = new OperateResult();
+		
+		if(pctm.ifparentbyNode(nodeid, companyid)>0){
+			o.setResult(false);
+			o.setMsg("该节点有子节点，不能删除，删除失败");
+		}else{
+			if(pctrm.selectifHasCarsbyCarTypeId(nodeid)>0){
+				o.setResult(false);
+				o.setMsg("该节点有车辆信息，拒绝删除，删除失败");
+				
+			}else{
+				pctrm.deleteByCarTypeId(nodeid);
+				pctm.updateStatusByPrimaryKey(nodeid);
+				//pcrm.deleteByCarType(nodeid);
+				logRecord.recordLog(ConstParamLog.LOG_MODULE_PFM_CAR_TYPE, ConstParamLog.LOG_OPER_DELETE, ConstParamLog.LOG_TYPE_CONFIG, "");
+
+				o.setResult(true);
+				o.setMsg("删除成功！");
+			}
+			
+		}
+		return o;
+	}
+	@Override
+	public ZTreeDto insertCarType(PfmCarType p) {
+		
+		
+		ZTreeDto dto=null;
+		if(pctm.insertSelective(p)>0){
+			 dto= pctm.selectCartypeById(p.getCarTypeId(), LoginInfo.getCompanyId());
+			
+		}		
+		return dto;
+		
+	}
+	@Override
+	public OperateResult updateCarType(PfmCarType p) {
+		OperateResult o = new OperateResult();
+		
+		try{
+		pctm.updateByPrimaryKeySelective(p);
+		o.setResult(true);
+		}
+		catch(Exception e){
+			o.setResult(false);
+			o.setMsg("修改失败！");
+		}
+			
+		
+		return o;
+	}
+	@Override
+	public List<ZTreeDto> selectCarTypesTree(int companyid) {
+		
+		if(LoginInfo.isCompanyManager()){
+		return pctm.selectCartypes(companyid);
+		}
+		else{
+			List<UserRoleRelDto> userroles=	bimUserRoleMapper.selectUserRoleDtoByUserId(LoginInfo.getLoginId());
+			List<Integer> carTypeIds = new ArrayList<>();
+			for(UserRoleRelDto temp:userroles){
+				BimUser user = userMapper.selectByPrimaryKey(temp.getRoleId());
+				if(user!=null){
+					if(user.getCustom3()!=null&&user.getCustom3().length()!=0){
+						List<String> list=Arrays.asList(user.getCustom3().split(","));
+						for(String temp1:list){
+							carTypeIds.add(Integer.parseInt(temp1));
+						}
+					}
+				}
+
+			}
+			return pctm.selectCartypesByAuth(companyid, carTypeIds);
+		}
+	}
+
+	@Override
+	public List<PfmParkingLot> select1PL(int companyid) {
+		
+		return ppl.select1ParkingLots(companyid);
+	}
+	@Override
+	public List<PfmCarType> select1CarTypeByLotId(int lotid, int companyid) {
+		// TODO Auto-generated method stub
+		return pctm.selectCartypeBy1LotId(lotid, companyid);
+	}
+	@Override
+	public ZTreeDto selectCarTypeById(int id) {
+		// TODO Auto-generated method stub
+		return pctm.selectCartypeById(id, LoginInfo.getCompanyId());
+	}
+	@Override
+	public List<PfmCarType> configParkReport() {
+		
+		return pctm.configParkReport();
+	}
+	@Override
+	public List<SelectDataDto> selectsubParkData(Integer parkId) {
+		List<PfmParkingLot> list= ppl.selectSubParksByInid(parkId);
+		List<SelectDataDto> dtos = new ArrayList<>();
+		for(PfmParkingLot item:list){
+			SelectDataDto temp = new SelectDataDto();
+			temp.setId(item.getPfmParkingLotId());
+			temp.setText(item.getParkingLotName());
+			dtos.add(temp);
+		}
+		return dtos;
+	}
+}

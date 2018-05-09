@@ -1,0 +1,205 @@
+<%@ page contentType="text/html; charset=UTF-8"%>
+<div class="modal open" id="personModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="exampleModalLabel"> 添加人员</h4>
+      </div>
+      <div class="modal-body">
+      <form class="form-horizontal" id="form1" method="post">  
+         <ul id="myTab" class="nav nav-tabs">
+	<li class="active" name="basicInfo">
+		<a href="#basicInfo" data-toggle="tab" id="jb">
+			基本信息
+		</a>
+	</li>
+	<!-- <li><a href="#zwInfo" data-toggle="tab" id="zw">指纹信息</a></li> -->
+	<li name="allInfo"><a href="#allInfo" data-toggle="tab" id="xx">详细信息</a></li>
+</ul> 
+<!-- </div> -->
+<!-- <form class="form-horizontal" id="form1" method="post"> -->
+<div id="myTabContent" class="tab-content">
+   
+	<div class="tab-pane fade  active in" style=" padding-top: 10px;" id="basicInfo" >
+	
+		<!--  <div class="row-fluid">  -->
+					 <div class="col-lg-6 left">
+					<input type="hidden" name ="personId">
+					<div class="form-group">
+                    <label for="recipient-name" class="control-label col-lg-5"><font color="red">*</font>人员编号</label>
+                    <div id="personCode" class="col-lg-7">
+                    <div id ="personCodeNotice" class="point-out" style="width: 348px;top:-38px; left:0px; display: none;"></div>
+                   
+                     <input type="text" class="form-control"   name ="personCode" >
+                    </div>
+                    </div>
+                    <div class="form-group">
+                    <label for="recipient-name" class="control-label col-lg-5"><font color="red">*</font>姓名</label>
+                    <div id="personName" class="col-lg-7">
+                    <div id ="personNameNotice" class="point-out" style="width: 348px;top:-38px; left:0px; display: none;"></div>
+                
+                     <input type="text" class="form-control"   name ="personName" >
+                    </div>
+                    </div>
+                    <div class="form-group">
+                    <label for="recipient-name" class="control-label col-lg-5"><font color="red">*</font>部门</label>
+                    <div id="deptName" class="col-lg-7">
+                    <div id ="deptNameNotice" class="point-out" style="width: 348px;top:-38px; left:0px; display: none;"></div>
+                    <input type="hidden" name ="deptName">
+                    <input type="text" class="form-control"   name ="deptName"  disabled="disabled">
+                    </div>
+                    </div>
+                     <div class="form-group">
+                    <label for="recipient-name" class="control-label col-lg-5 ">性别</label>
+                    <div id="sex" class="col-lg-7" >
+                     <label><input type="radio"  name ="sex" value="0" checked="true" >男  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label><label><input type="radio"  name ="sex" value="1" >女</label>
+                    </div>
+                    </div>
+                    <div class="form-group">
+                    <label for="recipient-name" class="control-label col-lg-5">身份类型</label>
+                    <div  class="col-lg-7" >
+                    <div id ="sexNotice" class="point-out" style="width: 348px;top:-38px; left:0px; display: none;"></div>
+                  
+                    <select id="personType" title="无" class="form-control" name="custom3" >
+                    <option value="0" title="无">无</option>
+                    <option value="1" title="新增身份">新增身份</option>
+                    </select>
+                    </div>
+                    </div>
+                    <div class="form-group">
+                    <label for="recipient-name" class="control-label col-lg-5">证件类型</label>
+                    <div  class="col-lg-7" >
+                    <div id ="sexNotice" class="point-out" style="width: 348px;top:-38px; left:0px; display: none;"></div>
+                   
+                    <select id="certtype" title="身份证" class="form-control" name="certtype">
+                    <option value="0" title="身份证">身份证</option>
+                    <option value="1" title="军官证">军官证</option>
+                    <option value="2" title="学生证">学生证</option>
+                    <option value="3" title="驾驶证">驾驶证</option>
+                    <option value="4" title="护照">护照</option>
+                    <option value="5" title="港澳通行证">港澳通行证</option>
+                    </select>
+                    </div>
+                    </div>
+                    <div class="form-group">
+                    <label for="recipient-name" class="control-label col-lg-5">证件号码</label>
+                    <div id="certId" class="col-lg-7">
+                    <div id ="certIdNotice" class="point-out" style="width: 348px;top:-38px; left:0px; display: none;"></div>
+                    
+                     <input type="text" class="form-control"   name ="certId" >
+                    </div>
+                    </div>
+                     <div class="form-group">
+                    <label for="recipient-name" class="control-label col-lg-5">出生日期</label>
+                    <div id="birthday" class="col-lg-7">
+                    <div id ="birthdayNotice" class="point-out" style="width: 348px;top:-38px; left:0px; display: none;"></div>
+                     <input type="text" class="form-control"   name ="birthday" ><i class="fa fa-calendar"></i>
+                    
+                    </div>
+                    </div>
+                    <div class="form-group">
+                    <label for="recipient-name" class="control-label col-lg-5">拼音代码</label>
+                    <div id="pinyin" class="col-lg-7">
+                    <div id ="pinyinNotice" class="point-out" style="width: 348px;top:-38px; left:0px; display: none;"></div>
+                    
+                     <input type="text" class="form-control"   name ="pinyin" >
+                    </div>
+                    </div>
+                    <div class="form-group">
+                    <label for="recipient-name" class="control-label col-lg-5">联系电话</label>
+                    <div id="phone" class="col-lg-7">
+                    <div id ="phoneNotice" class="point-out" style="width: 348px;top:-38px; left:0px; display: none;"></div>
+                    
+                     <input type="text" class="form-control"   name ="phone" >
+                     <div>短信开门:<input type="checkbox" id="openMsg" name="custom1" value="1"></div>
+                    </div>
+                    </div>
+                    <div class="form-group">
+                    <label for="recipient-name" class="control-label col-lg-5">联系地址</label>
+                    <div id="address" class="col-lg-7">
+                    <div id ="addressNotice" class="point-out" style="width: 348px;top:-38px; left:0px; display: none;"></div>
+                   
+                     <input type="text" class="form-control"   name ="address" >
+                    </div>
+                    </div>
+					</div>
+					 <div class="col-lg-6 right">
+					
+					<img id="personPhotoPreview"  class="img-polaroid" style="width:150px;height:210px;" alt="150x210" >
+					<div class="div-relative" style="width:160px;height:24px;">
+					<input name="file" id="file" type="file" accept="image/*">
+				
+					
+					</div>
+					
+					</div>  
+					<!--  </div>	  -->
+	</div>
+	 <div class="tab-pane fade" style=" padding-top: 10px;" id="allInfo" >
+	<div class="form-group">
+                    <label for="recipient-name" class="control-label col-lg-5">英文名</label>
+                    <div id="englishName" class="col-lg-7">
+                    <div id ="englishNameNotice" class="point-out" style="width: 348px;top:-38px; left:0px; display: none;"></div>
+                   
+                     <input type="text" class="form-control"   name ="englishName" >
+                    </div>
+                    </div>
+				
+				
+				<div class="form-group">
+                    <label for="recipient-name" class="control-label col-lg-5">E-MAIL</label>
+                    <div id="email" class="col-lg-7">
+                    <div id ="emailNotice" class="point-out" style="width: 348px;top:-38px; left:0px; display: none;"></div>
+                   
+                     <input type="text" class="form-control"   name ="mail" >
+                    </div>
+                    </div>
+				<div class="form-group">
+                    <label for="recipient-name" class="control-label col-lg-5">到职日期</label>
+                    <div id="jobDate" class="col-lg-7">
+                    <div id ="jobDateNotice" class="point-out" style="width: 348px;top:-38px; left:0px; display: none;"></div>
+                   
+                     <input type="text" class="form-control"   name ="jobDate" ><i class="fa fa-calendar"></i>
+                    </div>
+                    </div>
+				<div class="form-group">
+                    <label for="recipient-name" class="control-label col-lg-5">离职日期</label>
+                    <div id="resignationDate" class="col-lg-7">
+                    <div id ="resignationDateNotice" class="point-out" style="width: 348px;top:-38px; left:0px; display: none;"></div>
+                   
+                     <input type="text" class="form-control"   name ="resignationDate" ><i class="fa fa-calendar"></i>
+                    </div>
+                    </div>
+				<div class="form-group">
+                    <label for="recipient-name" class="control-label col-lg-5">学历</label>
+                    <div id="educational" class="col-lg-7">
+                    <div id ="educationalNotice" class="point-out" style="width: 348px;top:-38px; left:0px; display: none;"></div>
+                   
+                     <input type="text" class="form-control"   name ="educational" >
+                    </div>
+                    </div>
+				<div class="form-group">
+                    <label for="recipient-name" class="control-label col-lg-5">名族</label>
+                    <div id="ethnic" class="col-lg-7">
+                    <div id ="ethnicNotice" class="point-out" style="width: 348px;top:-38px; left:0px; display: none;"></div>
+                   
+                     <input type="text" class="form-control"   name ="ethnic" >
+                    </div>
+                    </div>
+	</div>  
+	
+	 </form> 
+</div>
+       
+      </div>
+      <div class="modal-footer">
+      
+        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+        <button type="button" class="btn btn-primary" id="submit">保存修改</button>
+        
+      </div>
+      
+    </div>
+  </div>
+</div> 

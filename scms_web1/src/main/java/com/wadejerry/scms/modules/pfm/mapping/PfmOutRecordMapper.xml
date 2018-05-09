@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.wadejerry.scms.modules.pfm.dao.PfmOutRecordMapper" >
+  <resultMap id="BaseResultMap" type="com.wadejerry.scms.modules.pfm.model.PfmOutRecord" >
+    <result column="out_record_id" property="outRecordId" jdbcType="INTEGER" />
+    <result column="car_id" property="carId" jdbcType="INTEGER" />
+    <result column="bim_company_id" property="bimCompanyId" jdbcType="INTEGER" />
+    <result column="car_number" property="carNumber" jdbcType="VARCHAR" />
+    <result column="card_id" property="cardId" jdbcType="VARCHAR" />
+    <result column="person_name" property="personName" jdbcType="VARCHAR" />
+    <result column="car_type_id" property="carTypeId" jdbcType="INTEGER" />
+    <result column="car_type_name" property="carTypeName" jdbcType="VARCHAR" />
+    <result column="park_id" property="parkId" jdbcType="INTEGER" />
+    <result column="park_name" property="parkName" jdbcType="VARCHAR" />
+    <result column="out_booth_id" property="outBoothId" jdbcType="INTEGER" />
+    <result column="out_booth_name" property="outBoothName" jdbcType="VARCHAR" />
+    <result column="out_device_id" property="outDeviceId" jdbcType="INTEGER" />
+    <result column="out_device_name" property="outDeviceName" jdbcType="VARCHAR" />
+    <result column="out_photo" property="outPhoto" jdbcType="VARCHAR" />
+    <result column="out_time" property="outTime" jdbcType="TIME" />
+  </resultMap>
+  <insert id="insert" parameterType="com.wadejerry.scms.modules.pfm.model.PfmOutRecord" >
+    insert into pfm_out_record (out_record_id, car_id, bim_company_id, 
+      car_number, card_id, person_name, 
+      car_type_id, car_type_name, park_id, 
+      park_name, out_booth_id, out_booth_name, 
+      out_device_id, out_device_name, out_photo, 
+      out_time)
+    values (#{outRecordId,jdbcType=INTEGER}, #{carId,jdbcType=INTEGER}, #{bimCompanyId,jdbcType=INTEGER}, 
+      #{carNumber,jdbcType=VARCHAR}, #{cardId,jdbcType=VARCHAR}, #{personName,jdbcType=VARCHAR}, 
+      #{carTypeId,jdbcType=INTEGER}, #{carTypeName,jdbcType=VARCHAR}, #{parkId,jdbcType=INTEGER}, 
+      #{parkName,jdbcType=VARCHAR}, #{outBoothId,jdbcType=INTEGER}, #{outBoothName,jdbcType=VARCHAR}, 
+      #{outDeviceId,jdbcType=INTEGER}, #{outDeviceName,jdbcType=VARCHAR}, #{outPhoto,jdbcType=VARCHAR}, 
+      #{outTime,jdbcType=TIME})
+  </insert>
+  <insert id="insertSelective" parameterType="com.wadejerry.scms.modules.pfm.model.PfmOutRecord" >
+    insert into pfm_out_record
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="outRecordId != null" >
+        out_record_id,
+      </if>
+      <if test="carId != null" >
+        car_id,
+      </if>
+      <if test="bimCompanyId != null" >
+        bim_company_id,
+      </if>
+      <if test="carNumber != null" >
+        car_number,
+      </if>
+      <if test="cardId != null" >
+        card_id,
+      </if>
+      <if test="personName != null" >
+        person_name,
+      </if>
+      <if test="carTypeId != null" >
+        car_type_id,
+      </if>
+      <if test="carTypeName != null" >
+        car_type_name,
+      </if>
+      <if test="parkId != null" >
+        park_id,
+      </if>
+      <if test="parkName != null" >
+        park_name,
+      </if>
+      <if test="outBoothId != null" >
+        out_booth_id,
+      </if>
+      <if test="outBoothName != null" >
+        out_booth_name,
+      </if>
+      <if test="outDeviceId != null" >
+        out_device_id,
+      </if>
+      <if test="outDeviceName != null" >
+        out_device_name,
+      </if>
+      <if test="outPhoto != null" >
+        out_photo,
+      </if>
+      <if test="outTime != null" >
+        out_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="outRecordId != null" >
+        #{outRecordId,jdbcType=INTEGER},
+      </if>
+      <if test="carId != null" >
+        #{carId,jdbcType=INTEGER},
+      </if>
+      <if test="bimCompanyId != null" >
+        #{bimCompanyId,jdbcType=INTEGER},
+      </if>
+      <if test="carNumber != null" >
+        #{carNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="cardId != null" >
+        #{cardId,jdbcType=VARCHAR},
+      </if>
+      <if test="personName != null" >
+        #{personName,jdbcType=VARCHAR},
+      </if>
+      <if test="carTypeId != null" >
+        #{carTypeId,jdbcType=INTEGER},
+      </if>
+      <if test="carTypeName != null" >
+        #{carTypeName,jdbcType=VARCHAR},
+      </if>
+      <if test="parkId != null" >
+        #{parkId,jdbcType=INTEGER},
+      </if>
+      <if test="parkName != null" >
+        #{parkName,jdbcType=VARCHAR},
+      </if>
+      <if test="outBoothId != null" >
+        #{outBoothId,jdbcType=INTEGER},
+      </if>
+      <if test="outBoothName != null" >
+        #{outBoothName,jdbcType=VARCHAR},
+      </if>
+      <if test="outDeviceId != null" >
+        #{outDeviceId,jdbcType=INTEGER},
+      </if>
+      <if test="outDeviceName != null" >
+        #{outDeviceName,jdbcType=VARCHAR},
+      </if>
+      <if test="outPhoto != null" >
+        #{outPhoto,jdbcType=VARCHAR},
+      </if>
+      <if test="outTime != null" >
+        #{outTime,jdbcType=TIME},
+      </if>
+    </trim>
+  </insert>
+</mapper>

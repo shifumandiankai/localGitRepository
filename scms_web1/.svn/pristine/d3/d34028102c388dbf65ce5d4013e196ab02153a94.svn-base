@@ -1,0 +1,95 @@
+package com.wadejerry.scms.utils;
+
+import java.math.BigInteger;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.codec.binary.Base64;
+
+public class RSAHelper {
+	
+	public static String prikey="AwEAAaold8NSn+JpfRV6ZBzNBiN86QzcVcibmTR2j759geT4dgqbTCvhbmsofTqRfF96X1Qx318e8wzbPH3F9xa/PtWp4ZKR5EvRBpztmLzN8cdVZnqvKgsOeCo8s3TFlwWlwXGH+2lq3Doj3vF9EsEAsccrsK7reBjmVNCCc6rl43nV";
+
+	// / <summary>
+	// / 解析密匙
+	// / </summary>
+	// / <param name="key">密匙</param>
+	// / <param name="b1">RSA的相应参数1</param>
+	// / <param name="b2">RSA的相应参数2</param>
+	private static List<byte[]> ResolveKey(String key) {
+		// 从base64字符串 解析成原来的字节数组
+		// byte[] b = Convert.FromBase64String(key);
+		byte[] b = Base64.decodeBase64(key);
+		// 初始化参数的数组长度
+		byte[] b1 = new byte[b[0]];
+		byte[] b2 = new byte[b.length - b[0] - 1];
+		// 将相应位置是值放进相应的数组
+		for (int n = 1, i = 0, j = 0; n < b.length; n++) {
+			if (n <= b[0]) {
+				b1[i++] = b[n];
+			} else {
+				b2[j++] = b[n];
+			}
+		}
+		List<byte[]> bytelist = new ArrayList<byte[]>();
+		bytelist.add(b1);
+		bytelist.add(b2);
+		return bytelist;
+	}
+
+	// / <summary>
+	// / 字符串解密
+	// / </summary>
+	// / <param name="encryptString">密文</param>
+	// / <param name="key">密钥</param>
+	// / <returns>遇到解密失败将会返回原字符串</returns>
+	public static String DecryptString(String encryptString, String key) {
+		String source = "";
+		//byte[] e;
+		// 解析这个密钥
+		try {
+			List<byte[]> bytelist = ResolveKey(key);
+			BigInteger biE = new BigInteger(1,bytelist.get(0));
+			BigInteger biN = new BigInteger(1,bytelist.get(1));
+			source = DecryptString(encryptString, biE, biN);
+		} catch (Exception e1) {
+			source = encryptString;
+		}
+		return source;
+	}
+
+	// / <summary>
+	// / 用指定的密匙加密
+	// / </summary>
+	// / <param name="source">密文</param>
+	// / <param name="e">可以是RSACryptoServiceProvider生成的Exponent</param>
+	// / <param name="n">可以是RSACryptoServiceProvider生成的Modulus</param>
+	// / <returns>返回明文</returns>
+	private static String DecryptString(String encryptString, BigInteger e,
+			BigInteger n) {
+		//StringBuilder result = new StringBuilder();
+	/*	String[] strarr1 = encryptString.Split(new char[] { '@' },
+				StringSplitOptions.RemoveEmptyEntries);*/
+		String[] strarr1 = encryptString.split("@");
+		byte[] bAllBytes = new byte[40960];
+		int index = 0;
+		for (int i = 0; i < strarr1.length; i++) {
+
+			String block = strarr1[i];
+			// System.Diagnostics.Debug.WriteLine(block);
+			BigInteger biText = new BigInteger(block, 16);
+			BigInteger biEnText = biText.modPow(e, n);
+			byte[] bData = biEnText.toByteArray();
+			System.arraycopy(bData, 0,bAllBytes, index, bData.length);
+			//Array.Copy(bData, 0, bAllBytes, index, bData.length);
+			index = index + bData.length;
+		}
+		//String b64Str = Encoding.Default.GetString(bAllBytes, 0, index);
+		String b64Str= new String(bAllBytes);
+		
+		byte[] b64 = Base64.decodeBase64(b64Str);
+		return new String(b64,Charset.forName("gb2312"));
+
+	}
+}

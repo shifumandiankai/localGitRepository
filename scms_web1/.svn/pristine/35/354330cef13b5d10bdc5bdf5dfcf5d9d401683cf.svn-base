@@ -1,0 +1,31 @@
+package com.wadejerry.scms.modules.pfm.dao;
+
+import java.util.List;
+
+import javax.servlet.http.HttpServletResponse;
+
+import com.wadejerry.scms.modules.pfm.dto.EntranceDto;
+import com.wadejerry.scms.modules.pfm.dto.ZEntranceTreeDto;
+import com.wadejerry.scms.modules.pfm.dto.ZTreeDto;
+import com.wadejerry.scms.modules.pfm.model.PfmEntrance;
+
+public interface PfmEntranceMapper {
+	List<ZEntranceTreeDto> SelectParkingTree(int companyid);
+	List<PfmEntrance> selectInfoByParkId(int parkid,int companyid, Integer id);
+	int selectMaxEntranceId(int commpanyId);
+	void insertInfo(PfmEntrance entrance);
+	PfmEntrance selectByName(String name,Integer id, Integer parkid, Integer custom1);
+	PfmEntrance  selectEntranceName(String name,Integer id, Integer parkid);
+	void updateInfo(EntranceDto dto);
+	int selectCount(int commpanyId);
+	void deleteInfo(PfmEntrance entrance);
+	List<PfmEntrance> selectByParkid(int parkid,int companyid);
+	List<PfmEntrance> selectInfoByPfmEntranceId(int pfmEntranceId);
+	void updateInfoNoAway(EntranceDto dto);
+	PfmEntrance selectByPfmEntranceId(int pfmentranceid,int companyid);
+	PfmEntrance selectName(String name,int parkid,int companyid);
+	List<PfmEntrance> selectInfoForPfmEntranceId(int companyid);
+	void updateEntranceType(EntranceDto dto);
+	List<PfmEntrance> configName(int commpanyId);
+	List<PfmEntrance> selectentranceId(Integer pfmParkingLotId);
+}

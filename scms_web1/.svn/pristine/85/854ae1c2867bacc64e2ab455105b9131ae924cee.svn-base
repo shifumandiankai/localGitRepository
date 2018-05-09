@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.wadejerry.scms.modules.auth.dao.BimAuthorizationMapper" >
+  <resultMap id="BaseResultMap" type="com.wadejerry.scms.modules.auth.model.BimAuthorization" >
+    <id column="bim_authorization_id" property="bimAuthorizationId" jdbcType="INTEGER" />
+    <result column="pid" property="pid" jdbcType="INTEGER" />
+    <result column="auth_name" property="authName" jdbcType="VARCHAR" />
+    <result column="identity" property="identity" jdbcType="VARCHAR" />
+  </resultMap>
+  <resultMap id="TreeResultMap" type="com.wadejerry.scms.modules.auth.dto.AuthTreeDto" >
+    <id column="bim_authorization_id" property="id" jdbcType="INTEGER" />
+    <result column="pid" property="pId" jdbcType="INTEGER" />
+    <result column="auth_name" property="name" jdbcType="VARCHAR" />
+    <result column="identity" property="identity" jdbcType="VARCHAR" />
+     <result column="checked" property="checked" jdbcType="VARCHAR" />
+  </resultMap>
+  <resultMap id="CarTypeTreeResultMap" type="com.wadejerry.scms.modules.pfm.dto.CarTypeTreeDto" >
+    <id column="car_type_id" property="id" jdbcType="INTEGER" />
+    <result column="in_id" property="pId" jdbcType="INTEGER" />
+    <result column="type_name" property="name" jdbcType="VARCHAR" />
+     <result column="checked" property="checked" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    bim_authorization_id, pid, auth_name, identity
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from bim_authorization
+    where bim_authorization_id = #{bimAuthorizationId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from bim_authorization
+    where bim_authorization_id = #{bimAuthorizationId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.wadejerry.scms.modules.auth.model.BimAuthorization" >
+    insert into bim_authorization (bim_authorization_id, pid, auth_name, 
+      identity)
+    values (#{bimAuthorizationId,jdbcType=INTEGER}, #{pid,jdbcType=INTEGER}, #{authName,jdbcType=VARCHAR}, 
+      #{identity,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.wadejerry.scms.modules.auth.model.BimAuthorization" >
+    insert into bim_authorization
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="bimAuthorizationId != null" >
+        bim_authorization_id,
+      </if>
+      <if test="pid != null" >
+        pid,
+      </if>
+      <if test="authName != null" >
+        auth_name,
+      </if>
+      <if test="identity != null" >
+        identity,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="bimAuthorizationId != null" >
+        #{bimAuthorizationId,jdbcType=INTEGER},
+      </if>
+      <if test="pid != null" >
+        #{pid,jdbcType=INTEGER},
+      </if>
+      <if test="authName != null" >
+        #{authName,jdbcType=VARCHAR},
+      </if>
+      <if test="identity != null" >
+        #{identity,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.wadejerry.scms.modules.auth.model.BimAuthorization" >
+    update bim_authorization
+    <set >
+      <if test="pid != null" >
+        pid = #{pid,jdbcType=INTEGER},
+      </if>
+      <if test="authName != null" >
+        auth_name = #{authName,jdbcType=VARCHAR},
+      </if>
+      <if test="identity != null" >
+        identity = #{identity,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where bim_authorization_id = #{bimAuthorizationId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.wadejerry.scms.modules.auth.model.BimAuthorization" >
+    update bim_authorization
+    set pid = #{pid,jdbcType=INTEGER},
+      auth_name = #{authName,jdbcType=VARCHAR},
+      identity = #{identity,jdbcType=VARCHAR}
+    where bim_authorization_id = #{bimAuthorizationId,jdbcType=INTEGER}
+  </update>
+  
+  <select id="selectAll" resultMap="TreeResultMap">
+		 SELECT
+			*, CASE
+		WHEN bim_authorization_id IN (
+			SELECT
+				bim_authorization_id
+			FROM
+				bim_role_auth
+			WHERE
+				role_id = #{roleId}
+		) THEN
+			'true'
+		ELSE
+			'false'
+		END AS checked
+		FROM
+			bim_authorization where system is null 
+			<if test="subs!=null and subs.size()!=0">
+			or system in
+			<foreach collection="subs" index="index" item="item"
+			open="(" separator="," close=")"> #{item}
+			</foreach>
+			</if>
+  </select>
+  
+  <select id="selectPermissionByUserId" parameterType="int" resultType="String">
+  
+  select identity from bim_authorization where bim_authorization_id in( select bim_authorization_id from bim_role_auth where role_id in(select bim_role_id from bim_user_role where user_id=#{id}))
+  
+  </select>
+  
+  <select id="selectPermissionsBySubs" resultType="String">
+   SELECT identity
+		FROM
+			bim_authorization where system is null 
+			<if test="subs!=null and subs.size()!=0">
+			or system in
+			<foreach collection="subs" index="index" item="item"
+			open="(" separator="," close=")"> #{item}
+			</foreach>
+			</if>
+  </select>
+  
+  <select id="selectCartypeBy" resultMap="CarTypeTreeResultMap">
+  	
+  select * <if test="ids==null or ids.size()==0">,'false' as checked</if> <if test="ids!=null and ids.size()!=0">,case when car_type_id in <foreach collection="ids" index="index" item="item"
+			open="(" separator="," close=")"> #{item}
+			</foreach> then 'true' else 'false' end as checked </if> from pfm_car_type <where>
+  <if test="companyId!=null">bim_company_id=#{companyId}</if>
+  </where>
+ order by insert_time
+	
+  </select>
+</mapper>

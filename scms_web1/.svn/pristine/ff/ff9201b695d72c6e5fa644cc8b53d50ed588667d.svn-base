@@ -1,0 +1,296 @@
+//验证两次密码是否输入一致  register
+function chkTwicePassword(password1, password2,div) {
+    if (password1 == password2) {
+        $("#confirmpasswordNotice").hide();
+        return true;
+    }
+    var msg = checkPasswordtwo(password1, password2);
+    if (msg != 100) {
+    	div.find('.point-out').hide();
+    	div.find("#confirmpasswordNotice").html('<span class="point-box errorbgTop dropdown"><i class="sprite icon_arrow_up2 pa"></i>' + msg + '</span>').show();
+        return false;
+    }
+}
+  //验证密码规则  register
+function checkPassword(password,div) {
+    var result = chkPassword(password); 
+    if (result != 100) {
+    	div.find('.point-out').hide();
+    	div.find("#passwordNotice").html('<span class="point-box errorbgTop dropdown"><i class="sprite icon_arrow_up2 pa"></i>' + result + '</span>').show();
+        return false;
+    }
+    div.find("#passwordNotice").hide();
+    return true;
+}
+
+/**
+ * [shown 弹出新增或编辑窗口后执行]
+ * @param  {[type]} devClone [新增后删除窗体div对象]
+ * @param  {[type]} operId   [0 新增 1 编辑]
+ * @param  {[type]} sel_obj  [所选中行的数据对象]
+ * @return {[type]}          [无]
+ */
+var shown= function(devClone,operId,sel_obj){
+	//===========================填充数据及插件初始化==============================
+	devClone.find('*[name="selRoleIds"]').select2({	//视觉效果好一点
+		multiple:true,
+	});
+	 $.ajax({	//获取角色数据
+	        url: "/role/GetRolesSelectData.do",
+	        dataType: 'json',
+	        quietMillis: 250,
+	        success: function (result) {
+	        		devClone.find('*[name="selRoleIds"]').select2({
+	        		dropdownParent:devClone,
+	        		multiple:true,
+	        		data:result
+	        	});
+	        	if(operId ==1){
+					wade.libs.datatable_fill_form_data(	//重新赋值,因为lib中赋值的时候，角色可能还没获取到数据	
+					"selRoleIds",sel_obj["selRoleIds"],devClone);
+	        	}
+	        }
+	    }); 
+	 devClone.find('*[name="status"]').select2({	//绑定状态数据
+		dropdownParent:devClone,
+		data:[{'id':0,"text":"启用"},{'id':1,'text':'停用'}]
+	 }); 
+	 /*devClone.find('*[name="disableTime"]').datepicker({	//到期时间
+		 language: 'zh-CN',
+		 autoclose: true,
+		 dropdownParent:devClone
+    });*/
+	 if(operId == 1){ // 编辑模式
+		 devClone.find("*[name=userName]").attr("disabled","disabled"); //禁用用户名修改
+		 if(sel_obj["sLevel"] ==1 ){	//系统管理员禁用角色、有效期、状态
+			 devClone.find("*[name=selRoleIds]").attr("disabled","disabled"); 
+			 devClone.find("*[name=disableTime]").attr("disabled","disabled");
+			 devClone.find("*[name=status]").attr("disabled","disabled");	 
+		 }
+	 }
+
+	 //===================================验证相关=================================================
+	 devClone.find('#user_submit').on('click',registerUser);	//绑定用户添加或修改事件
+	
+    //用户名光标锁定，有输入新的用户名
+ 	devClone.find('input[name=userName]').on('change, keyup', function () {
+ 		devClone.find("#loginnameNotice").hide();
+    });
+   	//用户名光标移出后验用户名
+   	devClone.find('input[name=userName]').on("blur", function () {
+   		var val = $(this).val();
+   		if(val != ''){
+   			verifyUsername(val); 
+   		}
+    });
+    //邮箱光标锁定，有输入新的邮箱地址
+ 	devClone.find('input[name=email]').on('change, keyup', function () {
+ 		devClone.find("#emailNotice").hide();
+    });
+   	//邮箱光标移出后验邮箱
+   	devClone.find('input[name=email]').on("blur", function () {
+   		var val = $(this).val();
+   		if(val != ''){
+   			verifyEmail(val);
+   		}
+    });
+    //手机号码光标锁定，有输入新的手机号码
+ 	devClone.find('input[name=phone]').on('change, keyup', function () {
+ 		devClone.find("#phoneNotice").hide();
+    });
+   	//手机号码光标移出后验证
+   	devClone.find('input[name=phone]').on("blur", function () {
+   		var val = $(this).val();
+   		if(val != ''){
+   			verifyPhone(val); //不为空验证用户名
+   		}
+    });
+
+   //密码光标锁定，有输入新的密码
+ 	devClone.find('input[name=password]').on('change, keyup', function () {
+   		devClone.find("#passwordNotice").hide();
+   		devClone.find("#confirmpasswordNotice").hide();
+    });
+   	//密码光标移出后验密码
+   	devClone.find('input[name=password]').on("blur", function () {
+   		var val = $(this).val();
+   		if(val != ''){
+   			checkPassword(val,devClone); //不为空验证用户名
+   		}
+    });
+
+   //密码光标锁定，有输入新的密码
+ 	devClone.find('input[name=confirmPassword]').on('change, keyup', function () {
+ 		devClone.find("#confirmpasswordNotice").hide();
+    });
+   	//密码光标移出后验密码
+   	devClone.find('input[name=confirmPassword]').on("blur", function () {
+   		var val = $(this).val();
+   		if(val != ''){
+   			 var password = devClone.find('input[name=password]').val();
+   			chkTwicePassword(password,val,devClone); //不为空验证用户名
+   		}
+    });
+
+    //验证用户名
+    function verifyUsername(value) {
+        var errMsg = checkUsername(value);
+        if (errMsg != 100) {
+        	devClone.find('.point-out').hide();
+            devClone.find("#loginnameNotice").html('<span class="point-box errorbgTop dropdown"  ><i class="sprite icon_arrow_up2 pa"></i>' + errMsg + '</span>').show();
+            return false;
+        }
+ /*     errMsg = checkStrMaxLen(value,32);
+        if (errMsg != 100) {
+        	devClone.find('.point-out').hide();
+            devClone.find("#loginnameNotice").html('<span class="point-box errorbgTop dropdown"  ><i class="sprite icon_arrow_up2 pa"></i>' + errMsg + '</span>').show();
+            return false;
+        }*/
+        
+        return true;
+    }
+    //验证邮箱
+    function verifyEmail(value) {
+        var errMsg = cgeckEmail(value);
+        if (errMsg != 100) {
+        	devClone.find('.point-out').hide();
+            devClone.find("#emailNotice").html('<span class="point-box errorbgTop dropdown"  ><i class="sprite icon_arrow_up2 pa"></i>' + errMsg + '</span>').show();
+            return false;
+        }
+        return true;
+    }
+    //验证手机号码
+    function verifyPhone(value){
+    	var errMsg = checkPhone(value); 
+    	if(errMsg != 100){
+    		devClone.find('.point-out').hide();
+        devClone.find("#phoneNotice").html('<span class="point-box errorbgTop dropdown"  ><i class="sprite icon_arrow_up2 pa"></i>' + errMsg + '</span>').show();
+            return false;
+    	}
+    	return true;
+    }
+    
+    function registerUser(event) {
+	     var username = devClone.find("input[name=userName]").val();
+	     if (!verifyUsername(username)) {	//验证用户名
+	    	   event.stopImmediatePropagation(); //阻止提交数据
+           return false;
+	     }
+	     if(operId == 0){	//新增模式验证密码
+		     var password = devClone.find('input[name=password]').val();
+		     var confirmpassword = devClone.find('input[name=confirmPassword]').val();
+		     if (!checkPassword(password,devClone)){	//检查密码
+            event.stopImmediatePropagation();
+		         return false;
+		     }
+	    	 if (!chkTwicePassword(password, confirmpassword,devClone)){	//检查两次输入的密码是否一致
+            event.stopImmediatePropagation();
+  	    	 	return false;
+	    	 }
+	     }
+	     var phone = devClone.find('input[name=phone]').val(); //验证手机号码
+	     if(phone != '' && !verifyPhone(phone)){
+          event.stopImmediatePropagation();
+	    		return false;
+	     }
+	     var email = devClone.find('input[name=email]').val(); //验证邮箱
+	     if(email != '' && !verifyEmail(email)){
+          event.stopImmediatePropagation();
+	     		return false;
+	     }  
+	}
+};
+
+var encode = function(data){
+  if(data.password){
+    data.password = hex_md5(data.password);
+    data.confirmPassword = hex_md5(data.confirmPassword);
+  }
+  return data;
+};
+
+/**
+ * [changePassword 修改密码]
+ * @param  {[type]} sel_tr      [选择行]
+ * @param  {[type]} all_tr      [所有选择项]
+ * @param  {[type]} sel_obj_arr [选择项]
+ * @return {[type]}             [无]
+ */
+var changePassword = function(sel_tr,all_tr,sel_obj_arr,sel_obj){
+    if(!sel_obj){
+        wade.libs.alert('请选择修改密码用户！',2);
+        return;
+    }
+    var dev = $('#userChangePasswordModal')
+    dev.find('input[name=password]').val('');
+    dev.find('input[name=confirmPassword]').val('');  
+    dev.find('.point-out').hide();
+    debugger;
+	//密码光标锁定，有输入新的密码
+    dev.find('input[name=password]').on('change, keyup', function () {
+    	dev.find("#passwordNotice").hide();
+    	dev.find("#confirmpasswordNotice").hide();
+   });
+  //确认密码光标锁定，有输入新的密码
+    dev.find('input[name=confirmPassword]').on('change, keyup', function () {
+    	dev.find("#confirmpasswordNotice").hide();
+   });  
+    dev.modal('show');    
+    dev.find('#user_submit').click(
+        function(){
+     	     var password = dev.find('input[name=password]').val();
+    	     var confirmpassword = dev.find('input[name=confirmPassword]').val();	 	
+    	     if (!checkPassword(password,dev)){	//检查密码
+    	         return false;
+    	     }
+        	 if (!chkTwicePassword(password, confirmpassword,dev)){	//检查两次输入的密码是否一致
+    	    	 	return false;
+        	 }
+        	 var userId = sel_obj.bimUserId;
+        	 $.ajax({	//获取角色数据
+     	        url: "/user/changePassword.do",
+     	        dataType:"json",
+     	        data:"userid="+userId+"&newPassword="+hex_md5(password),
+     	        success: function (result) {
+     	        	if(result.success){
+     	        		 $('#userChangePasswordModal').modal('hide')
+     	        		wade.libs.alert('修改成功');
+	     	       		//wade.libs.alert('密码修改成功',null ,dev.find('div:first')); 
+     	        	}else {
+     	        		wade.libs.alert(result.msg,0 ,dev.find('div:first'));	
+     	        	}
+     	        }
+     	    }); 
+        	 
+        }
+      );  
+};
+
+var config = $.extend({},{
+	btns: new Array({'id':'10005','name':'add','fun':null},	//需要显示的按钮
+			{'id':'10006','name':'edit',"fun":null},
+			{'id':"10007",'name':'del',"fun":null},
+			{'id':"10008",'name':'修改密码',"fun":changePassword}),
+	search:new Array({'type':'search','placeholder':'用户名','url':null,'index':0}), //查询条件
+	id:"userDatetable",	//dataTable ID
+	addDiv:"userModal", //新增弹出的DIV ID
+	editDiv:"userEditModal",	//编辑弹出的DIV ID
+	getUrl:"/user/getUserInfo.do",	//获取数据请求路径
+	delUrl:"/user/delUser.do",	//删除数据请求路径
+	saveUrl:"/user/saveUser.do",	//保存数据请求路径
+	columns: new Array(	//绑定数据的列
+			'bimUserId','userName','eealName','userType','inId','bimCompanyId',
+			'password','useSystem','phone','status','createTime','updateTime','sLevel', 
+			'photo','lastLoginTiem','ip','mac','inName','selRoleIds','custom1',
+			'custom2','custom3','custom4','disableTime','note','email'),
+	defs:new Array('bimUserId','userType','inId','bimCompanyId',	//隐藏列
+			'password','useSystem','status','updateTime','lastLoginTiem','ip','mac','photo',
+			'sLevel','selRoleIds','custom1','custom2','custom3','custom4','email'),
+	add_shown:shown, //弹出新增或编辑对话框后执行的方法,
+	fromDataFormat:encode
+});	
+wade.libs.datatable(config);	//初始化datatable
+
+
+
+

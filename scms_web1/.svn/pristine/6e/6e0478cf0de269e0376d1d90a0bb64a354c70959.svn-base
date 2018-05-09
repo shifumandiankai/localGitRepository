@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.wadejerry.scms.modules.pfm.dao.PfmPeriodMapper" >
+  <resultMap id="BaseResultMap" type="com.wadejerry.scms.modules.pfm.model.PfmPeriod" >
+    <id column="period_id" property="periodId" jdbcType="INTEGER" />
+    <result column="free_time" property="freeTime" jdbcType="INTEGER" />
+    <result column="rule_id" property="ruleId" jdbcType="INTEGER" />
+    <result column="park_over_max_period_money" property="parkOverMaxPeriodMoney" jdbcType="NUMERIC" />
+    <result column="use_top_money" property="useTopMoney" jdbcType="SMALLINT" />
+    <result column="custom1" property="custom1" jdbcType="INTEGER" />
+    <result column="custom2" property="custom2" jdbcType="INTEGER" />
+    <result column="custom3" property="custom3" jdbcType="VARCHAR" />
+    <result column="custom4" property="custom4" jdbcType="VARCHAR" />
+    <result column="top_money" property="topMoney" jdbcType="NUMERIC" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    period_id, free_time, rule_id, park_over_max_period_money, use_top_money, custom1, 
+    custom2, custom3, custom4, top_money
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from pfm_period
+    where period_id = #{periodId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from pfm_period
+    where period_id = #{periodId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.wadejerry.scms.modules.pfm.model.PfmPeriod" >
+    insert into pfm_period (period_id, free_time, rule_id, 
+      park_over_max_period_money, use_top_money, custom1, 
+      custom2, custom3, custom4, top_money
+      )
+    values (#{periodId,jdbcType=INTEGER}, #{freeTime,jdbcType=INTEGER}, #{ruleId,jdbcType=INTEGER}, 
+      #{parkOverMaxPeriodMoney,jdbcType=NUMERIC}, #{useTopMoney,jdbcType=SMALLINT}, #{custom1,jdbcType=INTEGER}, 
+      #{custom2,jdbcType=INTEGER}, #{custom3,jdbcType=VARCHAR}, #{custom4,jdbcType=VARCHAR}, #{topMoney,jdbcType=NUMERIC}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.wadejerry.scms.modules.pfm.model.PfmPeriod" useGeneratedKeys="true" keyProperty="periodId" >
+    insert into pfm_period
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="periodId != null" >
+        period_id,
+      </if>
+      <if test="freeTime != null" >
+        free_time,
+      </if>
+      <if test="ruleId != null" >
+        rule_id,
+      </if>
+      <if test="parkOverMaxPeriodMoney != null" >
+        park_over_max_period_money,
+      </if>
+      <if test="useTopMoney != null" >
+        use_top_money,
+      </if>
+      <if test="custom1 != null" >
+        custom1,
+      </if>
+      <if test="custom2 != null" >
+        custom2,
+      </if>
+      <if test="custom3 != null" >
+        custom3,
+      </if>
+      <if test="custom4 != null" >
+        custom4,
+      </if>
+       <if test="topMoney != null" >
+        top_money,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="periodId != null" >
+        #{periodId,jdbcType=INTEGER},
+      </if>
+      <if test="freeTime != null" >
+        #{freeTime,jdbcType=INTEGER},
+      </if>
+      <if test="ruleId != null" >
+        #{ruleId,jdbcType=INTEGER},
+      </if>
+      <if test="parkOverMaxPeriodMoney != null" >
+        #{parkOverMaxPeriodMoney,jdbcType=NUMERIC},
+      </if>
+      <if test="useTopMoney != null" >
+        #{useTopMoney,jdbcType=SMALLINT},
+      </if>
+      <if test="custom1 != null" >
+        #{custom1,jdbcType=INTEGER},
+      </if>
+      <if test="custom2 != null" >
+        #{custom2,jdbcType=INTEGER},
+      </if>
+      <if test="custom3 != null" >
+        #{custom3,jdbcType=VARCHAR},
+      </if>
+      <if test="custom4 != null" >
+        #{custom4,jdbcType=VARCHAR},
+      </if>
+       <if test="topMoney != null" >
+        #{topMoney,jdbcType=NUMERIC},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.wadejerry.scms.modules.pfm.model.PfmPeriod" >
+    update pfm_period
+    <set >
+      <if test="freeTime != null" >
+        free_time = #{freeTime,jdbcType=INTEGER},
+      </if>
+      <if test="ruleId != null" >
+        rule_id = #{ruleId,jdbcType=INTEGER},
+      </if>
+      <if test="parkOverMaxPeriodMoney != null" >
+        park_over_max_period_money = #{parkOverMaxPeriodMoney,jdbcType=NUMERIC},
+      </if>
+      <if test="useTopMoney != null" >
+        use_top_money = #{useTopMoney,jdbcType=SMALLINT},
+      </if>
+      <if test="custom1 != null" >
+        custom1 = #{custom1,jdbcType=INTEGER},
+      </if>
+      <if test="custom2 != null" >
+        custom2 = #{custom2,jdbcType=INTEGER},
+      </if>
+      <if test="custom3 != null" >
+        custom3 = #{custom3,jdbcType=VARCHAR},
+      </if>
+      <if test="custom4 != null" >
+        custom4 = #{custom4,jdbcType=VARCHAR},
+      </if>
+      <if test="topMoney != null" >
+        top_money = #{topMoney,jdbcType=NUMERIC},
+      </if>
+    </set>
+    where period_id = #{periodId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.wadejerry.scms.modules.pfm.model.PfmPeriod" >
+    update pfm_period
+    set free_time = #{freeTime,jdbcType=INTEGER},
+      rule_id = #{ruleId,jdbcType=INTEGER},
+      park_over_max_period_money = #{parkOverMaxPeriodMoney,jdbcType=NUMERIC},
+      use_top_money = #{useTopMoney,jdbcType=SMALLINT},
+      custom1 = #{custom1,jdbcType=INTEGER},
+      custom2 = #{custom2,jdbcType=INTEGER},
+      custom3 = #{custom3,jdbcType=VARCHAR},
+      custom4 = #{custom4,jdbcType=VARCHAR},
+       top_money = #{topMoney,jdbcType=NUMERIC}
+    where period_id = #{periodId,jdbcType=INTEGER}
+  </update>
+   <select id="selectByRuleId" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from pfm_period
+    where rule_id = #{ruleId,jdbcType=INTEGER}
+  </select>
+</mapper>

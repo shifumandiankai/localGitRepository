@@ -1,0 +1,69 @@
+ <%@ page contentType="text/html; charset=UTF-8"%>
+<div class="modal open" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="exampleModalLabel">车场信息</h4>
+      </div>
+      <div class="modal-body">
+      
+        <form class="form-horizontal"> 
+         <input type="hidden" name ="pfmParkingLotId">
+         
+          <div class="form-group">
+           
+            <label for="recipient-name" class="control-label col-lg-3">车场名称</label>
+            <div id="parkName" class="col-lg-9">
+           <div id ="parkNameNotice" class="point-out" style="width: 348px;top:-38px; left:0px; display: none;"></div>
+            <input type="text" class="form-control" id="recipient-name"  name ="parkingLotName">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="recipient-name" class="control-label col-lg-3">车场序号</label>
+            <div id="parkingLotCode" class="col-lg-9">
+           <div id ="parkingLotCodeNotice" class="point-out" style="width: 348px;top:-38px; left:0px; display: none;"></div>
+            <input type="text" class="form-control" id="recipient-name"  name ="parkingLotCode">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="recipient-name" class="control-label col-lg-3">车位数量</label>
+            <div id="carNumber" class="col-lg-9">
+             <div id ="carNumberNotice" class="point-out" style="width: 348px;top:-38px; left:0px; display: none;" name="carNumberNotice"></div>
+            <input type="text" class="form-control" id="recipient-name"  name ="carNumber">
+            </div>
+          </div>
+          <!-- <div class="form-group">
+         
+            <label for="recipient-name" class="control-label col-lg-3">预留车位</label>
+            <div id="remainName" class="col-lg-9">
+             <div id ="remainNumberNotice" class="point-out" style="width: 348px;top:-38px; left:0px; display: none;" name="remainNumberNotice"></div>
+            <input type="text" class="form-control" id="recipient-name"  name ="reserveCarNumber">
+            </div>
+          </div> -->
+           <div class="form-group">
+           <label for="message-text" class="control-label col-lg-3" >归属车场</label> 
+           <div class="col-lg-9">
+           
+           	<select name="attribution" class="form-control" id="attribution"> 
+           	</select> 
+           	</div>
+         </div>  
+          <div class="form-group">
+          <label for="message-text" class="control-label col-lg-3">备注</label>
+          <div class="col-lg-9">
+           <div id ="noteNotice" class="point-out" style="width: 348px;top:-38px; left:0px; display: none;" name="noteNotice"></div>
+            <textarea class="form-control" id="message-text" name ="note" maxlength="4" placeholder="长度不能超过4个字"></textarea>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+        <button type="button" class="btn btn-primary" id="submit">保存修改</button>
+      </div>
+    </div>
+  </div>
+</div> 
+
+

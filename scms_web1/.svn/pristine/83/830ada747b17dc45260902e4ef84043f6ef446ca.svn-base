@@ -1,0 +1,94 @@
+.server-wizard .server-wizard-li a {
+	display: block;
+	width: 200px !important;
+	height: 50px !important;
+	border: 1px solid transparent;
+}
+.server-wizard{
+	width:100%;
+	height:300px;
+	
+}
+.server-wizard .server-wizard-ul {
+	list-style: outside none none;
+	float:left;
+	padding-left: 0px;
+}
+
+.server-wizard .server-wizard-li span {
+	display: block;
+	padding-left: 30px;
+	padding-top: 15px;
+	font: bold 18px simsun, serif;
+	color: #686f7a !important;
+}
+
+.server-wizard .server-wizard-li a.selected {
+	cursor: text;
+	border: 1px solid #d6e4ed;
+	background: rgba(0, 0, 0, 0) url("/pages/basic/server/image/select.png")
+		no-repeat scroll 5px 3px;
+}
+
+.server-wizard .server-wizard-li a.done:hover {
+	background: #dfdfdf none repeat scroll 0 0 !important;
+}
+
+.server-wizard .server-wizard-li a.disabled {
+	cursor: text;
+}
+
+.server-wizard .step-container{
+	width:450px;
+	height:100%;
+	float:right;
+	
+}
+.servers .line{
+	border-top:5px dashed transparent;
+	border-bottom:1px dashed #cccccc;
+}
+.servers table{
+	width:100%;
+}
+.servers td.server-type{
+	
+	text-align:center;
+	cursor:pointer;
+	
+}
+.servers td{
+	
+	padding:3px;
+	width:50%;
+}
+.servers .server-type:hover{
+	background-color: #d6e4ed;
+}
+.servers .server-type.selected{
+	background-color: #d6e4ed;
+	
+}
+.servers .server-1-1{
+	background-image: url("/pages/basic/server/image/icon2.png");
+	background-repeat:no-repeat;
+	display:inline-block;
+	height: 40px;
+    width: 44px;
+    background-position: -292px -32px;
+}
+
+#exampleModal .modal-footer button.disabled{
+	display:none!important;
+}
+
+.serverForm label{
+	width:100px;
+	text-align:right;
+	margin-bottom:20px;
+	margin-right:20px;
+}
+
+.form-ele{
+	display:inline-block;
+}

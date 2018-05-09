@@ -1,0 +1,5 @@
+package com.wadejerry.scms.webservice.server.support.weixin.dto;
+
+public class QRCodeDto {
+	
+}

@@ -1,0 +1,84 @@
+package com.wadejerry.scms.modules.pfm.service;
+
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+import com.wadejerry.scms.frame.entity.ReportPageParamsDto;
+import com.wadejerry.scms.modules.pfm.dto.CzReportDto;
+
+public interface pfmCzReportService {
+
+	int selectRecordTotal(Date startTime, Date endTime, String carNumber, List<Integer> listtypeId, String size);
+
+	
+
+	List<CzReportDto> selectAllListByPage(Date startTime, Date endTime, String carNumber, List<Integer> listtypeId,
+			String size, int length, int start);
+
+
+
+	Date selectCarTypeName(Integer integer);
+
+
+
+	List selectDoubleRecordTotal(Date startTime, Date endTime, String carNumber, Integer temp, String size, List listcarType);
+
+
+
+	List<CzReportDto> selectDoubleListByPage(Date startTime, Date endTime, String carNumber, Integer temp, String size,
+			int length, int start, List listcarType, String order);
+
+
+
+	List<String> selectByTypeList();
+
+
+
+	Date selectInserttime(Date startTime, Date endTime, String carNumber, Integer integer, String size, List<Integer> listcarType);
+
+
+
+	List<Map<String, Object>> exportDay(Date startTime, Date endTime, Integer typeId, String size, List<Integer> list, String carNumber);
+
+
+
+	List<CzReportDto> selectMonthRecordTotal(Integer year, Integer month, String carNumber, Integer typeId, String size, Date startTime, Date endTime, Integer nowMonth, Integer endmonth, List<Integer> listcarType);
+
+
+
+	List<CzReportDto> selectMonthListByPage(Integer year, Integer month, String carNumber, Integer typeId, String size,
+			int length, int start, Date startTime, Date endTime, Integer nowMonth, Integer endmonth, List<Integer> listcarType, String order);
+
+
+
+	List<CzReportDto> selectMonthInserttime(Integer year, Integer month, String carNumber, Integer typeId, String size,
+			Date startTime, Date endTime, Integer nowMonth);
+
+
+
+	List<CzReportDto> selectYearRecordTotal(Integer year, String carNumber, Integer typeId, String size, Date startTime,
+			Date endTime, Integer endyear, List<Integer> listcarType, Integer nowYear);
+
+
+
+	List<CzReportDto> selectYearListByPage(Integer startyear, Integer endyear, String carNumber, Integer typeId,
+			String size, int length, int start, Date startTime, Date endTime, Integer nowYear,
+			List<Integer> listcarType, String order);
+
+
+
+
+	List<Map<String, Object>> exportMonth(Date startTime, Date endTime, Integer typeId, String size, List<Integer> list,
+			String carNumber, Integer nowMonth, Integer year);
+
+
+
+	List<Map<String, Object>> exportYear(Integer startyear, String carNumber, Integer typeId, String size,
+			Date startTime, Date endTime, Integer endyear, List<Integer> list, Integer nowYear);
+
+
+
+	//List<Map<String, Object>> exportMonth(Date startTime, Date endTime, List<Integer> listTypeId, String size);
+
+}

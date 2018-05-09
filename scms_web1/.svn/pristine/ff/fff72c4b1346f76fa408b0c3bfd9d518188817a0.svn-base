@@ -1,0 +1,772 @@
+var wade = wade || {};
+wade.role = wade.role || {};
+var config1 = new Object();
+var config2 = new Object();//批量开卡
+var NodeArray=new Array(5);//节点
+var personArray=new Array(3);//存 人员编号，姓名，部门
+var ztreeConf = $.extend({},
+{
+    id: "tree",
+    url: "/personnel/getptree.do",
+    // 获取所有节点
+    btns: ["add", "delete", "edit", "cancel"],
+    adddiv: "adddept",
+    addurl: "/personnel/adddept.do",
+    add_shown: add_shownTree,
+    deleteurl: "/personnel/deleteTreeNode.do",
+    //delnode: delnode1,
+    //oncancel: cancel,
+    //afterdelete:afterdel,
+    setting: {
+        data: {
+            simpleData: {
+                enable: true
+                // 简单数据
+            }
+        },
+        view: {
+            selectedMulti: false
+        },
+        callback: {
+           onClick: nodeClick
+        }
+    },
+
+
+});
+ 
+//$.fn.zTree.init($("#"+ztreeConf.id),ztreeConf.setting, ztreeConf.zNodes);
+wade.libs.tree(ztreeConf);
+ 
+
+
+function afterdel(){
+	 $("[name=searchValue0_search_hidden]").val("").trigger('keyup.DT');
+}
+/*function delnode1(node) {
+   if (node.type == "cartype") {
+       return true
+   } else {
+       //wade.libs.dialog("当前车场无法删除！！！！");
+       wade.libs.alert("当前车场无法删除！",2);
+       return false;
+   }
+
+}*/
+//点击节点是触发事件,触发表格
+function nodeClick(event, treeId, treeNode) {
+	//alert(0);
+	var zTree = $.fn.zTree.getZTreeObj(treeId);
+	var node=zTree.getSelectedNodes()[0];
+	//console.log(node);
+	//NodeArray.push(node.SpId);
+	
+	// $("[name=searchValue0_search_hidden]").val(treeNode.deptCode).trigger('keyup.DT');
+	//wade.libs.datatable(config1);
+	//dataTable(config1,node.id);
+	/*$.ajax({
+		url:'/personnel/updateInfoByNode.do',
+		data:{deptid:node.id},
+		dataType:'json',
+		//async : false,//设置为同步操作就可以给全局变量赋值成功 
+		success:function(data){
+			$(".paginate_button.active").click(); //点击分页按钮获取新数据
+		}
+	});*/
+	
+}
+//点击cancel回调函数
+function cancel() {
+/*
+   $("[name=searchValue1_search_hidden]").val("").trigger('keyup.DT');
+   $("[name=searchValue0_search_hidden]").val("").trigger('keyup.DT');*/
+}
+/*//获取名称的拼音代码
+function getPinyin(val,devClone){
+	$.ajax({
+		url:'/personnel/selectpinyin.do',
+		data:{val:val},
+		dataType:'json',
+		//async : false,//设置为同步操作就可以给全局变量赋值成功 
+		success:function(data){
+			var result = eval(data);
+			alert(val);
+			alert(result.val);
+            devClone.find('input[name="'+val+'"]').val(result.val);
+		}
+		
+	});
+}*/
+//弹出部门树节点的信息
+function add_shownTree(devClone, treeid, flag){
+	//alert(0);
+	 var selnode = wade.tree.selectNode(treeid);
+	    if (selnode == undefined) {
+	        devClone.modal('hide');
+	      //  wade.libs.dialog("请选择需要操作的项");
+	        wade.libs.alert("请选择需要操作的部门",2);
+	        return false;
+
+	    }
+	    
+	var zTree = $.fn.zTree.getZTreeObj(treeid);
+	var node=zTree.getSelectedNodes()[0];
+	var id=node.id;//树的id
+	//alert(id);
+	devClone.find('input[name="bimDeptId"]').val(id);
+	devClone.find('input[name="deptName"]').on('blur',function(){
+		var deptName=devClone.find('input[name="deptName"]').val();
+		$.ajax({
+			url:'/personnel/selectpinyin.do',
+			data:{val:deptName},
+			dataType:'json',
+			//async : false,//设置为同步操作就可以给全局变量赋值成功 
+			success:function(data){
+				var result = eval(data);
+				//alert(val);
+				//alert(result.val);
+	            devClone.find('input[name="pinyin"]').val(result.pinyin);
+			}
+			
+		});
+		//getPinyin(deptName,devClone);//获取名称的拼音代码
+		
+	});
+	if(flag==0){
+		//添加树节点
+		    devClone.find('input[name="type"]').val(flag);//设置为添加
+			devClone.find('input[name="inCode"]').val(node.name);
+			
+			
+	}
+	else{
+		devClone.find('input[name="type"]').val(flag);//设置为修改
+		//查询，修改dept信息
+		$.ajax({
+			url:'/personnel/selectdeptInfo.do',
+			data:{id:id},
+			dataType:'json',
+			//async : false,//设置为同步操作就可以给全局变量赋值成功 
+			success:function(data){
+				var result = eval(data);
+	        	devClone.find('input[name="inCode"]').val(result.inCodeName);
+	        	devClone.find('input[name="deptCode"]').val(result.deptCode);
+	        	devClone.find('input[name="deptName"]').val(result.deptName);
+	        	devClone.find('input[name="pinyin"]').val(result.pinyin);
+	        
+			}
+			
+		});
+		//修改树节点
+		devClone.find('input[name="bimDeptId"]').val(id);
+		
+	}
+	
+}	
+
+
+//需要显示的按钮
+config1.btns = new Array({
+	'id' : '10001',
+	'name' : '添加',
+	'fun' : addPersonInfo
+},/*{
+	'id' : '10002',
+	'name' : 'fileadd',
+	'fun' : null	
+},*/
+{
+	'id' : "10003",
+	'name' : 'del',
+	"fun" : null
+},{
+	'id' : "10004",
+	'name' : '移至',
+	"fun" : move
+},{
+	'id' : "10005",
+	'name' : '批量开卡',
+	"fun" : batchcard
+},{
+	'id' : "10006",
+	'name' : '身份管理',
+	"fun" : identitymanagement
+},
+{
+	'id' : "10007",
+	'name' : '导入',
+	"fun" : importInfo
+},
+{
+	'id' : "10008",
+	'name' : '导出',
+	"fun" : exportInfo
+}
+);
+
+config1.search = new Array(
+
+		{
+			'type' : 'search',
+			'placeholder' : '编号',
+			'url' : null,
+			'index' : 0
+		},
+		{
+			'type' : 'search_hidden',
+			'placeholder' : '',
+			'url' : null,
+			'index' : 0
+		}
+		);
+
+	//移至
+	function move(sel_tr,all_tr,sel_obj_arr,sel_obj){
+		if (sel_obj_arr.length == 0) {
+	        wade.libs.alert("请选择需要移至的员工!",2);
+	        return;
+	    }
+		var devClone = $("#changedept").clone(true);
+		devClone.modal('show').on('hidden.bs.modal',
+			    function(event) {
+			        $(this).remove();
+			    });
+		//修改clone后的modal的id
+		var tree = devClone.find("#changetree");
+		//var treeid='clonechangetree';
+		 //treeid = new Date().getTime().toString();
+		 tree.attr('id', 'clonechangetree');
+		 var treeid=tree.attr('id');
+		var ztreeConf = $.extend({},
+			    {
+			        id:tree.attr('id'), 
+			        url: "/personnel/getptree.do",
+			        // 获取所有节点
+			        btns: [],
+			        setting: {
+			            data: {
+			                simpleData: {
+			                    enable: true
+			                    // 简单数据
+			                }
+			            },
+			            view: {
+			                selectedMulti: false
+			            }
+			           
+			        }
+			    });
+
+			    wade.libs.tree(ztreeConf);
+			  
+			            
+			    		 var condition = "[";
+			    		 $.each(sel_obj_arr,
+			    		            function(index, obj) {
+			    		                var personCode = obj.personCode;
+			    		                //var personName = obj.personName;
+			    		                //alert(personCode);
+			    		                if (index == 0)
+
+			    		                condition += personCode;
+			    		                else condition += ',' + personCode
+
+			    		            });
+			    		   condition += "]";
+			    		   devClone.find(".btn-primary").unbind("click").click(function() {
+			    			   if (!wade.tree.selectNode(treeid)) {
+
+			    		           wade.libs.alert("请选择部门！", 0, devClone.find('div:first'));
+			    		        } else{
+			    		        	 var deptid = wade.tree.selectNode(treeid).id
+			    		        	 alert(deptid);
+			    		        	 $.ajax({
+						                   url: "/personnel/changedept.do",
+						                   data: "condition=" + condition + "&deptid=" + deptid,
+						                   // 默认获取div下第一个from数据
+						                   success: function(data) {
+						                       result = JSON.parse(data);
+						                       if (result.success) {
+						                           wade.libs.alert('修改成功');
+						                           $(".paginate_button.active").click(); // 点击分页获取最新数据
+						                           devClone.modal('hide');
+						                       } else {
+						                           wade.libs.alert(result.msg, 0, devClone.find('div:first'));
+						                       }
+						                   }
+						               });
+			    		        }
+			    			  
+			    		   });
+			    		   
+			    		   //alert(cartypeid);
+			    		  
+
+			    	
+			    	//console.log(condition);
+			   
+			    
+	};
+	//批量开卡
+	function batchcard(sel_tr,all_tr,sel_obj_arr,sel_obj){
+		if (sel_obj_arr.length == 0) {
+	        wade.libs.alert("请选择需要移至的员工!",2);
+	        return;
+	    }
+		var devClone = $("#batchcard").clone(true);
+		devClone.modal('show').on('hidden.bs.modal',
+			    function(event) {
+			        $(this).remove();
+			    });
+	};
+	//身份管理
+    function identitymanagement(sel_tr,all_tr,sel_obj_arr,sel_obj){
+		
+	};
+	//导入
+    function importInfo(){
+    	//alert(0);
+    	var devClone = $("#uploadModal1").clone(true);
+    	 //var devClone2 = $("#progressModal").clone(true);
+    	devClone.modal({backdrop: 'static', keyboard: false}).on('hidden.bs.modal',
+    		    function(event) {
+    		        $(this).remove();
+    		    });
+    	
+    	devClone.find('input[name="lx"]').change(function(){
+    		var type=devClone.find('input:radio[name="lx"]:checked').val();
+    		
+        	if(type==0){//部门
+        		devClone.find('#mb').text('下载部门模板');
+        	}
+        	else{//员工
+        		devClone.find('#mb').text('下载人员模板');
+        	}
+    	});
+    	//点击下载模板类型
+    	devClone.find('#mb').click(function(){
+    		var type=devClone.find('input:radio[name="lx"]:checked').val();
+    	
+    		if(type==0){//部门
+        		
+    			window.open("/personnel/DeptDemodownload.do");
+        	}
+        	else{//员工
+        		
+        		window.open("/personnel/PersonDemodownload.do");
+        	}
+    	});
+    	
+    	devClone.find('#sc').click(function() {
+    		//alert(0);
+    		if(devClone.find("#file").val()==""){
+        		alert("请选择文件！");
+        		return;
+        	}
+    		
+    		var type=devClone.find('input:radio[name="lx"]:checked').val();
+    	    var formData = new FormData(devClone.find('#form1')[0]);
+    	    formData.append("type",type);
+    	   $.ajax({
+               type:'post',
+    		   url: '/personnel/upload.do',
+               data: formData,
+               mimeType: "multipart/form-data",
+               contentType: false,
+               cache: false,
+               processData: false,
+               success:function(data){
+            	   var result = JSON.parse(data);
+            	   //alert(result.success);
+                   if (result.success) {
+                       alert("恭喜！上传成功！");
+                       devClone.modal('hide');
+                       //devClone2.modal('hide');
+                   } else {
+                   	 //devClone2.modal('hide');
+                       alert(result.msg);
+                   }
+		                
+           },
+           fail:function(jqXHR, textStatus, errorThrown){
+        	   
+           }
+
+        });
+    	
+    	});
+    	
+    	
+	};
+	//导出
+	  function exportInfo(){
+		  var devClone = $("#downloadModal").clone(true);
+		 
+	      devClone.modal({backdrop: 'static', keyboard: false}).on('hidden.bs.modal',
+	    		    function(event) {
+	    		        $(this).remove();
+	    		    });
+	    	
+	    	
+	      devClone.find('#submit').click(function() {
+	    	  var type=devClone.find('input:radio[name="LX"]:checked').val();
+	    	  if(type==0){//部门
+	    		  window.open("/personnel/Deptdownload.do");
+	    		}
+	    	  else{
+	    		  //员工
+	    		  window.open("/personnel/Persondownload.do");
+	    	  }
+
+	    	   
+
+	        });
+		};
+		
+		//添加人员信息
+	function addPersonInfo(){
+		var devClone = $("#personModal").clone(true);
+		
+   	    devClone.modal({backdrop: 'static', keyboard: false}).on('hidden.bs.modal',
+   		    function(event) {
+   		        $(this).remove();
+   		    });
+   	    
+   	    //默认显示部门名称
+			var zTree = $.fn.zTree.getZTreeObj("tree");
+			var node=zTree.getSelectedNodes()[0];
+			if(node==undefined){
+				// alert(0);
+				devClone.find('input[name="deptName"]').val("默认部门");
+			}
+			else{
+				//alert(0);
+				devClone.find('input[name="deptName"]').val(node.name);
+			}
+			//动态显示拼音
+			devClone.find('input[name="personName"]').on('blur',function(){
+				var personName=devClone.find('input[name="personName"]').val();
+				$.ajax({
+					url:'/personnel/selectpinyin.do',
+					data:{val:personName},
+					dataType:'json',
+					//async : false,//设置为同步操作就可以给全局变量赋值成功 
+					success:function(data){
+						var result = eval(data);
+						//alert(val);
+						//alert(result.val);
+			            devClone.find('input[name="pinyin"]').val(result.pinyin);
+					}
+					
+				});
+				//getPinyin(deptName,devClone);//获取名称的拼音代码
+				
+			});
+		
+   	    //用来改变tab样式
+   		function ChangeTab(devClone){
+   			devClone.find('#allInfo').removeClass('active in');
+   			devClone.find('#basicInfo').addClass('active in');
+   			devClone.find('li[name="allInfo"]').removeClass('active in');
+   			devClone.find('li[name="basicInfo"]').addClass('active in');
+   		}
+   		
+   		ChangeTab(devClone);
+   		
+   		devClone.find('#jb').click(function(){
+   			devClone.find('#allInfo').removeClass('active in');
+   			devClone.find('#basicInfo').addClass('active in');
+   			
+   			
+   		});
+   		devClone.find('#xx').click(function(){
+   			devClone.find('#basicInfo').removeClass('active in');
+   			devClone.find('#allInfo').addClass('active in');
+   			
+   		});
+   	   //出生日期
+   	   devClone.find('input[name="birthday"]').datepicker({
+   	        autoclose: true,
+   	        format: 'yyyy-mm-dd',
+   	        todayBtn: true,
+   	        todayHighlight: true,
+   	        language: 'zh-CN'
+
+   	    }).datepicker();
+   	   //到职日期
+   	   devClone.find('input[name="jobDate"]').datepicker({
+   	        autoclose: true,
+   	        format: 'yyyy-mm-dd',
+   	        todayBtn: true,
+   	        todayHighlight: true,
+   	        language: 'zh-CN'
+
+   	    }).datepicker();
+   	//离职日期
+   	 devClone.find('input[name="resignationDate"]').datepicker({
+   	        autoclose: true,
+   	        format: 'yyyy-mm-dd',
+   	        todayBtn: true,
+   	        todayHighlight: true,
+   	        language: 'zh-CN'
+
+   	    }).datepicker();
+		
+   	/** **********************  校验开始 */
+		devClone.find("#submit").click(register);//绑定提交事件
+		function register(event){
+			var personCode=devClone.find('input[name="personCode"]').val();
+			//alert(personCode);
+			var personName=devClone.find('input[name="personName"]').val();
+			//alert(personName);
+			var deptName=$('input[name="deptName"]').val();
+			var msg=null;
+			if(!RegExpObj.isNumber(personCode)){
+				//alert(personCode);
+				msg='人员编号为数字';
+				devClone.find("#personCodeNotice").html('<span class="point-box errorbgTop dropdown"><i class="sprite icon_arrow_up2 pa"></i>' + msg + '</span>').show();
+				event.stopImmediatePropagation(); //阻止提交数据
+				ChangeTab(devClone);
+				return false;
+			}
+			if(!RegExpObj.isName(personName)){
+				//alert(personName);
+				msg='姓名只能为中文';
+				devClone.find("#personNameNotice").html('<span class="point-box errorbgTop dropdown"><i class="sprite icon_arrow_up2 pa"></i>' + msg + '</span>').show();
+				event.stopImmediatePropagation(); //阻止提交数据
+				ChangeTab(devClone);
+				 return false;
+			}
+				
+			
+		}
+		//获取焦点
+		devClone.find('input[name="personCode"]').on('focus',function(){
+			devClone.find("#personCodeNotice").hide();
+			devClone.find("#personNameNotice").hide();
+		});
+		
+		devClone.find('input[name="personName"]').on('focus',function(){
+			devClone.find("#personCodeNotice").hide();
+			devClone.find("#personNameNotice").hide();
+		});
+		/********************校验结束*/
+		
+		devClone.find(".btn-primary").click(function() { // 保存按钮添加事件
+			if(devClone.find("#file").val()==""){
+        		alert("请选择上传的头像！");
+        		return;
+        	}
+			var formData = new FormData(devClone.find("#form1")[0]);
+			var jsonuserinfo = devClone.find("#form1").serializeObject();
+			 var condition = JSON.stringify(jsonuserinfo);
+			formData.append('condition',condition);
+			// 提交表单
+			$.ajax({
+				url :'/personnel/savepersonnelInfo.do',
+				type:'post',
+				data :formData, // 默认获取div下第一个from数据
+				mimeType: "multipart/form-data",
+	            contentType: false,
+	            cache: false,
+	            processData: false,
+				success : function(data) {
+					result = JSON.parse(data);
+					if (result.success) {
+						//devClone.modal("hide");
+						wade.libs.alert('添加成功');
+						//var imagesrc='<%=Session["src"]%>';
+							//alert(imagesrc);
+						//devClone.find('#file').attr('src',imagesrc);
+						if($("#personnelexample_wrapper").find(".paginate_button.active").size() >0){
+							$("#personnelexample_wrapper").find(".paginate_button.active").click(); //点击分页按钮获取新数据
+						} else{
+							$("#personnelexample_wrapper").find('#personnelexample th:first').click(); //数据表中没有数据，通过排序列获取数据
+						}					
+					} else {
+
+						alert(result.msg);	
+					}
+				}
+			});
+		});
+		
+		
+	}
+	
+//添加人员
+/*config1.add_shown=function(devClone, operId,sel_obj){
+	//用来改变tab样式
+	function ChangeTab(devClone){
+		devClone.find('#allInfo').removeClass('active in');
+		devClone.find('#basicInfo').addClass('active in');
+		devClone.find('li[name="allInfo"]').removeClass('active in');
+		devClone.find('li[name="basicInfo"]').addClass('active in');
+	}
+	
+	ChangeTab(devClone);
+	
+	devClone.find('#jb').click(function(){
+		devClone.find('#allInfo').removeClass('active in');
+		devClone.find('#basicInfo').addClass('active in');
+		
+		
+	});
+	devClone.find('#xx').click(function(){
+		devClone.find('#basicInfo').removeClass('active in');
+		devClone.find('#allInfo').addClass('active in');
+		
+	});
+	
+	//出生日期
+	 devClone.find('input[name="birthday"]').datepicker({
+	        autoclose: true,
+	        format: 'yyyy-mm-dd',
+	        todayBtn: true,
+	        todayHighlight: true,
+	        language: 'zh-CN'
+
+	    }).datepicker();
+	//到职日期
+	 devClone.find('input[name="jobDate"]').datepicker({
+	        autoclose: true,
+	        format: 'yyyy-mm-dd',
+	        todayBtn: true,
+	        todayHighlight: true,
+	        language: 'zh-CN'
+
+	    }).datepicker();
+	//离职日期
+	 devClone.find('input[name="resignationDate"]').datepicker({
+	        autoclose: true,
+	        format: 'yyyy-mm-dd',
+	        todayBtn: true,
+	        todayHighlight: true,
+	        language: 'zh-CN'
+
+	    }).datepicker();
+	 
+	if(operId==0){
+			var zTree = $.fn.zTree.getZTreeObj("tree");
+			var node=zTree.getSelectedNodes()[0];
+			if(node==undefined){
+				// alert(0);
+				devClone.find('input[name="deptName"]').val("默认部门");
+			}
+			else{
+				//alert(0);
+				devClone.find('input[name="deptName"]').val(node.name);
+			}
+			
+			devClone.find('input[name="personName"]').on('blur',function(){
+				var personName=devClone.find('input[name="personName"]').val();
+				$.ajax({
+					url:'/personnel/selectpinyin.do',
+					data:{val:personName},
+					dataType:'json',
+					//async : false,//设置为同步操作就可以给全局变量赋值成功 
+					success:function(data){
+						var result = eval(data);
+						//alert(val);
+						//alert(result.val);
+			            devClone.find('input[name="pinyin"]').val(result.pinyin);
+					}
+					
+				});
+				//getPinyin(deptName,devClone);//获取名称的拼音代码
+				
+			});
+		}
+	
+	//上传照片
+	devClone.find('#imagebtn').click(function(){
+		//alert(0);
+		var formData = new FormData(devClone.find('#form1')[0]);
+		//var formData = new FormData();
+		//formData.append("file",$('#file')[0].files[0]);
+		$.ajax({
+            type:'post',
+ 		    url: '/personnel/uploadImage.do',
+            data: formData,
+            mimeType: "multipart/form-data",
+            contentType: false,
+            cache: false,
+            processData: false,
+            success:function(data){
+         	   var result = JSON.parse(data);
+         	   //alert(result.success);
+                if (result.success) {
+                    alert("恭喜！上传成功！");
+                    devClone.modal('hide');
+                    //devClone2.modal('hide');
+                } else {
+                	 //devClone2.modal('hide');
+                    alert(result.msg);
+                }
+		                
+        },
+        
+
+     });
+	});
+	
+	*//** **********************  校验 *//*
+	devClone.find("#submit").click(register);//绑定提交事件
+	function register(event){
+		var personCode=devClone.find('input[name="personCode"]').val();
+		//alert(personCode);
+		var personName=devClone.find('input[name="personName"]').val();
+		//var deptName=$('input[name="deptName"]').val();
+		var msg=null;
+		if(!RegExpObj.isNumber(personCode)){
+			msg='人员编号为数字';
+			devClone.find("#personCodeNotice").html('<span class="point-box errorbgTop dropdown"><i class="sprite icon_arrow_up2 pa"></i>' + msg + '</span>').show();
+			event.stopImmediatePropagation(); //阻止提交数据
+			ChangeTab(devClone);
+			 return false;
+		}
+		if(!RegExpObj.isCharOrNum(personName)||!RegExpObj.isName(personName)){
+			msg='姓名只能为数字,字母,中文';
+			devClone.find("#personNameNotice").html('<span class="point-box errorbgTop dropdown"><i class="sprite icon_arrow_up2 pa"></i>' + msg + '</span>').show();
+			event.stopImmediatePropagation(); //阻止提交数据
+			ChangeTab(devClone);
+			 return false;
+		}
+			
+		
+	}
+	//获取焦点
+	devClone.find('input[name="personCode"]').on('focus',function(){
+		devClone.find("#personCodeNotice").hide();
+		devClone.find("#personNameNotice").hide();
+	});
+	
+	devClone.find('input[name="personName"]').on('focus',function(){
+		devClone.find("#personCodeNotice").hide();
+		devClone.find("#personNameNotice").hide();
+	});
+	};	*/
+
+	
+config1.id = "personnelexample"; // table id
+//config1.addDiv = "personModal"; // 新增弹出的层 ID
+config1.getUrl ="/personnel/getpersonnelInfo.do"; // ajax获取数据请求地址
+//config1.saveUrl = "/personnel/savepersonnelInfo.do"; // 保存修改请求地址
+config1.delUrl = "/personnel/delpersonnelInfo.do";//删除信息
+//需要绑定数据的列
+config1.columns = new Array("personId","bimDeptId","personCode", "personName",
+		"strsex", "certId","certtype","pinyin","phone");
+//需要隐藏的列
+config1.defs = new Array("personId","bimDeptId");
+wade.libs.datatable(config1);
+//批量开卡
+/*config2.id = "batchcardexample"; // table id
+//config1.addDiv = "personModal"; // 新增弹出的层 ID
+config2.getUrl ="/personnel/getpersonnelInfo.do"; // ajax获取数据请求地址
+//config1.saveUrl = "/personnel/savepersonnelInfo.do"; // 保存修改请求地址
+//需要绑定数据的列
+config2.columns = new Array("personId","bimDeptId","personCode", "personName",
+		"strsex", "certId","certtype","pinyin","phone");
+//需要隐藏的列
+config2.defs = new Array("personId","bimDeptId");
+wade.libs.datatable(config2);*/

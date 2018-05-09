@@ -1,0 +1,1037 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.wadejerry.scms.modules.pfm.dao.PfmChargeRecordMapper" >
+  <resultMap id="BaseResultMap" type="com.wadejerry.scms.modules.pfm.model.PfmChargeRecord" >
+    <id column="charge_record_id" property="chargeRecordId" jdbcType="INTEGER" />
+    <result column="car_id" property="carId" jdbcType="INTEGER" />
+    <result column="car_number" property="carNumber" jdbcType="VARCHAR" />
+    <result column="card_id" property="cardId" jdbcType="VARCHAR" />
+    <result column="person_name" property="personName" jdbcType="VARCHAR" />
+    <result column="car_type_id" property="carTypeId" jdbcType="INTEGER" />
+    <result column="car_type_name" property="carTypeName" jdbcType="VARCHAR" />
+    <result column="park_id" property="parkId" jdbcType="INTEGER" />
+    <result column="park_name" property="parkName" jdbcType="VARCHAR" />
+    <result column="in_entrance_id" property="inEntranceId" jdbcType="INTEGER" />
+    <result column="in_entrance_name" property="inEntranceName" jdbcType="VARCHAR" />
+    <result column="in_carriageway_id" property="inCarriagewayId" jdbcType="INTEGER" />
+    <result column="in_carriageway_name" property="inCarriagewayName" jdbcType="VARCHAR" />
+    <result column="in_booth_id" property="inBoothId" jdbcType="INTEGER" />
+    <result column="in_booth_name" property="inBoothName" jdbcType="VARCHAR" />
+    <result column="in_device_id" property="inDeviceId" jdbcType="INTEGER" />
+    <result column="in_device_name" property="inDeviceName" jdbcType="VARCHAR" />
+    <result column="in_time" property="inTime" jdbcType="TIMESTAMP" />
+    <result column="in_photo" property="inPhoto" jdbcType="VARCHAR" />
+    <result column="in_user_id" property="inUserId" jdbcType="INTEGER" />
+    <result column="in_user_name" property="inUserName" jdbcType="VARCHAR" />
+    <result column="out_entrance_id" property="outEntranceId" jdbcType="INTEGER" />
+    <result column="out_entrance_name" property="outEntranceName" jdbcType="VARCHAR" />
+    <result column="out_carriageway_id" property="outCarriagewayId" jdbcType="INTEGER" />
+    <result column="out_carriageway_name" property="outCarriagewayName" jdbcType="VARCHAR" />
+    <result column="out_booth_id" property="outBoothId" jdbcType="INTEGER" />
+    <result column="out_booth_name" property="outBoothName" jdbcType="VARCHAR" />
+    <result column="out_device_id" property="outDeviceId" jdbcType="INTEGER" />
+    <result column="out_device_name" property="outDeviceName" jdbcType="VARCHAR" />
+    <result column="out_time" property="outTime" jdbcType="TIMESTAMP" />
+    <result column="out_photo" property="outPhoto" jdbcType="VARCHAR" />
+    <result column="rule_id" property="ruleId" jdbcType="INTEGER" />
+    <result column="rule_name" property="ruleName" jdbcType="VARCHAR" />
+    <result column="rule_type" property="ruleType" jdbcType="INTEGER" />
+    <result column="parking_duration" property="parkingDuration" jdbcType="INTEGER" />
+    <result column="charge_fee" property="chargeFee" jdbcType="NUMERIC" />
+    <result column="balance" property="balance" jdbcType="NUMERIC" />
+    <result column="disable_time" property="disableTime" jdbcType="TIMESTAMP" />
+    <result column="paymethod" property="paymethod" jdbcType="INTEGER" />
+    <result column="jianmian_fee" property="jianmianFee" jdbcType="NUMERIC" />
+    <result column="jianmian_rule_name" property="jianmianRuleName" jdbcType="VARCHAR" />
+    <result column="note" property="note" jdbcType="VARCHAR" />
+    <result column="flag" property="flag" jdbcType="INTEGER" />
+    <result column="insert_time" property="insertTime" jdbcType="TIMESTAMP" />
+    <result column="userid" property="userid" jdbcType="INTEGER" />
+    <result column="user_name" property="userName" jdbcType="VARCHAR" />
+    <result column="custom1" property="custom1" jdbcType="INTEGER" />
+    <result column="custom2" property="custom2" jdbcType="INTEGER" />
+    <result column="custom3" property="custom3" jdbcType="VARCHAR" />
+    <result column="custom4" property="custom4" jdbcType="VARCHAR" />
+  </resultMap>
+  <resultMap id="ResultDto" type="com.wadejerry.scms.modules.pfm.dto.PfmChargeRecordDto" >
+   <id column="charge_record_id" property="chargeRecordId" jdbcType="INTEGER" />
+   <result column="car_type_name" property="carTypeName" jdbcType="VARCHAR" />
+   <result column="insert_time" property="insertTime" jdbcType="TIMESTAMP" />
+   <result column="countNum" property="countNum" jdbcType="INTEGER" />
+   <result column="czfee" property="czfee" jdbcType="NUMERIC" />
+  </resultMap>
+  
+  <sql id="Base_Column_List" >
+    charge_record_id, car_id, car_number, card_id, person_name, car_type_id, car_type_name, 
+    park_id, park_name, in_entrance_id, in_entrance_name, in_carriageway_id, in_carriageway_name, 
+    in_booth_id, in_booth_name, in_device_id, in_device_name, in_time, in_photo, in_user_id, 
+    in_user_name, out_entrance_id, out_entrance_name, out_carriageway_id, out_carriageway_name, 
+    out_booth_id, out_booth_name, out_device_id, out_device_name, out_time, out_photo, 
+    rule_id, rule_name, rule_type, parking_duration, charge_fee, balance, disable_time, 
+    paymethod, jianmian_fee, jianmian_rule_name, note, flag, insert_time, userid, user_name, 
+    custom1, custom2, custom3, custom4
+  </sql>
+  <select id="selectRecordTotal"   resultType="java.lang.Integer" >
+   select count(charge_record_id) from pfm_charge_record 
+   <where>
+        <if test="startTime!=null">out_time &gt;=#{startTime}</if>
+  		<if test="endTime!=null">and out_time  &lt;=#{endTime}</if>
+  		<if test="carNumber!=null">and car_number=#{carNumber}</if>
+  		<if test="parkId!=null">and park_id=#{parkId}</if>
+  		<if test="entranceId!=null">and (in_entrance_id in
+  		<foreach item="item" index="index" collection="entranceId" open="(" separator="," close=")">
+            #{item,jdbcType=INTEGER}
+        </foreach> 
+  		or out_entrance_id in
+  		<foreach item="item" index="index" collection="entranceId" open="(" separator="," close=")">
+            #{item,jdbcType=INTEGER}
+        </foreach> 
+  		)</if>
+  		<if test="carriagewayId!=null">and (in_carriageway_id=#{carriagewayId} or out_carriageway_id=#{carriagewayId})</if>
+  	    <if test="listtype!=null">and car_type_id in <foreach item="item" index="index" collection="listtype" open="(" separator="," close=")">
+            #{item,jdbcType=INTEGER}
+        </foreach>
+        </if>
+        <if test="size!=null">and 1=-1</if>
+        
+  	    </where>
+  </select>
+  <!-- 分页获取操作员信息 -->
+  <select id="selectAllListByPage" parameterType="com.wadejerry.scms.frame.entity.ReportPageParamsDto" resultMap="BaseResultMap" >
+  select * from pfm_charge_record 
+   <where>
+	  	 <if test="searchValue0!=null">out_time &gt;=#{searchValue0,jdbcType=TIMESTAMP}</if>
+  		<if test="searchValue1!=null">and out_time &lt;=#{searchValue1,jdbcType=TIMESTAMP}</if>
+  		<if test="searchValue2!=null">and car_number=#{searchValue2,jdbcType=VARCHAR}</if>
+  		<!-- <if test="intValue1!=0">and in_entrance_id=#{intValue1,jdbcType=INTEGER} or out_entrance_id=#{intValue1,jdbcType=INTEGER}</if> -->
+  		<if test="intValue4!=0">and park_id=#{intValue4,jdbcType=INTEGER}</if>
+  		<if test="entranceIdList!=null">and (in_entrance_id in  
+  		<foreach item="item" index="index" collection="entranceIdList" open="(" separator="," close=")">
+            #{item,jdbcType=INTEGER}
+        </foreach> 
+  		or out_entrance_id in
+  		<foreach item="item" index="index" collection="entranceIdList" open="(" separator="," close=")">
+            #{item,jdbcType=INTEGER}
+        </foreach>
+  		)</if>
+  		<if test="intValue7!=0">and (in_carriageway_id=#{intValue7,jdbcType=INTEGER} or out_carriageway_id=#{intValue7,jdbcType=INTEGER})</if>
+  		<!-- <if test="flag!=null">and car_type_id in
+  		<foreach item="item" index="index" collection="listType" open="(" separator="," close=")">
+            #{item,jdbcType=INTEGER}
+        </foreach>
+  		</if>  -->
+  		<if test="listType!=null">and car_type_id in
+  		<foreach item="item" index="index" collection="listType" open="(" separator="," close=")">
+            #{item,jdbcType=INTEGER}
+        </foreach>
+  		</if>
+  		 <if test="size!=null">and 1=-1</if>
+	  	</where> 
+	  	${order} 
+	  	LIMIT  #{length,jdbcType=INTEGER} OFFSET  #{start,jdbcType=INTEGER}
+  </select>
+   
+  
+  <!-- 导出 -->
+  <select id="exportcharge" resultType="java.util.HashMap">
+  select car_number,person_name,car_type_name,rule_name,parking_duration,charge_fee,jianmian_fee,jianmian_rule_name,user_name,in_time,out_time
+  from pfm_charge_record  <where>
+  <if test="startTime!=null">out_time &gt;=#{startTime}</if>
+  <if test="endTime!=null">and out_time  &lt;=#{endTime}</if>
+  <if test="carNumber!=null">and car_number=#{carNumber}</if>
+  <if test="listtype!=null">and car_type_id in
+  <foreach item="item" index="index" collection="listtype" open="(" separator="," close=")">
+            #{item,jdbcType=INTEGER}
+  </foreach></if>
+        <if test="listentranceId!=null">and (in_entrance_id in
+  		<foreach item="item" index="index" collection="listentranceId" open="(" separator="," close=")">
+            #{item,jdbcType=INTEGER}
+        </foreach> 
+  		or out_entrance_id in
+  		<foreach item="item" index="index" collection="listentranceId" open="(" separator="," close=")">
+            #{item,jdbcType=INTEGER}
+        </foreach> 
+  		)</if>
+  <if test="size!=null">and 1=-1</if>
+  </where>
+  order by charge_record_id
+  </select>
+  
+  
+  
+  
+  
+  <!-- 查询消费日报表个数 -->
+  <select id="selectChargeRecordTotal"   resultMap="ResultDto" >
+
+  	    
+  	    select car_type_name from pfm_charge_record 
+<where>
+       
+        <if test="startTime!=null"> and insert_time &gt;=#{startTime}  </if>
+  	    <if test="endTime!=null">and  insert_time  &lt;=#{endTime}</if>
+  		<if test="carNumber!=null">and car_number=#{carNumber}</if>
+  	    <if test="listtype!=null">and car_type_id =#{listtype,jdbcType=INTEGER}
+        </if>
+        <if test="listcarType!=null">and car_type_id in
+        <foreach item="item" index="index" collection="listcarType" open="(" separator="," close=")">
+            #{item,jdbcType=INTEGER}
+        </foreach>
+        </if>
+        <if test="size!=null">and 1=-1</if>
+  	    </where>
+  	    group by car_type_name
+</select> 
+  <!-- 查询插入的时间 -->
+  <select id="selectInserttime"   resultType="java.util.Date" >
+
+  	    
+  	    select insert_time from pfm_charge_record 
+<where>
+        <if test="startTime!=null"> and insert_time &gt;=#{startTime}  </if>
+  	    <if test="endTime!=null">and  insert_time  &lt;=#{endTime}</if>
+  		<if test="carNumber!=null">and car_number=#{carNumber}</if>
+  	    <if test="listtype!=null">and car_type_id =#{listtype,jdbcType=INTEGER}
+        </if>
+        <if test="listcarType!=null">and car_type_id in
+        <foreach item="item" index="index" collection="listcarType" open="(" separator="," close=")">
+            #{item,jdbcType=INTEGER}
+        </foreach>
+        </if>
+        <if test="size!=null">and 1=-1</if>
+  	    </where>
+  	    limit 1
+</select> 
+  
+ <!-- 查询消费日报表信息 -->
+  <select id="selectChargeDayListByPage"  resultMap="ResultDto" >
+
+  	  select car_type_name,count(1) as countNum,sum(charge_fee) as czfee from pfm_charge_record<where>
+  	    <if test="startTime!=null"> and insert_time &gt;=#{startTime}  </if>
+  	    <if test="endTime!=null">and  insert_time  &lt;=#{endTime}</if>
+  		<if test="carNumber!=null">and car_number=#{carNumber}</if>
+  		<if test="listtype!=null">and car_type_id=#{listtype,jdbcType=INTEGER}</if>
+  		<if test="listcarType!=null">and car_type_id in
+        <foreach item="item" index="index" collection="listcarType" open="(" separator="," close=")">
+            #{item,jdbcType=INTEGER}
+        </foreach>
+        </if>
+        <if test="size!=null">and 1=-1</if>
+  	    group by car_type_name 
+	  	LIMIT  #{length,jdbcType=INTEGER} OFFSET  #{start,jdbcType=INTEGER} 
+  	  </where>
+  	     
+</select> 
+  
+  <!-- 查询月报表信息个数 -->
+  <select id="selectMonthRecordTotal" resultMap="ResultDto">
+ select car_type_name from pfm_charge_record 
+ 
+<where>
+       
+         <if test="nowMonth!=null">and EXTRACT (month from insert_time)=#{month}</if>
+         <if test="carNumber!=null">and car_number=#{carNumber}</if>
+  	    <if test="listtype!=null">and car_type_id =#{listtype,jdbcType=INTEGER}
+        </if>
+        <if test="listcarType!=null">and car_type_id in
+  <foreach item="item" index="index" collection="listcarType" open="(" separator="," close=")">
+            #{item,jdbcType=INTEGER}
+        </foreach></if>
+        <if test="size!=null">and 1=-1</if>
+        <choose>
+        <when test="startTime!=null and endTime!=null">
+           <!-- and ((EXTRACT (month from insert_time)=#{month} and insert_time&gt;=#{startTime})
+           and (EXTRACT (month from insert_time)=#{endMonth} and insert_time&lt;=#{endTime})) -->
+           and insert_time&gt;=#{startTime} and insert_time&lt;=#{endTime}
+        </when>
+        <otherwise>
+        and EXTRACT (year from insert_time)=#{year}
+        <if test="startTime!=null">and (EXTRACT (month from insert_time)=#{month} and insert_time&gt;=#{startTime})</if>
+  	    <if test="endTime!=null">and  (EXTRACT (month from insert_time) =#{month} and insert_time&lt;=#{endTime})</if>
+        </otherwise>
+    </choose>
+         
+  	    </where>
+  	    group by car_type_name	
+</select>
+<!-- 查询消费月报表 信息-->
+  <select id="selectMonthListByPage"  resultMap="ResultDto" >
+
+  	  select car_type_name,car_type_id,count(1) as countNum,sum(charge_fee) as czfee from pfm_charge_record
+  	  <where>
+  	 
+         <if test="nowMonth!=null">and EXTRACT (month from insert_time)=#{month}</if>
+         <if test="carNumber!=null">and car_number=#{carNumber}</if>
+  	    <if test="listtype!=null">and car_type_id =#{listtype,jdbcType=INTEGER}
+        </if>
+        <if test="listcarType!=null">and car_type_id in
+  <foreach item="item" index="index" collection="listcarType" open="(" separator="," close=")">
+            #{item,jdbcType=INTEGER}
+        </foreach></if>
+        <if test="size!=null">and 1=-1</if>
+        <choose>
+        <when test="startTime!=null and endTime!=null">
+        
+        and insert_time&gt;=#{startTime} and insert_time&lt;=#{endTime}
+        
+        </when>
+        <otherwise>
+        and EXTRACT (year from insert_time)=#{year} 
+        <if test="startTime!=null">and EXTRACT (month from insert_time)=#{month}  and insert_time&gt;=#{startTime}</if>
+  	    <if test="endTime!=null"> and  EXTRACT (month from insert_time) =#{month}  and insert_time&lt;=#{endTime}</if>
+        </otherwise>
+    </choose>
+        
+  		 group by car_type_name,car_type_id 
+	  	LIMIT  #{length,jdbcType=INTEGER} OFFSET  #{start,jdbcType=INTEGER} 
+  	    </where>
+  	  
+  	     
+</select> 
+  
+  
+  <!-- 消费年报表查询 个数-->
+<select id="selectYearRecordTotal" resultMap="ResultDto">
+select car_type_name from pfm_charge_record 
+ 
+ 
+<where>
+        
+        <if test="nowyear!=null">and EXTRACT (year from insert_time)=#{nowyear}</if>
+         <if test="carNumber!=null">and car_number=#{carNumber}</if>
+  	    <if test="listtype!=null">and car_type_id =#{listtype,jdbcType=INTEGER}
+        </if>
+        <if test="listcarType!=null">and car_type_id in
+  <foreach item="item" index="index" collection="listcarType" open="(" separator="," close=")">
+            #{item,jdbcType=INTEGER}
+        </foreach></if>
+        <if test="size!=null">and 1=-1</if>
+        <choose>
+        <when test="startTime!=null and endTime!=null">
+           <!-- and ((EXTRACT (month from insert_time)=#{month} and insert_time&gt;=#{startTime})
+           and (EXTRACT (month from insert_time)=#{endMonth} and insert_time&lt;=#{endTime})) -->
+           and insert_time&gt;=#{startTime} and insert_time&lt;=#{endTime}
+        </when>
+        <otherwise>
+        <if test="startTime!=null">and (EXTRACT (year from insert_time)=#{nowyear} and insert_time&gt;=#{startTime})</if>
+  	    <if test="endTime!=null">and  (EXTRACT (year from insert_time) =#{nowyear} and insert_time&lt;=#{endTime})</if>
+        </otherwise>
+    </choose>
+         
+  	    </where>
+  	    group by car_type_name	
+
+
+</select>
+ <!-- 消费年报表查询信息-->
+<select id="selectYearListByPage"  resultMap="ResultDto" >
+
+  	  select car_type_name,car_type_id,count(1) as countNum,sum(charge_fee) as czfee from pfm_charge_record
+  	  <where>
+  	 
+        <if test="nowyear!=null">and EXTRACT (year from insert_time)=#{nowyear}</if>
+         <if test="carNumber!=null">and car_number=#{carNumber}</if>
+  	    <if test="listtype!=null">and car_type_id =#{listtype,jdbcType=INTEGER}
+        </if>
+        <if test="listcarType!=null">and car_type_id in
+  <foreach item="item" index="index" collection="listcarType" open="(" separator="," close=")">
+            #{item,jdbcType=INTEGER}
+        </foreach></if>
+        <if test="size!=null">and 1=-1</if>
+        <choose>
+        <when test="startTime!=null and endTime!=null">
+         <!-- and ((EXTRACT (month from insert_time)=#{month} and insert_time&gt;=#{startTime})
+         and (EXTRACT (month from insert_time)=#{endMonth} and insert_time&lt;=#{endTime})) -->  
+        
+        and insert_time&gt;=#{startTime} and insert_time&lt;=#{endTime}
+        
+       
+        </when>
+        <otherwise>
+       <if test="startTime!=null">and (EXTRACT (year from insert_time)=#{nowyear} and insert_time&gt;=#{startTime})</if>
+  	    <if test="endTime!=null">and  (EXTRACT (year from insert_time) =#{nowyear} and insert_time&lt;=#{endTime})</if>
+        </otherwise>
+    </choose>
+        
+  		 group by car_type_name,car_type_id 
+	  	LIMIT  #{length,jdbcType=INTEGER} OFFSET  #{start,jdbcType=INTEGER} 
+  	    </where>
+  	  
+  	     
+</select> 
+  
+  
+  <!-- 消费日报表导出 -->
+  <!-- <select id="exportChargeDay"   resultType="java.util.HashMap" >
+
+  	    
+  	    select car_type_name,count(1) as countNum,sum(charge_fee) as czfee  from pfm_charge_record 
+<where>
+       
+        <if test="start!=null"> and insert_time &gt;=#{start}  </if>
+  	    <if test="endTime!=null">and  insert_time  &lt;=#{endTime}</if>
+  		<if test="carNumber!=null">and car_number=#{carNumber}</if>
+  	    <if test="listtype!=null">and car_type_id =#{listtype,jdbcType=INTEGER}
+        </if>
+        <if test="listcarType!=null">and car_type_id in
+        <foreach item="item" index="index" collection="listcarType" open="(" separator="," close=")">
+            #{item,jdbcType=INTEGER}
+        </foreach>
+        </if>
+        <if test="size!=null">and 1=-1</if>
+  	    </where>
+  	    group by car_type_name
+</select>  -->
+<!-- 收费日报表导出 -->
+  <select id="exportChargeDay"  resultType="java.util.HashMap" >
+
+  	    
+  	    select car_type_name,count(1) as countNum,sum(charge_fee) as czfee from pfm_charge_record 
+<where>
+       
+        <if test="start!=null"> and insert_time &gt;=#{start}  </if>
+  	    <if test="endTime!=null">and  insert_time  &lt;=#{endTime}</if>
+  		<if test="carNumber!=null">and car_number=#{carNumber}</if>
+  	    <if test="listtype!=null">and car_type_id =#{listtype,jdbcType=INTEGER}
+        </if>
+        <if test="listcarType!=null">and car_type_id in
+        <foreach item="item" index="index" collection="listcarType" open="(" separator="," close=")">
+            #{item,jdbcType=INTEGER}
+        </foreach>
+        </if>
+        <if test="size!=null">and 1=-1</if>
+  	    </where>
+  	    group by car_type_name order by charge_record_id
+  	    
+</select> 
+  
+ <!-- 收费月报表导出 --> 
+  
+   <select id="exportChargeMonth"  resultType="java.util.HashMap" >
+
+  	    
+  	    select car_type_name,count(1) as countNum,sum(charge_fee) as czfee from pfm_charge_record 
+ 
+<where>
+       
+         <if test="nowMonth!=null">and EXTRACT (month from insert_time)=#{nowMonth}</if>
+         <if test="carNumber!=null">and car_number=#{carNumber}</if>
+  	    <if test="listtype!=null">and car_type_id =#{listtype,jdbcType=INTEGER}
+        </if>
+        <if test="listcarType!=null">and car_type_id in
+  <foreach item="item" index="index" collection="listcarType" open="(" separator="," close=")">
+            #{item,jdbcType=INTEGER}
+        </foreach></if>
+        <if test="size!=null">and 1=-1</if>
+        <choose>
+        <when test="startTime!=null and endTime!=null">
+           
+           and insert_time&gt;=#{startTime} and insert_time&lt;=#{endTime}
+        </when>
+        <otherwise>
+        and EXTRACT (year from insert_time)=#{year}
+        <if test="startTime!=null">and (EXTRACT (month from insert_time)=#{nowMonth} and insert_time&gt;=#{startTime})</if>
+  	    <if test="endTime!=null">and  (EXTRACT (month from insert_time) =#{nowMonth} and insert_time&lt;=#{endTime})</if>
+        </otherwise>
+    </choose>
+         
+  	    </where>
+  	    group by car_type_name
+</select> 
+  
+  
+  <!-- 收费年报表导出 -->
+  
+   <select id="exportChargeYear"  resultType="java.util.HashMap" >
+   select car_type_name,count(1) as countNum,sum(charge_fee) as czfee from pfm_charge_record 
+ 
+ 
+<where>
+        
+        <if test="nowyear!=null">and EXTRACT (year from insert_time)=#{nowyear}</if>
+         <if test="carNumber!=null">and car_number=#{carNumber}</if>
+  	    <if test="listtype!=null">and car_type_id =#{listtype,jdbcType=INTEGER}
+        </if>
+        <if test="listcarType!=null">and car_type_id in
+  <foreach item="item" index="index" collection="listcarType" open="(" separator="," close=")">
+            #{item,jdbcType=INTEGER}
+        </foreach></if>
+        <if test="size!=null">and 1=-1</if>
+        <choose>
+        <when test="startTime!=null and endTime!=null">
+           <!-- and ((EXTRACT (month from insert_time)=#{month} and insert_time&gt;=#{startTime})
+           and (EXTRACT (month from insert_time)=#{endMonth} and insert_time&lt;=#{endTime})) -->
+           and insert_time&gt;=#{startTime} and insert_time&lt;=#{endTime}
+        </when>
+        <otherwise>
+        <if test="startTime!=null">and (EXTRACT (year from insert_time)=#{nowyear} and insert_time&gt;=#{startTime})</if>
+  	    <if test="endTime!=null">and  (EXTRACT (year from insert_time) =#{nowyear} and insert_time&lt;=#{endTime})</if>
+        </otherwise>
+    </choose>
+         
+  	    </where>
+  	    group by car_type_name	
+   </select>
+  
+  
+  
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from pfm_charge_record
+    where charge_record_id = #{chargeRecordId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from pfm_charge_record
+    where charge_record_id = #{chargeRecordId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.wadejerry.scms.modules.pfm.model.PfmChargeRecord" >
+    insert into pfm_charge_record (charge_record_id, car_id, car_number, 
+      card_id, person_name, car_type_id, 
+      car_type_name, park_id, park_name, 
+      in_entrance_id, in_entrance_name, in_carriageway_id, 
+      in_carriageway_name, in_booth_id, in_booth_name, 
+      in_device_id, in_device_name, in_time, 
+      in_photo, in_user_id, in_user_name, 
+      out_entrance_id, out_entrance_name, out_carriageway_id, 
+      out_carriageway_name, out_booth_id, out_booth_name, 
+      out_device_id, out_device_name, out_time, 
+      out_photo, rule_id, rule_name, 
+      rule_type, parking_duration, charge_fee, 
+      balance, disable_time, paymethod, 
+      jianmian_fee, jianmian_rule_name, note, 
+      flag, insert_time, userid, 
+      user_name, custom1, custom2, 
+      custom3, custom4)
+    values (#{chargeRecordId,jdbcType=INTEGER}, #{carId,jdbcType=INTEGER}, #{carNumber,jdbcType=VARCHAR}, 
+      #{cardId,jdbcType=VARCHAR}, #{personName,jdbcType=VARCHAR}, #{carTypeId,jdbcType=INTEGER}, 
+      #{carTypeName,jdbcType=VARCHAR}, #{parkId,jdbcType=INTEGER}, #{parkName,jdbcType=VARCHAR}, 
+      #{inEntranceId,jdbcType=INTEGER}, #{inEntranceName,jdbcType=VARCHAR}, #{inCarriagewayId,jdbcType=INTEGER}, 
+      #{inCarriagewayName,jdbcType=VARCHAR}, #{inBoothId,jdbcType=INTEGER}, #{inBoothName,jdbcType=VARCHAR}, 
+      #{inDeviceId,jdbcType=INTEGER}, #{inDeviceName,jdbcType=VARCHAR}, #{inTime,jdbcType=TIMESTAMP}, 
+      #{inPhoto,jdbcType=VARCHAR}, #{inUserId,jdbcType=INTEGER}, #{inUserName,jdbcType=VARCHAR}, 
+      #{outEntranceId,jdbcType=INTEGER}, #{outEntranceName,jdbcType=VARCHAR}, #{outCarriagewayId,jdbcType=INTEGER}, 
+      #{outCarriagewayName,jdbcType=VARCHAR}, #{outBoothId,jdbcType=INTEGER}, #{outBoothName,jdbcType=VARCHAR}, 
+      #{outDeviceId,jdbcType=INTEGER}, #{outDeviceName,jdbcType=VARCHAR}, #{outTime,jdbcType=TIMESTAMP}, 
+      #{outPhoto,jdbcType=VARCHAR}, #{ruleId,jdbcType=INTEGER}, #{ruleName,jdbcType=VARCHAR}, 
+      #{ruleType,jdbcType=INTEGER}, #{parkingDuration,jdbcType=INTEGER}, #{chargeFee,jdbcType=NUMERIC}, 
+      #{balance,jdbcType=NUMERIC}, #{disableTime,jdbcType=TIMESTAMP}, #{paymethod,jdbcType=INTEGER}, 
+      #{jianmianFee,jdbcType=NUMERIC}, #{jianmianRuleName,jdbcType=VARCHAR}, #{note,jdbcType=VARCHAR}, 
+      #{flag,jdbcType=INTEGER}, #{insertTime,jdbcType=TIMESTAMP}, #{userid,jdbcType=INTEGER}, 
+      #{userName,jdbcType=VARCHAR}, #{custom1,jdbcType=INTEGER}, #{custom2,jdbcType=INTEGER}, 
+      #{custom3,jdbcType=VARCHAR}, #{custom4,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.wadejerry.scms.modules.pfm.model.PfmChargeRecord" >
+    insert into pfm_charge_record
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="chargeRecordId != null" >
+        charge_record_id,
+      </if>
+      <if test="carId != null" >
+        car_id,
+      </if>
+      <if test="carNumber != null" >
+        car_number,
+      </if>
+      <if test="cardId != null" >
+        card_id,
+      </if>
+      <if test="personName != null" >
+        person_name,
+      </if>
+      <if test="carTypeId != null" >
+        car_type_id,
+      </if>
+      <if test="carTypeName != null" >
+        car_type_name,
+      </if>
+      <if test="parkId != null" >
+        park_id,
+      </if>
+      <if test="parkName != null" >
+        park_name,
+      </if>
+      <if test="inEntranceId != null" >
+        in_entrance_id,
+      </if>
+      <if test="inEntranceName != null" >
+        in_entrance_name,
+      </if>
+      <if test="inCarriagewayId != null" >
+        in_carriageway_id,
+      </if>
+      <if test="inCarriagewayName != null" >
+        in_carriageway_name,
+      </if>
+      <if test="inBoothId != null" >
+        in_booth_id,
+      </if>
+      <if test="inBoothName != null" >
+        in_booth_name,
+      </if>
+      <if test="inDeviceId != null" >
+        in_device_id,
+      </if>
+      <if test="inDeviceName != null" >
+        in_device_name,
+      </if>
+      <if test="inTime != null" >
+        in_time,
+      </if>
+      <if test="inPhoto != null" >
+        in_photo,
+      </if>
+      <if test="inUserId != null" >
+        in_user_id,
+      </if>
+      <if test="inUserName != null" >
+        in_user_name,
+      </if>
+      <if test="outEntranceId != null" >
+        out_entrance_id,
+      </if>
+      <if test="outEntranceName != null" >
+        out_entrance_name,
+      </if>
+      <if test="outCarriagewayId != null" >
+        out_carriageway_id,
+      </if>
+      <if test="outCarriagewayName != null" >
+        out_carriageway_name,
+      </if>
+      <if test="outBoothId != null" >
+        out_booth_id,
+      </if>
+      <if test="outBoothName != null" >
+        out_booth_name,
+      </if>
+      <if test="outDeviceId != null" >
+        out_device_id,
+      </if>
+      <if test="outDeviceName != null" >
+        out_device_name,
+      </if>
+      <if test="outTime != null" >
+        out_time,
+      </if>
+      <if test="outPhoto != null" >
+        out_photo,
+      </if>
+      <if test="ruleId != null" >
+        rule_id,
+      </if>
+      <if test="ruleName != null" >
+        rule_name,
+      </if>
+      <if test="ruleType != null" >
+        rule_type,
+      </if>
+      <if test="parkingDuration != null" >
+        parking_duration,
+      </if>
+      <if test="chargeFee != null" >
+        charge_fee,
+      </if>
+      <if test="balance != null" >
+        balance,
+      </if>
+      <if test="disableTime != null" >
+        disable_time,
+      </if>
+      <if test="paymethod != null" >
+        paymethod,
+      </if>
+      <if test="jianmianFee != null" >
+        jianmian_fee,
+      </if>
+      <if test="jianmianRuleName != null" >
+        jianmian_rule_name,
+      </if>
+      <if test="note != null" >
+        note,
+      </if>
+      <if test="flag != null" >
+        flag,
+      </if>
+      <if test="insertTime != null" >
+        insert_time,
+      </if>
+      <if test="userid != null" >
+        userid,
+      </if>
+      <if test="userName != null" >
+        user_name,
+      </if>
+      <if test="custom1 != null" >
+        custom1,
+      </if>
+      <if test="custom2 != null" >
+        custom2,
+      </if>
+      <if test="custom3 != null" >
+        custom3,
+      </if>
+      <if test="custom4 != null" >
+        custom4,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="chargeRecordId != null" >
+        #{chargeRecordId,jdbcType=INTEGER},
+      </if>
+      <if test="carId != null" >
+        #{carId,jdbcType=INTEGER},
+      </if>
+      <if test="carNumber != null" >
+        #{carNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="cardId != null" >
+        #{cardId,jdbcType=VARCHAR},
+      </if>
+      <if test="personName != null" >
+        #{personName,jdbcType=VARCHAR},
+      </if>
+      <if test="carTypeId != null" >
+        #{carTypeId,jdbcType=INTEGER},
+      </if>
+      <if test="carTypeName != null" >
+        #{carTypeName,jdbcType=VARCHAR},
+      </if>
+      <if test="parkId != null" >
+        #{parkId,jdbcType=INTEGER},
+      </if>
+      <if test="parkName != null" >
+        #{parkName,jdbcType=VARCHAR},
+      </if>
+      <if test="inEntranceId != null" >
+        #{inEntranceId,jdbcType=INTEGER},
+      </if>
+      <if test="inEntranceName != null" >
+        #{inEntranceName,jdbcType=VARCHAR},
+      </if>
+      <if test="inCarriagewayId != null" >
+        #{inCarriagewayId,jdbcType=INTEGER},
+      </if>
+      <if test="inCarriagewayName != null" >
+        #{inCarriagewayName,jdbcType=VARCHAR},
+      </if>
+      <if test="inBoothId != null" >
+        #{inBoothId,jdbcType=INTEGER},
+      </if>
+      <if test="inBoothName != null" >
+        #{inBoothName,jdbcType=VARCHAR},
+      </if>
+      <if test="inDeviceId != null" >
+        #{inDeviceId,jdbcType=INTEGER},
+      </if>
+      <if test="inDeviceName != null" >
+        #{inDeviceName,jdbcType=VARCHAR},
+      </if>
+      <if test="inTime != null" >
+        #{inTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="inPhoto != null" >
+        #{inPhoto,jdbcType=VARCHAR},
+      </if>
+      <if test="inUserId != null" >
+        #{inUserId,jdbcType=INTEGER},
+      </if>
+      <if test="inUserName != null" >
+        #{inUserName,jdbcType=VARCHAR},
+      </if>
+      <if test="outEntranceId != null" >
+        #{outEntranceId,jdbcType=INTEGER},
+      </if>
+      <if test="outEntranceName != null" >
+        #{outEntranceName,jdbcType=VARCHAR},
+      </if>
+      <if test="outCarriagewayId != null" >
+        #{outCarriagewayId,jdbcType=INTEGER},
+      </if>
+      <if test="outCarriagewayName != null" >
+        #{outCarriagewayName,jdbcType=VARCHAR},
+      </if>
+      <if test="outBoothId != null" >
+        #{outBoothId,jdbcType=INTEGER},
+      </if>
+      <if test="outBoothName != null" >
+        #{outBoothName,jdbcType=VARCHAR},
+      </if>
+      <if test="outDeviceId != null" >
+        #{outDeviceId,jdbcType=INTEGER},
+      </if>
+      <if test="outDeviceName != null" >
+        #{outDeviceName,jdbcType=VARCHAR},
+      </if>
+      <if test="outTime != null" >
+        #{outTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="outPhoto != null" >
+        #{outPhoto,jdbcType=VARCHAR},
+      </if>
+      <if test="ruleId != null" >
+        #{ruleId,jdbcType=INTEGER},
+      </if>
+      <if test="ruleName != null" >
+        #{ruleName,jdbcType=VARCHAR},
+      </if>
+      <if test="ruleType != null" >
+        #{ruleType,jdbcType=INTEGER},
+      </if>
+      <if test="parkingDuration != null" >
+        #{parkingDuration,jdbcType=INTEGER},
+      </if>
+      <if test="chargeFee != null" >
+        #{chargeFee,jdbcType=NUMERIC},
+      </if>
+      <if test="balance != null" >
+        #{balance,jdbcType=NUMERIC},
+      </if>
+      <if test="disableTime != null" >
+        #{disableTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="paymethod != null" >
+        #{paymethod,jdbcType=INTEGER},
+      </if>
+      <if test="jianmianFee != null" >
+        #{jianmianFee,jdbcType=NUMERIC},
+      </if>
+      <if test="jianmianRuleName != null" >
+        #{jianmianRuleName,jdbcType=VARCHAR},
+      </if>
+      <if test="note != null" >
+        #{note,jdbcType=VARCHAR},
+      </if>
+      <if test="flag != null" >
+        #{flag,jdbcType=INTEGER},
+      </if>
+      <if test="insertTime != null" >
+        #{insertTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="userid != null" >
+        #{userid,jdbcType=INTEGER},
+      </if>
+      <if test="userName != null" >
+        #{userName,jdbcType=VARCHAR},
+      </if>
+      <if test="custom1 != null" >
+        #{custom1,jdbcType=INTEGER},
+      </if>
+      <if test="custom2 != null" >
+        #{custom2,jdbcType=INTEGER},
+      </if>
+      <if test="custom3 != null" >
+        #{custom3,jdbcType=VARCHAR},
+      </if>
+      <if test="custom4 != null" >
+        #{custom4,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.wadejerry.scms.modules.pfm.model.PfmChargeRecord" >
+    update pfm_charge_record
+    <set >
+      <if test="carId != null" >
+        car_id = #{carId,jdbcType=INTEGER},
+      </if>
+      <if test="carNumber != null" >
+        car_number = #{carNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="cardId != null" >
+        card_id = #{cardId,jdbcType=VARCHAR},
+      </if>
+      <if test="personName != null" >
+        person_name = #{personName,jdbcType=VARCHAR},
+      </if>
+      <if test="carTypeId != null" >
+        car_type_id = #{carTypeId,jdbcType=INTEGER},
+      </if>
+      <if test="carTypeName != null" >
+        car_type_name = #{carTypeName,jdbcType=VARCHAR},
+      </if>
+      <if test="parkId != null" >
+        park_id = #{parkId,jdbcType=INTEGER},
+      </if>
+      <if test="parkName != null" >
+        park_name = #{parkName,jdbcType=VARCHAR},
+      </if>
+      <if test="inEntranceId != null" >
+        in_entrance_id = #{inEntranceId,jdbcType=INTEGER},
+      </if>
+      <if test="inEntranceName != null" >
+        in_entrance_name = #{inEntranceName,jdbcType=VARCHAR},
+      </if>
+      <if test="inCarriagewayId != null" >
+        in_carriageway_id = #{inCarriagewayId,jdbcType=INTEGER},
+      </if>
+      <if test="inCarriagewayName != null" >
+        in_carriageway_name = #{inCarriagewayName,jdbcType=VARCHAR},
+      </if>
+      <if test="inBoothId != null" >
+        in_booth_id = #{inBoothId,jdbcType=INTEGER},
+      </if>
+      <if test="inBoothName != null" >
+        in_booth_name = #{inBoothName,jdbcType=VARCHAR},
+      </if>
+      <if test="inDeviceId != null" >
+        in_device_id = #{inDeviceId,jdbcType=INTEGER},
+      </if>
+      <if test="inDeviceName != null" >
+        in_device_name = #{inDeviceName,jdbcType=VARCHAR},
+      </if>
+      <if test="inTime != null" >
+        in_time = #{inTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="inPhoto != null" >
+        in_photo = #{inPhoto,jdbcType=VARCHAR},
+      </if>
+      <if test="inUserId != null" >
+        in_user_id = #{inUserId,jdbcType=INTEGER},
+      </if>
+      <if test="inUserName != null" >
+        in_user_name = #{inUserName,jdbcType=VARCHAR},
+      </if>
+      <if test="outEntranceId != null" >
+        out_entrance_id = #{outEntranceId,jdbcType=INTEGER},
+      </if>
+      <if test="outEntranceName != null" >
+        out_entrance_name = #{outEntranceName,jdbcType=VARCHAR},
+      </if>
+      <if test="outCarriagewayId != null" >
+        out_carriageway_id = #{outCarriagewayId,jdbcType=INTEGER},
+      </if>
+      <if test="outCarriagewayName != null" >
+        out_carriageway_name = #{outCarriagewayName,jdbcType=VARCHAR},
+      </if>
+      <if test="outBoothId != null" >
+        out_booth_id = #{outBoothId,jdbcType=INTEGER},
+      </if>
+      <if test="outBoothName != null" >
+        out_booth_name = #{outBoothName,jdbcType=VARCHAR},
+      </if>
+      <if test="outDeviceId != null" >
+        out_device_id = #{outDeviceId,jdbcType=INTEGER},
+      </if>
+      <if test="outDeviceName != null" >
+        out_device_name = #{outDeviceName,jdbcType=VARCHAR},
+      </if>
+      <if test="outTime != null" >
+        out_time = #{outTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="outPhoto != null" >
+        out_photo = #{outPhoto,jdbcType=VARCHAR},
+      </if>
+      <if test="ruleId != null" >
+        rule_id = #{ruleId,jdbcType=INTEGER},
+      </if>
+      <if test="ruleName != null" >
+        rule_name = #{ruleName,jdbcType=VARCHAR},
+      </if>
+      <if test="ruleType != null" >
+        rule_type = #{ruleType,jdbcType=INTEGER},
+      </if>
+      <if test="parkingDuration != null" >
+        parking_duration = #{parkingDuration,jdbcType=INTEGER},
+      </if>
+      <if test="chargeFee != null" >
+        charge_fee = #{chargeFee,jdbcType=NUMERIC},
+      </if>
+      <if test="balance != null" >
+        balance = #{balance,jdbcType=NUMERIC},
+      </if>
+      <if test="disableTime != null" >
+        disable_time = #{disableTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="paymethod != null" >
+        paymethod = #{paymethod,jdbcType=INTEGER},
+      </if>
+      <if test="jianmianFee != null" >
+        jianmian_fee = #{jianmianFee,jdbcType=NUMERIC},
+      </if>
+      <if test="jianmianRuleName != null" >
+        jianmian_rule_name = #{jianmianRuleName,jdbcType=VARCHAR},
+      </if>
+      <if test="note != null" >
+        note = #{note,jdbcType=VARCHAR},
+      </if>
+      <if test="flag != null" >
+        flag = #{flag,jdbcType=INTEGER},
+      </if>
+      <if test="insertTime != null" >
+        insert_time = #{insertTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="userid != null" >
+        userid = #{userid,jdbcType=INTEGER},
+      </if>
+      <if test="userName != null" >
+        user_name = #{userName,jdbcType=VARCHAR},
+      </if>
+      <if test="custom1 != null" >
+        custom1 = #{custom1,jdbcType=INTEGER},
+      </if>
+      <if test="custom2 != null" >
+        custom2 = #{custom2,jdbcType=INTEGER},
+      </if>
+      <if test="custom3 != null" >
+        custom3 = #{custom3,jdbcType=VARCHAR},
+      </if>
+      <if test="custom4 != null" >
+        custom4 = #{custom4,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where charge_record_id = #{chargeRecordId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.wadejerry.scms.modules.pfm.model.PfmChargeRecord" >
+    update pfm_charge_record
+    set car_id = #{carId,jdbcType=INTEGER},
+      car_number = #{carNumber,jdbcType=VARCHAR},
+      card_id = #{cardId,jdbcType=VARCHAR},
+      person_name = #{personName,jdbcType=VARCHAR},
+      car_type_id = #{carTypeId,jdbcType=INTEGER},
+      car_type_name = #{carTypeName,jdbcType=VARCHAR},
+      park_id = #{parkId,jdbcType=INTEGER},
+      park_name = #{parkName,jdbcType=VARCHAR},
+      in_entrance_id = #{inEntranceId,jdbcType=INTEGER},
+      in_entrance_name = #{inEntranceName,jdbcType=VARCHAR},
+      in_carriageway_id = #{inCarriagewayId,jdbcType=INTEGER},
+      in_carriageway_name = #{inCarriagewayName,jdbcType=VARCHAR},
+      in_booth_id = #{inBoothId,jdbcType=INTEGER},
+      in_booth_name = #{inBoothName,jdbcType=VARCHAR},
+      in_device_id = #{inDeviceId,jdbcType=INTEGER},
+      in_device_name = #{inDeviceName,jdbcType=VARCHAR},
+      in_time = #{inTime,jdbcType=TIMESTAMP},
+      in_photo = #{inPhoto,jdbcType=VARCHAR},
+      in_user_id = #{inUserId,jdbcType=INTEGER},
+      in_user_name = #{inUserName,jdbcType=VARCHAR},
+      out_entrance_id = #{outEntranceId,jdbcType=INTEGER},
+      out_entrance_name = #{outEntranceName,jdbcType=VARCHAR},
+      out_carriageway_id = #{outCarriagewayId,jdbcType=INTEGER},
+      out_carriageway_name = #{outCarriagewayName,jdbcType=VARCHAR},
+      out_booth_id = #{outBoothId,jdbcType=INTEGER},
+      out_booth_name = #{outBoothName,jdbcType=VARCHAR},
+      out_device_id = #{outDeviceId,jdbcType=INTEGER},
+      out_device_name = #{outDeviceName,jdbcType=VARCHAR},
+      out_time = #{outTime,jdbcType=TIMESTAMP},
+      out_photo = #{outPhoto,jdbcType=VARCHAR},
+      rule_id = #{ruleId,jdbcType=INTEGER},
+      rule_name = #{ruleName,jdbcType=VARCHAR},
+      rule_type = #{ruleType,jdbcType=INTEGER},
+      parking_duration = #{parkingDuration,jdbcType=INTEGER},
+      charge_fee = #{chargeFee,jdbcType=NUMERIC},
+      balance = #{balance,jdbcType=NUMERIC},
+      disable_time = #{disableTime,jdbcType=TIMESTAMP},
+      paymethod = #{paymethod,jdbcType=INTEGER},
+      jianmian_fee = #{jianmianFee,jdbcType=NUMERIC},
+      jianmian_rule_name = #{jianmianRuleName,jdbcType=VARCHAR},
+      note = #{note,jdbcType=VARCHAR},
+      flag = #{flag,jdbcType=INTEGER},
+      insert_time = #{insertTime,jdbcType=TIMESTAMP},
+      userid = #{userid,jdbcType=INTEGER},
+      user_name = #{userName,jdbcType=VARCHAR},
+      custom1 = #{custom1,jdbcType=INTEGER},
+      custom2 = #{custom2,jdbcType=INTEGER},
+      custom3 = #{custom3,jdbcType=VARCHAR},
+      custom4 = #{custom4,jdbcType=VARCHAR}
+    where charge_record_id = #{chargeRecordId,jdbcType=INTEGER}
+  </update>
+</mapper>

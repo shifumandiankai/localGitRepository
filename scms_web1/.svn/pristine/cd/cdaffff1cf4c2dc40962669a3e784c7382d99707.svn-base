@@ -1,0 +1,35 @@
+package com.wadejerry.scms.modules.pfm.dao;
+
+import java.util.Date;
+import java.util.List;
+
+import com.wadejerry.scms.modules.pfm.dto.PfmFeeRecDto;
+import com.wadejerry.scms.modules.pfm.model.PfmFeeRec;
+
+public interface PfmFeeRecMapper {
+
+	List<PfmFeeRecDto> selectRecording(Integer cardid, int enterpriseAdministrator);
+
+	int selectMaxTradeId(Integer carInfoId);
+
+	Date SelectMaxDisableTime(Integer carInfoId, Integer tradeId);
+
+	PfmFeeRecDto selectInfo(Integer carId, Integer typeId);
+
+	void insertchongInfo(PfmFeeRecDto pfmFeeRecDto);
+
+	int selectMaxTradeIdByType( Integer typeid);
+
+	Date selectMaxTime(Integer carid);
+
+	String selectFeeTatal(Integer carid);
+
+	List<PfmFeeRecDto> selectPFRInfo(Integer carid, int companyid);
+
+	List<PfmFeeRecDto> selectPFRAllInfo();
+
+	Double selectAllFeeTatal(int carid, int type, int companyid);
+
+	int selectInfoByType(int carid, int type, int companyid);
+
+}

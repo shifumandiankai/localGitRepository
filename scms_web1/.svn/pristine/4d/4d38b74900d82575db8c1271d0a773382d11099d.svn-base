@@ -1,0 +1,27 @@
+package com.wadejerry.scms.modules.pfm.service;
+
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+import com.wadejerry.scms.frame.entity.PageParamsDto;
+import com.wadejerry.scms.frame.entity.ReportPageParamsDto;
+import com.wadejerry.scms.modules.pfm.model.PfmChargeRecord;
+
+public interface PfmChargeRecordReportService {
+
+	List<PfmChargeRecord> selectAllListByPage(ReportPageParamsDto paramsDto);
+
+	int selectRecordTotal(ReportPageParamsDto paramsDto);
+
+	List<PfmChargeRecord> selectAllByCharge(PfmChargeRecord chargeRecord);
+
+	int selectRecordTotal(Date startTime, Date endTime, String carNumber, Integer parkId, Integer entranceId, Integer carriagewayId, List<Integer> listtype, String hasPermission, String size);
+
+	List<PfmChargeRecord> selectAllListByPage(Date startTime, Date endTime, String carNumber, int inentranceid,
+			int outentranceid);
+
+	List<Map<String, Object>> exportcharge(List<Integer> listTypeId, String size);
+
+
+}

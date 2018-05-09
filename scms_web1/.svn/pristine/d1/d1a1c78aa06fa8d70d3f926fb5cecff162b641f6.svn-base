@@ -1,0 +1,46 @@
+package com.wadejerry.scms.modules.pfm.service;
+
+import java.text.ParseException;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.ibatis.annotations.Param;
+
+import com.wadejerry.scms.frame.entity.OperateResult;
+import com.wadejerry.scms.frame.entity.PageParamsDto;
+import com.wadejerry.scms.modules.pfm.dto.AddCarinfoDto;
+import com.wadejerry.scms.modules.pfm.dto.CarInfoDto;
+import com.wadejerry.scms.modules.pfm.dto.CarTypeDto;
+import com.wadejerry.scms.modules.pfm.dto.ZTreeDto;
+import com.wadejerry.scms.modules.pfm.model.PfmParkSpace;
+import com.wadejerry.scms.modules.pfm.model.PfmParkingLot;
+import com.wadejerry.scms.modules.pfm.model.PfmSubsidiaryCarNum;
+
+public interface PfmCarInfoService {
+
+	public List<CarInfoDto> getCarInfoListByPage(PageParamsDto ppd);
+	public int getCarInfoCount(PageParamsDto ppd);
+	public int deleteCarInfo(CarInfoDto dto);
+	//isdel 删除方式
+	public OperateResult deleteCarInfobyIsDel(List<CarInfoDto> dtos);
+//	public List<CarTypeDto> getCarTypeList(int companyid);
+	public List<PfmParkingLot> getParkingLots(int companyid);
+	public List<PfmParkSpace> getParkSpaceList(int parkinglotid);
+	public PfmParkSpace getParkSpace(int carinfoid);
+	//添加修改车辆
+	public OperateResult addCarInfo(AddCarinfoDto carinfo) throws ParseException;	
+	//修改车辆类型
+	public OperateResult changtCarType(List<Integer> carinfoids,Integer carTypeId);
+	//导入
+	public OperateResult validateAndInsert(List<Map<String,String>> list) throws Exception;
+	
+	//验证车牌号和编号重复
+	public OperateResult validateCardId(String cardId,int companyId,int flag,String carInfoId);
+	public OperateResult validateCarnum(String carnum,int companyId,int flag,String carInfoId);
+	//导出excel
+	List<Map<String,Object>> download(int companyid,String carTypeId);
+	
+	public List<PfmSubsidiaryCarNum> selectSubsidiaryCarNumByCarInfoId(int carInfoId);
+	
+	
+}

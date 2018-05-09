@@ -1,0 +1,157 @@
+<%@ page contentType="text/html; charset=UTF-8"%>
+<%@taglib prefix="shiro" uri="http://shiro.apache.org/tags" %> 
+
+<link rel="stylesheet" href="/plugins/datatables/dataTables.bootstrap.css">
+<link rel="stylesheet" href="/pages/pfm/carmanage/css/jquery.shCircleLoader.css">
+<link rel="stylesheet" type="text/css" href="/pages/pfm/carmanage/css/car_manage.css" >
+		<div class="content-wrapper">
+			<!-- Content Header (Page header) -->
+			<section class="content-header">
+			 
+				<h1>
+					<shiro:hasPermission name="CarManages"> 车辆信息界面</shiro:hasPermission>
+				</h1>
+				<ol class="breadcrumb">
+					<li><a href="/index.do"><i class="fa fa-dashboard"></i>主页</a></li>
+					<shiro:hasPermission name="CarManages"><li class="active">车辆信息</li></shiro:hasPermission>
+				</ol>
+			</section>
+			<!-- Main content -->
+			<section class="content">
+			
+			<div class="box">
+			<!-- 	<div class="box-header">
+					<h3 class="box-title"></h3>
+				</div> -->
+				<div class="box-body">
+					<div>
+						<div id="left"<shiro:lacksPermission name="CarType">style="display:none;"</shiro:lacksPermission>>
+							
+							<ul id="tree" class="ztree" style="margin-left:10px;"></ul>
+			
+						</div>
+
+						<div id="right" <shiro:lacksPermission name="CarType">style="width:100%"</shiro:lacksPermission> >
+
+							<div class="nav-tabs-custom">
+								<ul class="nav nav-tabs">
+								<shiro:hasPermission name="CarInfo">	<li><a href="#carinfo" data-toggle="tab">车辆信息</a></li></shiro:hasPermission>
+								<shiro:hasPermission name="RuleConfig">	<li><a href="#rule" data-toggle="tab">规则配置</a></li></shiro:hasPermission>
+								</ul>
+								<div class="tab-content">
+									<shiro:hasPermission name="CarInfo">
+									<div class="tab-pane" id="carinfo">
+										<table id="example1" class="table table-bordered table-striped">
+											<thead>
+												<tr>
+													<th></th>
+													<th>车辆使用人</th>
+													<th>车牌</th>
+													<th>卡号</th>
+													<th>性别</th>
+													<th>手机号</th>
+													<th>车辆类型</th>
+													<th>规则</th>
+													<th>车位</th>
+													<th>状态</th>
+													<th>备注</th>
+													<th></th>
+													<th></th>
+													<th></th>
+													<th></th>
+													<th></th>
+													<th></th>
+													<th></th>
+													<th></th>
+													<th></th>
+													<th></th>
+													<th></th>
+												
+												</tr>
+											</thead>
+											<tbody>
+											</tbody>
+											<tfoot>
+											</tfoot>
+										</table>
+									</div>
+									</shiro:hasPermission>
+									<!-- /.carinfo -->
+									<shiro:hasPermission name="RuleConfig">	
+									<div class="tab-pane" id="rule">
+									<table id="example2" class="table table-bordered table-striped">
+											<thead>
+												<tr>
+													<th>规则名称</th>
+													<th>临时车是否匹配</th>
+													<th>车辆类型</th>
+													<th>收费类型</th>
+													<th>修改时间</th>
+													<th>最后更新操作员</th>
+													<th></th>
+													<th></th>
+													<th></th>
+													<th></th>
+													</tr>
+											</thead>
+											<tbody>
+											</tbody>
+											<tfoot>
+											</tfoot>
+										</table>
+									</div>
+									</shiro:hasPermission>
+									<!-- rule -->
+								</div>
+								<!-- /.tabcontent -->
+							</div>
+							<!-- /.nav-tabs-custom -->
+						</div>
+						<!-- /.right -->
+
+
+					</div>
+					<!--/. container -->
+
+				</div>
+				<!-- /.box-body -->
+			</div>
+			<!-- /.box -->
+			</section>
+		</div>
+
+	<%@ include file="addDialog.jsp"%>
+	<%@ include file="addchargerule.jsp"%>
+	<%@ include file="addFushuCarNum.jsp"%>
+	<%@ include file="upload.jsp"%>
+	<%@ include file="changetypeDialog.jsp"%>
+	<div id="menuContent" class="menuContent" style="display:none; position: absolute;z-index: 2500 !important;">
+		<ul id="cartypetree"  class="ztree" style="margin-top: 0px;border: 1px solid #617775;background: #f0f6e4;width:190px;height:300px;overflow-y:scroll;overflow-x:auto;"></ul>
+	</div>
+	<script src="/pages/pfm/carmanage/js/jquery.shCircleLoader.js" type="text/javascript"></script>
+	<script type="text/javascript">
+		function Buttonpermission(){
+			<shiro:lacksPermission name="CarAdd">$("#example1_wrapper a[name='wade.libs.datatable_add']").remove();</shiro:lacksPermission>
+			<shiro:lacksPermission name="CarDelete">$("#example1_wrapper a[name='wade.libs.datatable_del']").remove();</shiro:lacksPermission>
+			<shiro:lacksPermission name="CarEdit">$("#example1_wrapper a[name='wade.libs.datatable_edit']").remove();</shiro:lacksPermission>
+			<shiro:lacksPermission name="CartypeChange">$("#example1_wrapper a[id='wade.libs.datatable_custom_调换车辆类型']").remove();</shiro:lacksPermission>
+			<shiro:lacksPermission name="OutPort">$("#example1_wrapper a[id='wade.libs.datatable_custom_导出']").remove();</shiro:lacksPermission>
+			<shiro:lacksPermission name="Import">$("#example1_wrapper a[id='wade.libs.datatable_custom_导入']").remove();</shiro:lacksPermission>
+			
+			<shiro:lacksPermission name="RuleAdd">$("#example2_wrapper a[name='wade.libs.datatable_add']").remove();</shiro:lacksPermission>
+			<shiro:lacksPermission name="RuleDelete">$("#example2_wrapper a[name='wade.libs.datatable_del']").remove();</shiro:lacksPermission>
+			<shiro:lacksPermission name="RuleEdit">$("#example2_wrapper a[name='wade.libs.datatable_edit']").remove();</shiro:lacksPermission>
+		
+			<shiro:lacksPermission name="CartypeAdd">$("#zaddtree").remove();</shiro:lacksPermission>
+			<shiro:lacksPermission name="CartypeEdit">$("#zedittree").remove();</shiro:lacksPermission>
+			<shiro:lacksPermission name="CartypeDelete">$("#zdeletetree").remove();</shiro:lacksPermission>
+			<shiro:lacksPermission name="CarTypeSee">$("#tree").hide();</shiro:lacksPermission>
+		}
+		function Seepermission(){
+			<shiro:lacksPermission name="CarSee">$("#example1 tbody td").text("没有浏览权限");</shiro:lacksPermission>
+			<shiro:lacksPermission name="RuleSee">$("#example2 tbody td").text("没有浏览权限");</shiro:lacksPermission>
+		}
+	
+	</script>
+	<script src="/plugins/My97DatePicker/WdatePicker.js"></script>
+	<script src="/pages/pfm/carmanage/js/car_manage.js" type="text/javascript"></script>

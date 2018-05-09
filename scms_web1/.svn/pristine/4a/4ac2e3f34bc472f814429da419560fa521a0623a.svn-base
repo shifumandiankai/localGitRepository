@@ -1,0 +1,5 @@
+package com.wadejerry.scms.modules.log.model;
+
+public class ConfigurationLog {
+
+}

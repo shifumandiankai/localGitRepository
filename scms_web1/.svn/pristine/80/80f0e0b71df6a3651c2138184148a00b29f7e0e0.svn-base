@@ -1,0 +1,830 @@
+package com.wadejerry.scms.modules.basic.controller;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.wadejerry.scms.frame.constant.ConstParamLog;
+import com.wadejerry.scms.frame.entity.LoginInfo;
+import com.wadejerry.scms.frame.entity.OperateResult;
+import com.wadejerry.scms.frame.log.LogRecord;
+import com.wadejerry.scms.modules.basic.dto.AccountDto;
+import com.wadejerry.scms.modules.basic.dto.CardAppDto;
+import com.wadejerry.scms.modules.basic.service.CardAppService;
+import com.wadejerry.scms.modules.basic.service.PfmAccountService;
+import com.wadejerry.scms.modules.pfm.dao.PfmCarInfoMapper;
+import com.wadejerry.scms.modules.pfm.dto.PfmFeeRecDto;
+import com.wadejerry.scms.modules.pfm.model.PfmBaoqi;
+import com.wadejerry.scms.modules.pfm.model.PfmCarInfo;
+import com.wadejerry.scms.modules.pfm.model.PfmCarType;
+import com.wadejerry.scms.modules.pfm.service.PfmChargeRuleService;
+import com.wadejerry.scms.modules.pfm.service.PfmFeeRecService;
+import com.wadejerry.scms.utils.AjaxUtil;
+import com.wadejerry.scms.utils.date.DateUtil;
+
+@Controller
+public class AccountController {
+@Autowired
+private HttpServletRequest request;
+@Autowired
+private HttpServletResponse response;
+@Autowired
+private PfmAccountService pfmAccountservice;
+@Autowired
+private PfmChargeRuleService pfmChargeRuleService;//车辆类型
+@Autowired
+private CardAppService cardAppService;
+@Autowired
+private PfmFeeRecService pfmFeeRecService;
+@Autowired
+private PfmCarInfoMapper PfmCarInfoMapper;
+@Autowired
+private LogRecord logRecord;
+
+/*
+ *点击查询按钮查询信息
+ */
+@RequestMapping("/account/selectaccountid.do")
+@ResponseBody	
+public void SelectAccountId(){
+	String selectinfo=request.getParameter("selectinfo");
+	String selectval=request.getParameter("selectval");
+	try {
+		PfmCarInfo carInfo=null;
+		PfmCarType pfmCarType=null;
+		List<PfmCarInfo> carInfolist=null;
+		PfmBaoqi baoqi=null;
+		CardAppDto appDto=null;
+		OperateResult operateResult=new OperateResult();
+		AccountDto pfmaccountDto=new AccountDto();
+		PfmFeeRecDto listDto=new PfmFeeRecDto();
+		carInfolist=pfmChargeRuleService.selectCarInfoByValue(Integer.valueOf(selectinfo),selectval);//查询车辆信息
+		if(carInfolist.size()>0){
+			//判断pfm_fee_rec中是否存在消费记录
+			carInfo=carInfolist.get(0);
+			
+			pfmCarType =pfmChargeRuleService.selectByCarinfoId(carInfo.getCarInfoId());//查询车辆类别名称
+			
+			appDto=cardAppService.SelectCardAppInfo(carInfo.getCarInfoId());//查询钱包信息
+			//List<pfmFeeRecDto> listDto=pfmFeeRecService.selectRecording(carInfo.getCarInfoId());//查询pfm_fee_rec中的信息
+			if(!pfmChargeRuleService.isBaoqi(carInfo.getCarInfoId())){//判断是否是包期车辆
+				//不是包期车辆，显示余额 不显示到期时间  余额是value1(不变)
+				if(appDto.getBdvalue1()==null){
+					pfmaccountDto.setValue1("0");//余额设为0
+					pfmaccountDto.setBdvalue1(new BigDecimal(0));
+					
+				}
+				else{
+					pfmaccountDto.setValue1(String.valueOf(appDto.getBdvalue1()));
+					pfmaccountDto.setBdvalue1(appDto.getBdvalue1());
+				}
+				
+				pfmaccountDto.setStrDisableTime(DateUtil.YMDsdf.format(carInfo.getDisableTime()));//到期日期为禁用日期 (车辆表)
+				pfmaccountDto.setIntbqMoney(0);
+				pfmaccountDto.setBaoqiType("储值用户");
+			}
+			else{
+				//是包期车辆 不显示余额(余额是0)，显示到期时间
+				baoqi=pfmChargeRuleService.baoqiRule(carInfo.getCarInfoId());//查询包期类型
+				//判断pfm_fee_rec中是否存在消费记录
+				List<PfmFeeRecDto> AllDto=pfmFeeRecService.selectPFRInfo(carInfo.getCarInfoId(),LoginInfo.getCompanyId());
+				//存在
+				if(AllDto.size()!=0){
+					//int tradeId=pfmFeeRecService.selectMaxTradeIdByType(0);//根据carInfoId查询充值类型最大流水号
+					int tradeId=pfmFeeRecService.selectMaxTradeId(carInfo.getCarInfoId());
+					listDto=pfmFeeRecService.selectInfo(carInfo.getCarInfoId(), tradeId);//查询消费记录信息
+					if(listDto.getDisableTime()==null){
+						//pfmaccountDto.setStrDisableTime(DateUtil.YMDsdf.format(carInfo.getDisableTime()));//到期日期为禁用日期
+						if(appDto.getDisableTime()==null){
+							pfmaccountDto.setStrDisableTime("空");
+							//pfmaccountDto.setStrDisableTime(DateUtil.YMDsdf.format(carInfo.getDisableTime()));//到期时间为当前时间
+							//pfmaccountDto.setStrDisableTime(DateUtil.YMDsdf.format(new Date()));//到期时间为当前时间间
+						}else{
+							pfmaccountDto.setStrDisableTime(DateUtil.YMDsdf.format(appDto.getDisableTime()));//到期日期为禁用日期(bim_card_app)
+						}
+						
+					}
+					else{
+						//pfmaccountDto.setStrDisableTime(DateUtil.YMDsdf.format(pfmFeeRecService.SelectMaxDisableTime(carInfo.getCarInfoId(), 0)));
+						pfmaccountDto.setStrDisableTime(DateUtil.YMDsdf.format(listDto.getDisableTime()));
+					}
+					
+				}
+				else{
+					//不存在 则设置到期日期为car_app禁用日期
+					//pfmaccountDto.setStrDisableTime(DateUtil.YMDsdf.format(carInfo.getDisableTime()));//到期日期为禁用日期
+					if(appDto.getDisableTime()==null){
+						pfmaccountDto.setStrDisableTime("空");
+					}else{
+						pfmaccountDto.setStrDisableTime(DateUtil.YMDsdf.format(appDto.getDisableTime()));//到期日期为禁用日期(bim_card_app)
+					}
+					
+				}
+				if(baoqi.getType()==0){//包月
+					pfmaccountDto.setBaoqiType("包月");
+				}
+				else{//包年
+					pfmaccountDto.setBaoqiType("包年");
+				}
+				pfmaccountDto.setIntbqMoney(baoqi.getMoney().intValue());//显示包期金额
+			}
+			pfmaccountDto.setCarInfoId(carInfo.getCarInfoId());
+			pfmaccountDto.setPersonName(carInfo.getPersonName());
+			//pfmaccountDto.setCardId(Integer.valueOf(carInfo.getCardId()));
+			pfmaccountDto.setCardId(String.valueOf(carInfo.getCardId()));
+			if(carInfo.getCardId()==null){
+				pfmaccountDto.setCardId("");
+			}
+			else{
+				pfmaccountDto.setCardId(carInfo.getCardId());
+			}
+			pfmaccountDto.setCarNumber(carInfo.getCarNumber());
+			pfmaccountDto.setTypeName(pfmCarType.getTypeName());
+			pfmaccountDto.setNote(carInfo.getNote());
+			
+			//logRecord.recordLog(ConstParamLog.LOG_MODULE_PFM_ACCOUNT, ConstParamLog.LOG_OPER_QUERY,  ConstParamLog.LOG_TYPE_CONFIG,carInfo.getCarNumber());
+			AjaxUtil.ajaxWriteObject(true,pfmaccountDto,response);
+			return ;
+		}
+		else{
+			operateResult.setMsg("您查的车辆信息不存在");
+			operateResult.setResult(false);
+			AjaxUtil.ajaxWriteObject(operateResult,carInfo,response);
+		}
+	} catch (Exception e) {
+		e.printStackTrace();
+	}
+}
+
+
+/*
+ * 充值 
+ */
+
+@RequestMapping("/account/chargeMoney.do")
+@ResponseBody
+public void RechargeMoney() throws Exception{
+	String money=request.getParameter("money");//操作金额
+	String cardid=request.getParameter("cardid");
+	String carInfoId=request.getParameter("carInfoId");
+	//String bfmoney=request.getParameter("beforemoney");//操作前金额(显示的余额)
+	String bqmoney=request.getParameter("bqmoney");//包期金额
+	String beforedistime=request.getParameter("beforedistime");//充值前到期时间
+	//AccountDto accountDto =new AccountDto();	
+	PfmCarInfo carInfo=null;
+	PfmCarType pfmCarType=null;
+	PfmFeeRecDto pfmFeeRecDto=new PfmFeeRecDto();
+	PfmFeeRecDto listDto=new PfmFeeRecDto();
+	CardAppDto appDto=null;
+	CardAppDto cardAppDto=new CardAppDto();
+	Calendar cal = Calendar.getInstance();
+	PfmBaoqi baoqi=null;
+	Date time=new Date();
+	BigDecimal totalDeposit=null;
+	carInfo=PfmCarInfoMapper.selectByPrimaryKey(Integer.valueOf(carInfoId));
+	pfmCarType =pfmChargeRuleService.selectByCarinfoId(carInfo.getCarInfoId());//查询车辆类别名称
+	appDto=cardAppService.SelectCardAppInfo(carInfo.getCarInfoId());//查询钱包信息
+	String bfmoney=String.valueOf(appDto.getBdvalue1());//操作前金额(显示的余额)
+	//查找car_id在pfm_fee_rec是否存在这条记录
+	List<PfmFeeRecDto> listAllDto=pfmFeeRecService.selectPFRInfo(carInfo.getCarInfoId(),LoginInfo.getCompanyId());
+	List<PfmFeeRecDto> listAll=pfmFeeRecService.selectPFRAllInfo();
+	if(listAll.size()==0){
+		pfmFeeRecDto.setTradeId(1);//设置第一条数据的流水号为1 LastDisableTime上一次到期时间为null
+	}
+	else{
+		//int tradeId=pfmFeeRecService.selectMaxTradeIdByType(0);//根据carInfoId查询充值类型最大流水号
+		int tradeId=pfmAccountservice.selectTradeId();//查询充值表中最大流水号
+		pfmFeeRecDto.setTradeId(tradeId+1);
+	}
+	if(pfmChargeRuleService.isBaoqi(carInfo.getCarInfoId())){//判断是否是包期车辆
+		//是包期车辆
+		baoqi=pfmChargeRuleService.baoqiRule(carInfo.getCarInfoId());//查询包期类型
+		//如果没有记录存在 则到期时间是根据包期规则+操作时间计算的 上一次的到期时间为null
+		if(listAllDto.size()==0){
+			//pfmFeeRecDto.setTradeId(1);//设置第一条数据的流水号为1 LastDisableTime上一次到期时间为null
+			//if(!beforedistime.equals("空")){//bim_car_app中disable_time不为空
+			if(appDto.getDisableTime()!=null){//bim_car_app中disable_time不为空
+				//pfmFeeRecDto.setLastDisableTime(DateUtil.YMDsdf.parse(beforedistime));//设置上一次的到期时间(上一次到期时间为bim_app中到期时间)
+				pfmFeeRecDto.setLastDisableTime(appDto.getDisableTime());
+				int a=time.compareTo(appDto.getDisableTime());//判断充值时间是否超过到期时间
+		           if(a>0){
+		        	   //超过，充值后到期时间从充值时间基础上加上
+		        	   if(baoqi.getType()==0){
+		   				//包月
+		   				int month=(int) (Double.valueOf(money)/Double.valueOf(bqmoney));
+		   				cal.setTime(time);
+		   				cal.add(Calendar.MONTH, +month);
+		   				
+		   			}
+		   			else{
+		   				//包年
+		   				int year=(int) (Double.valueOf(money)/Double.valueOf(bqmoney));
+		   				cal.setTime(time);
+		   				cal.add(Calendar.YEAR, +year);
+		   			}
+		           }
+		           else{
+		        	   //没超过 充值后到期时间从充值前到期时间基础上加上
+		        	   if(baoqi.getType()==0){
+		   				//包月
+		   				int month=(int) (Double.valueOf(money)/Double.valueOf(bqmoney));
+		   				cal.setTime(appDto.getDisableTime());
+		   				cal.add(Calendar.MONTH, +month);
+		   				
+		   			}
+		   			else{
+		   				//包年
+		   				int year=(int) (Double.valueOf(money)/Double.valueOf(bqmoney));
+		   				cal.setTime(appDto.getDisableTime());
+		   				cal.add(Calendar.YEAR, +year);
+		   			}
+		           }
+		           //pfmFeeRecDto.setDisableTime(cal.getTime());
+		           Date caldate=cal.getTime();
+		           cal.setTime(caldate);
+		           //cal.add(Calendar.DAY_OF_MONTH, -1);
+		           cal.add(Calendar.DAY_OF_MONTH, 0);
+		           pfmFeeRecDto.setDisableTime(cal.getTime());
+				   pfmFeeRecDto.setStrDisableTime(DateUtil.YMDsdf.format(cal.getTime()));
+			}
+			else{
+				//如果bim_app中到期时间为空 则到期时间为当前的时间
+				
+				if(baoqi.getType()==0){
+	   				//包月
+	   				int month=(int) (Double.valueOf(money)/Double.valueOf(bqmoney));
+	   				//cal.setTime(carInfo.getDisableTime());
+	   				cal.setTime(time);
+	   				cal.add(Calendar.MONTH, +month);
+	   				
+	   			}
+	   			else{
+	   				//包年
+	   				int year=(int) (Double.valueOf(money)/Double.valueOf(bqmoney));
+	   				//cal.setTime(carInfo.getDisableTime());
+	   				cal.setTime(time);
+	   				cal.add(Calendar.YEAR, +year);
+	   			}
+				Date caldate=cal.getTime();
+		        cal.setTime(caldate);
+		        //cal.add(Calendar.DAY_OF_MONTH, -1);
+		        cal.add(Calendar.DAY_OF_MONTH, 0);
+				pfmFeeRecDto.setDisableTime(cal.getTime());
+				pfmFeeRecDto.setStrDisableTime(DateUtil.YMDsdf.format(cal.getTime()));
+			}
+			
+			
+		}
+		//如果有记录存在 到期时间是根据包期规则+最近的到期时间计算的(流水号最大的到期时间计算)
+		else{
+			int tradeId=pfmFeeRecService.selectMaxTradeId(carInfo.getCarInfoId());
+			listDto=pfmFeeRecService.selectInfo(carInfo.getCarInfoId(), tradeId);//查询消费记录信息
+			if(listDto.getDisableTime()==null){
+				//从储值用户切换成包期车辆
+				int a=1;
+				if(appDto.getDisableTime()!=null){
+					
+					pfmFeeRecDto.setLastDisableTime(appDto.getDisableTime());//设置上一次的到期时间为car_app到期时间
+					a=time.compareTo(appDto.getDisableTime());//判断充值时间是否超过显示到期时间
+					
+				}else{
+					//还没有充值,到期时间是从当前时间基础上加的
+					pfmFeeRecDto.setLastDisableTime(null);//设置上一次的到期时间为当前时间
+					appDto.setDisableTime(time);
+				}
+				 //a=time.compareTo(DateUtil.YMDsdf.parse(beforedistime));//判断充值时间是否超过显示到期时间
+				
+				 if(a>0){
+		        	   //超过，充值后到期时间从充值时间基础上加上
+		        	   if(baoqi.getType()==0){
+		   				//包月
+		   				int month=(int) (Double.valueOf(money)/Double.valueOf(bqmoney));
+		   				cal.setTime(time);
+		   				cal.add(Calendar.MONTH, +month);
+		   				
+		   			}
+		   			else{
+		   				//包年
+		   				int year=(int) (Double.valueOf(money)/Double.valueOf(bqmoney));
+		   				cal.setTime(time);
+		   				cal.add(Calendar.YEAR, +year);
+		   			}
+		           }
+		           else{
+		        	   //没超过 充值后到期时间从显示到期时间基础上加上
+		        	   if(baoqi.getType()==0){
+		   				//包月
+		   				int month=(int) (Double.valueOf(money)/Double.valueOf(bqmoney));
+		   				cal.setTime(appDto.getDisableTime());
+		   				
+		   				cal.add(Calendar.MONTH, +month);
+		   				
+		   			}
+		   			else{
+		   				//包年
+		   				int year=(int) (Double.valueOf(money)/Double.valueOf(bqmoney));
+		   				cal.setTime(appDto.getDisableTime());
+		   				
+		   				cal.add(Calendar.YEAR, +year);
+		   			}
+		           }
+			}else{
+				 int a=time.compareTo(listDto.getDisableTime());//判断充值时间是否超过充值前到期时间
+				 pfmFeeRecDto.setLastDisableTime(listDto.getDisableTime());//设置上一次的到期时间
+				 if(a>0){
+		        	   //超过，充值后到期时间从充值时间基础上加上
+		        	   if(baoqi.getType()==0){
+		   				//包月
+		   				int month=(int) (Double.valueOf(money)/Double.valueOf(bqmoney));
+		   				cal.setTime(time);
+		   				cal.add(Calendar.MONTH, +month);
+		   				
+		   			}
+		   			else{
+		   				//包年
+		   				int year=(int) (Double.valueOf(money)/Double.valueOf(bqmoney));
+		   				cal.setTime(time);
+		   				cal.add(Calendar.YEAR, +year);
+		   			}
+		           }
+		           else{
+		        	   //没超过 充值后到期时间从充值前到期时间基础上加上
+		        	   if(baoqi.getType()==0){
+		   				//包月
+		   				int month=(int) (Double.valueOf(money)/Double.valueOf(bqmoney));
+		   				cal.setTime(listDto.getDisableTime());
+		   				cal.add(Calendar.MONTH, +month);
+		   				
+		   			}
+		   			else{
+		   				//包年
+		   				int year=(int) (Double.valueOf(money)/Double.valueOf(bqmoney));
+		   				cal.setTime(listDto.getDisableTime());
+		   				cal.add(Calendar.YEAR, +year);
+		   			}
+		           }
+	        }
+			//获取前一天时间
+			Date caldate=cal.getTime();
+	        cal.setTime(caldate);
+	        //cal.add(Calendar.DAY_OF_MONTH, -1);
+	        cal.add(Calendar.DAY_OF_MONTH, 0);
+			pfmFeeRecDto.setDisableTime(cal.getTime());
+			pfmFeeRecDto.setStrDisableTime(DateUtil.YMDsdf.format(cal.getTime()));
+		}
+		
+		cardAppDto.setDisableTime(pfmFeeRecDto.getDisableTime());
+		
+		//pfmFeeRecDto.setLastFee(new BigDecimal(0));//操作后金额 BigDecimal类型
+		//cardAppDto.setBdvalue1(new BigDecimal(0));
+		
+		
+	}
+	//不是包期，充值记录表中就没有到期时间和上次到期时间
+	else{
+		
+		cardAppDto.setBdvalue1(BigDecimal.valueOf(Double.valueOf(money)).add(BigDecimal.valueOf(Double.valueOf(bfmoney))));
+		pfmFeeRecDto.setLastFee(BigDecimal.valueOf(Double.valueOf(money)).add(BigDecimal.valueOf(Double.valueOf(bfmoney))));
+		pfmFeeRecDto.setSlastFee(String.valueOf(Double.valueOf(money)+Double.valueOf(bfmoney)));
+	}
+	pfmFeeRecDto.setBimCompanyId(LoginInfo.getCompanyId());
+	pfmFeeRecDto.setCarTypeId(Integer.valueOf(pfmCarType.getCarTypeId()));
+	pfmFeeRecDto.setCarTypeName(pfmCarType.getTypeName());
+	pfmFeeRecDto.setCarNumber(carInfo.getCarNumber());
+	pfmFeeRecDto.setPersonName(carInfo.getPersonName());
+	pfmFeeRecDto.setCardId(cardid);
+	pfmFeeRecDto.setFee(BigDecimal.valueOf(Double.valueOf(money)));//操作金额 BigDecimal类型
+	pfmFeeRecDto.setSfee(money);
+	pfmFeeRecDto.setTypeId(0);
+	String strtime=DateUtil.YMDsdf.format(time);
+	pfmFeeRecDto.setStrTime(strtime);
+	pfmFeeRecDto.setTime(time);
+	pfmFeeRecDto.setBqmoney(BigDecimal.valueOf(Double.valueOf(bqmoney)));
+	pfmFeeRecDto.setInsertTime(time);
+	pfmFeeRecDto.setCarId(Integer.valueOf(carInfoId));
+	pfmFeeRecDto.setAppId(appDto.getAppId());
+	pfmFeeRecDto.setAppCode(appDto.getAppCode());
+	pfmFeeRecDto.setPayMethod(1);
+	String feetatal=pfmFeeRecService.selectFeeTatal(carInfo.getCarInfoId());//所有充值金额(不算本次的)
+	if(feetatal==null){//判断消费表中是否有充值金额
+		//没有
+		 totalDeposit=BigDecimal.valueOf(Double.valueOf(money));//总充值金额(算上本次的)
+	}
+	else{
+		//有
+		//Double temp=Double.valueOf(MoneyToStringUtils.Remove(feetatal))+Double.valueOf(money);
+		//Double temp=Double.valueOf(Double.valueOf(feetatal)+Double.valueOf(money));
+		BigDecimal temp=BigDecimal.valueOf(Double.valueOf(feetatal)).add(BigDecimal.valueOf(Double.valueOf(money)));
+		//totalDeposit=BigDecimal.valueOf(temp);//总充值金额(算上本次的)
+		totalDeposit=temp;//总充值金额(算上本次的)
+	}
+	int a=pfmAccountservice.selectAllByTypeAndCarid(Integer.valueOf(carInfoId));
+	cardAppDto.setTradeId(a+1);
+	cardAppDto.setLastDepositTime(time);
+	cardAppDto.setBdtotalDeposit(totalDeposit);
+	cardAppDto.setUpdateTime(time);
+	/*if(pfmFeeRecDto.getDisableTime()="空"){
+		cardAppDto.setDisableTime(pfmFeeRecDto.getDisableTime());
+	}*/
+	
+	pfmAccountservice.chongzhiInfo(cardAppDto,pfmFeeRecDto,carInfo.getCarInfoId());
+	logRecord.recordLog(ConstParamLog.LOG_MODULE_PFM_ACCOUNT, ConstParamLog.LOG_OPER_ADD,  ConstParamLog.LOG_TYPE_CONFIG,carInfo.getCarNumber());
+	
+	AjaxUtil.ajaxWriteObject(pfmFeeRecDto,response);
+	
+}
+
+
+/*
+ * 退款
+ */
+@RequestMapping("/account/returnMoney.do")
+@ResponseBody
+public void ReturnMoney() throws Exception{
+	/*String money=request.getParameter("money");
+	String cardid=request.getParameter("cardid");
+	String cardcode=request.getParameter("cardcode");
+	//String phone=request.getParameter("phone");
+	List<AccountDto> listDto=null;
+	Date nowtime=new Date();//操作时间
+	StringBuffer sb=new StringBuffer();
+	listDto=pfmAccountservice.selectAccountId(Integer.valueOf(cardid));//查询所有的信息
+	AccountDto accountDto=listDto.get(0);//取出其中一条数据
+	int tradeId=pfmAccountservice.selectTradeId();//查询所有流水号
+	int tradenowId=pfmAccountservice.selectAllTradeId(Integer.valueOf(cardid));//查询当前流水号
+	accountDto.setTradeId(tradeId);//设置流水号 插入信息用
+	accountDto.setCardCode(cardcode);
+	//accountDto.setF(money);//操作金额 Sting类型
+	String strdate=transforDate(nowtime);//处理过后要显示的到期时间
+	accountDto.setData(strdate);
+	String strmoney=sb.append(money+".00").toString();//处理过后的本次退款金额；
+	accountDto.setStrfee(strmoney);
+	Double bfee=Double.valueOf(money);//操作金额 把String类型变成Double
+	String lf=Remove(accountDto.getLf());
+	Double blf=Double.valueOf(lf);//余额 是String类型 转换成Double类型
+	Double blastfee=blf-bfee;//操作后的金额=余额-操作金额
+	//String strlastFee=Remove(Double.V);
+	StringBuffer sb2=new StringBuffer();
+	String strlastFee=sb2.append(Double.valueOf(blastfee)+"0").toString();//处理过后的操作后的金额
+	accountDto.setStrlastFee(strlastFee);
+	accountDto.setFee(BigDecimal.valueOf(bfee)); //操作金额。把Double类型变成BigDecimal类型    
+	accountDto.setIlastFee(BigDecimal.valueOf(blastfee));//操作后金额 把Double类型变成BigDecimal类型    
+	Date disabletime=pfmAccountservice.MaxDisableTime(Integer.valueOf(cardid),tradenowId);//查询流水号最大时(最近一次操作)到期时间 
+	accountDto.setBfdisableTime(disabletime);//上一次到期时间 插入上一次到期时间中
+	accountDto.setTime(nowtime);//操作时间 插入到操作时间中
+	Calendar cal = Calendar.getInstance();
+	//如果是包月
+	if(accountDto.getBqType()==0){
+		int month=(int) (Double.valueOf(money)/accountDto.getBqMoney());
+		cal.setTime(disabletime);
+		cal.add(Calendar.MONTH, -month);
+		
+	}
+	//如果是包月年
+	else{
+		int year=(int) (Double.valueOf(money)/accountDto.getBqMoney());
+		cal.setTime(disabletime);
+		cal.add(Calendar.YEAR, -year);
+		
+	}
+	//判断是否超出到期时间
+	int a=cal.getTime().compareTo(nowtime);
+	if(a>0){
+		accountDto.setDisableTime(cal.getTime());//到期时间  插入到期时间中
+		accountDto.setStrdistimetime(transforDate(cal.getTime()));//处理到期时间的显示形式
+	}
+	else{
+		accountDto.setDisableTime(nowtime);//到期时间  插入到期时间中
+		accountDto.setStrdistimetime(transforDate(nowtime));//处理到期时间的显示形式
+	}
+	//accountDto.setDisableTime(cal.getTime());//到期时间  插入到期时间中
+	//accountDto.setStrdistimetime(transforDate(cal.getTime()));//处理到期时间的显示形式
+	accountDto.setTypeId(1);//1.退款
+	//更新bim_card_app
+	accountDto.setLastUseTime(pfmAccountservice.selectLastUseTime(Integer.valueOf(cardid)));//上次交易时间 更新用
+	accountDto.setLastDepositTime(pfmAccountservice.selectlastDepositTime(Integer.valueOf(cardid)));//最后一次充值时间
+	//String totalChargeMoney=Remove(accountDto.getTotalDf());//总充值金额
+	//accountDto.setTotalChargeMoney(BigDecimal.valueOf(Double.valueOf(totalChargeMoney)));
+	//accountDto.setTotalChargeMoney(BigDecimal.valueOf(Double.valueOf(accountDto.getTotalDeposit())));//总充值金额
+	String totalReturnMoney=Remove(accountDto.getTotalDf());//总退款金额
+	accountDto.setTotalReturnMoney(BigDecimal.valueOf(Double.valueOf(totalReturnMoney)+bfee));//总退款金额=插入前所以得钱+操作金额
+	
+	pfmAccountservice.chargetxInfo(accountDto);
+	AjaxUtil.ajaxWriteObject(accountDto,response);
+	
+	String money=request.getParameter("money");//操作金额
+	String cardid=request.getParameter("cardid");
+	String carInfoId=request.getParameter("carInfoId");
+	String bfmoney=request.getParameter("beforemoney");//操作前金额
+	String bqmoney=request.getParameter("bqmoney");//包期金额
+	AccountDto accountDto =new AccountDto();	
+	PfmCarInfo carInfo=null;
+	pfmCarType pfmCarType=null;
+	pfmFeeRecDto pfmFeeRecDto=new pfmFeeRecDto();
+	pfmFeeRecDto listDto=new pfmFeeRecDto();
+	//pfmFeeRecDto pfmFeeRecAllDto=new pfmFeeRecDto();
+	CardAppDto appDto=null;
+	Calendar cal = Calendar.getInstance();
+	PfmBaoqi baoqi=null;
+	Date time=new Date();
+	carInfo=pfmChargeRuleService.selectBySerchValue(cardid);//查询车辆信息
+	pfmCarType =pfmChargeRuleService.selectByCarinfoId(carInfo.getCarInfoId());//查询车辆类别名称
+	appDto=CardAppService.SelectCardAppInfo(carInfo.getCarInfoId());//查询钱包信息
+	
+	baoqi=pfmChargeRuleService.baoqiRule(carInfo.getCarInfoId());//查询包期类型
+	
+	//查找car_id在pfm_fee_rec是否存在这条记录
+	List<pfmFeeRecDto> listAllDto=pfmFeeRecService.selectPFRInfo(carInfo.getCarInfoId(),ConstUser.ENTERPRISE_ADMINISTRATOR);
+	//如果没有记录存在
+	if(listAllDto==null){
+		pfmFeeRecDto.setTradeId(1);//设置第一条数据的流水号为1 LastDisableTime上一次到期时间为null
+		
+	}
+	//如果有记录存在
+	else{
+		int tradeMaxId=pfmFeeRecService.selectMaxTradeId(carInfo.getCarInfoId());//根据carInfoId查询所有类型最大流水号
+		int tradeId=pfmFeeRecService.selectMaxTradeIdByType(carInfo.getCarInfoId(),0);//根据carInfoId查询充值类型最大流水号
+		listDto=pfmFeeRecService.selectInfo(carInfo.getCarInfoId(), tradeId);//查询消费记录信息
+		pfmFeeRecDto.setTradeId(tradeMaxId+1);
+		pfmFeeRecDto.setLastDisableTime(listDto.getDisableTime());//设置上一次的到期时间
+	}
+	
+	pfmFeeRecDto.setBimCompanyId(ConstUser.ENTERPRISE_ADMINISTRATOR);
+	pfmFeeRecDto.setCarTypeId(Integer.valueOf(pfmCarType.getCarTypeId()));
+	pfmFeeRecDto.setCarTypeName(pfmCarType.getTypeName());
+	pfmFeeRecDto.setCarNumber(carInfo.getCarNumber());
+	pfmFeeRecDto.setPersonName(carInfo.getPersonName());
+	pfmFeeRecDto.setCardId(Integer.valueOf(cardid));
+	pfmFeeRecDto.setFee(BigDecimal.valueOf(Double.valueOf(money)));//操作金额 BigDecimal类型
+	pfmFeeRecDto.setLastFee(BigDecimal.valueOf(Double.valueOf(bfmoney)-Double.valueOf(money)));//操作后金额 BigDecimal类型
+	pfmFeeRecDto.setSfee(money);
+	pfmFeeRecDto.setSlastFee(String.valueOf(Double.valueOf(bfmoney)-Double.valueOf(money)));
+	pfmFeeRecDto.setTypeId(1);
+	pfmFeeRecDto.setTime(time);
+	pfmFeeRecDto.setBqmoney(BigDecimal.valueOf(Double.valueOf(bqmoney)));
+	pfmFeeRecDto.setCarId(Integer.valueOf(carInfoId));
+	pfmFeeRecDto.setAppId(listDto.getAppId());
+	pfmFeeRecDto.setAppCode(listDto.getAppCode());
+	pfmFeeRecDto.setPayMethod(listDto.getPayMethod());
+	
+	if(pfmChargeRuleService.isBaoqi(carInfo.getCarInfoId())){//判断是否是包期车辆
+		//是
+		if(baoqi.getType()==0){
+			//包月
+			int month=(int) (Double.valueOf(money)/Double.valueOf(bqmoney));
+			cal.setTime(listDto.getDisableTime());
+			cal.add(Calendar.MONTH, -month);
+			
+		}
+		else{
+			//包年
+			int year=(int) (Double.valueOf(money)/Double.valueOf(bqmoney));
+			cal.setTime(listDto.getDisableTime());
+			cal.add(Calendar.YEAR, -year);
+		}
+		//判断是否超出到期时间
+		int a=cal.getTime().compareTo(time);
+		if(a>0){
+			pfmFeeRecDto.setDisableTime(cal.getTime());
+		}
+		else{
+			pfmFeeRecDto.setDisableTime(time);
+		}
+	}
+	else{
+		pfmFeeRecDto.setDisableTime(carInfo.getDisableTime());//不是包期车辆 它到期时间为carinfo中的停用时间
+	}
+	String feetatal=pfmFeeRecService.selectFeeTatal(carInfo.getCarInfoId());//所有退款金额(不算本次的)
+	BigDecimal totalDeposit=BigDecimal.valueOf(Double.valueOf(MoneyToStringUtils.Remove(feetatal))+Double.valueOf(money));//总充值金额(算上本次的)
+	//pfmFeeRecService.insertchongInfo(pfmFeeRecDto);//插入pfm_fee_rec消费信息
+	
+	int CardAppMaxTid=CardAppService.selectMaxTradeId(Integer.valueOf(carInfoId));//查询card_app中最大的流水号
+	//Date lastdeposittime=pfmFeeRecService.selectMaxTime(carInfo.getCarInfoId());//查询pfm_fee_rec中最大的充值时间
+	
+	if(pfmFeeRecDto!=null){
+		appDto.setBdvalue1(pfmFeeRecDto.getLastFee());
+		appDto.setTradeId(CardAppMaxTid+1);
+		appDto.setLastDepositTime(time);
+		appDto.setBdtotalDeposit(totalDeposit);
+	}
+	pfmAccountservice.chongzhiInfo(appDto,pfmFeeRecDto,carInfo.getCarInfoId());
+	AjaxUtil.ajaxWriteObject(pfmFeeRecDto,response);*/
+	
+	
+	String money=request.getParameter("money");//操作金额(退款金额)
+	String carInfoId=request.getParameter("carInfoId");
+	String tmonthoryear=request.getParameter("tmonthoryear");//包期退款的月或年个数
+	String redistime=request.getParameter("redistime");//到期时间
+	Calendar cal = Calendar.getInstance();
+	PfmCarInfo carInfo=null;
+	PfmCarType pfmCarType=null;
+	CardAppDto appDto=null;
+	CardAppDto appDto2=new CardAppDto();
+	PfmBaoqi baoqi=null;
+	PfmFeeRecDto pfmFeeRecDto=new PfmFeeRecDto();
+	Date time=new Date();//退款时间
+	OperateResult operateResult=new OperateResult();
+	carInfo=PfmCarInfoMapper.selectByPrimaryKey(Integer.valueOf(carInfoId));//车辆信息
+	pfmCarType =pfmChargeRuleService.selectByCarinfoId(carInfo.getCarInfoId());//查询车辆类别名称
+	appDto=cardAppService.SelectCardAppInfo(carInfo.getCarInfoId());//查询钱包信息
+	String bfmoney=String.valueOf(appDto.getBdvalue1());//操作前金额(显示的余额，即退款前金额)
+	
+	//int maxtradeId=pfmAccountservice.selectTradeId();//查询充值表中最大流水号
+	int count=pfmFeeRecService.selectInfoByType(Integer.valueOf(carInfoId),1,LoginInfo.getCompanyId());//查询是否有退款记录
+	//判断pfm_fee_rec中是否存在消费记录
+	List<PfmFeeRecDto> listAll=pfmFeeRecService.selectPFRAllInfo();
+	if(listAll.size()==0){
+		//无消费记录
+		pfmFeeRecDto.setTradeId(1);//流水号
+	}else{
+		int maxtradeId=pfmAccountservice.selectTradeId();//查询充值表中最大流水号
+		pfmFeeRecDto.setTradeId(1+maxtradeId);//流水号
+	}
+	
+	
+	//判断车辆类型
+	if(pfmChargeRuleService.isBaoqi(carInfo.getCarInfoId())){
+		//是包期车辆
+		
+		if(appDto.getDisableTime()==null){
+			appDto.setDisableTime(time);
+		}
+		
+		
+		//pfmFeeRecDto.setCarType(1);
+		baoqi=pfmChargeRuleService.baoqiRule(carInfo.getCarInfoId());//查询包期类型
+		int moycount=Integer.valueOf(tmonthoryear);//退款月或年的个数
+		pfmFeeRecDto.setFee(baoqi.getMoney().multiply(BigDecimal.valueOf(moycount)));//退款金额
+		
+		
+		 if(baoqi.getType()==0){
+			 //包月
+			 cal.setTime(appDto.getDisableTime());
+			 cal.add(Calendar.MONTH,-moycount);
+			 Date sss=cal.getTime();
+			 String sr=DateUtil.YMDsdf.format(sss);
+		     int a=time.compareTo(cal.getTime());
+		     if(a>0){
+		    	 //退款时间大于退款后的到期时间
+		    	 operateResult.setMsg("退款后的到期时间小于当前退款时间,退款失败");
+		 		operateResult.setResult(false);
+		 		AjaxUtil.ajaxWrite(operateResult,response);
+		 		return ;
+		     }
+		     else{
+		    	 //退款时间小于退款后的到期时间
+		    	 //pfmFeeRecDto.setLastDisableTime(DateUtil.YMDsdf.parse(redistime));//退款前的到期时间
+		    	 pfmFeeRecDto.setLastDisableTime(appDto.getDisableTime());//退款前的到期时间
+		    	 pfmFeeRecDto.setDisableTime(cal.getTime());//退款后的到期时间
+		    	 pfmFeeRecDto.setStrDisableTime(DateUtil.YMDsdf.format(cal.getTime()));
+		    	 //appDto2.setBdvalue1(new BigDecimal(0));
+		     }
+		 }else{
+			//包年
+			 cal.setTime(appDto.getDisableTime());
+			 cal.add(Calendar.YEAR,-moycount);
+			 Date sss=cal.getTime();
+			 String sr=DateUtil.YMDsdf.format(sss);
+		     int a=time.compareTo(cal.getTime());
+			 if(a>0){
+				//退款时间大于退款后的到期时间
+		    	 operateResult.setMsg("退款后的到期时间小于当前退款时间,退款失败");
+		 		operateResult.setResult(false);
+		 		AjaxUtil.ajaxWrite(operateResult,response);
+		 		return ;
+			 }else{
+				 //退款时间小于退款后的到期时间
+		    	 pfmFeeRecDto.setLastDisableTime(appDto.getDisableTime());//退款前的到期时间
+		    	 pfmFeeRecDto.setDisableTime(cal.getTime());//退款后的到期时间
+		    	 pfmFeeRecDto.setStrDisableTime(DateUtil.YMDsdf.format(cal.getTime()));
+		    	 //appDto2.setBdvalue1(new BigDecimal(0));
+				 
+			 }
+			 
+		 }
+		 
+		 pfmFeeRecDto.setBqmoney(baoqi.getMoney());//包期金额
+		 appDto2.setDisableTime(pfmFeeRecDto.getDisableTime());
+		 
+		
+	}else{
+		//储值用户
+		//pfmFeeRecDto.setCarType(0);
+		if(Double.valueOf(money)>Double.valueOf(bfmoney)){
+			operateResult.setMsg("余额不足,不能退款");
+			operateResult.setResult(false);
+			AjaxUtil.ajaxWrite(operateResult,response);
+			return ;
+		}
+		if(count!=0){//有
+			Double Dmoney=pfmFeeRecService.selectAllFeeTatal(Integer.valueOf(carInfoId),1,LoginInfo.getCompanyId());//查询所有退款金额
+			appDto2.setBdtotalDecFee(BigDecimal.valueOf(Dmoney).add(BigDecimal.valueOf(Double.valueOf(money))));
+		}
+		else{
+			appDto2.setBdtotalDecFee(BigDecimal.valueOf(Double.valueOf(money)));
+		}
+		pfmFeeRecDto.setBqmoney(new BigDecimal(0));//包期金额
+		pfmFeeRecDto.setFee(BigDecimal.valueOf(Double.valueOf(money)));//退款金额
+		pfmFeeRecDto.setLastFee(BigDecimal.valueOf(Double.valueOf(bfmoney)).subtract(BigDecimal.valueOf(Double.valueOf(money))));//退款后金额
+		appDto2.setBdvalue1(pfmFeeRecDto.getLastFee());
+	}	
+	pfmFeeRecDto.setBimCompanyId(LoginInfo.getCompanyId());
+	pfmFeeRecDto.setCarTypeName(pfmCarType.getTypeName());//车辆类别名称
+	pfmFeeRecDto.setCarTypeId(pfmCarType.getCarTypeId());//车辆类别编号
+	pfmFeeRecDto.setCarNumber(carInfo.getCarNumber());//车牌号
+	pfmFeeRecDto.setPersonName(carInfo.getPersonName());//车主名称
+	pfmFeeRecDto.setCardId(carInfo.getCardId());
+	//pfmFeeRecDto.setFee(BigDecimal.valueOf(Double.valueOf(money)));//退款金额
+	//pfmFeeRecDto.setLastFee(BigDecimal.valueOf(Double.valueOf(bfmoney)).subtract(BigDecimal.valueOf(Double.valueOf(money))));//退款后金额
+	pfmFeeRecDto.setTypeId(1);//退款类型
+	pfmFeeRecDto.setTime(time);//操作时间
+	pfmFeeRecDto.setStrTime(DateUtil.YMDsdf.format(time));
+	pfmFeeRecDto.setInsertTime(time);//入库时间
+	//pfmFeeRecDto.setTradeId(maxtradeId+1);//流水号
+	
+	pfmFeeRecDto.setPayMethod(1);
+	pfmFeeRecDto.setAppId(appDto.getAppId());
+	pfmFeeRecDto.setAppCode(appDto.getAppCode());
+	pfmFeeRecDto.setCarId(Integer.valueOf(carInfoId));
+	//appDto2.setBdvalue1(pfmFeeRecDto.getLastFee());
+	int a=pfmAccountservice.selectAllByTypeAndCarid(Integer.valueOf(carInfoId));
+	appDto2.setTradeId(a+1);
+	appDto2.setUpdateTime(time);
+	//appDto2.setDisableTime(pfmFeeRecDto.getDisableTime());
+	pfmAccountservice.tuikuanInfo(pfmFeeRecDto,appDto2);
+	logRecord.recordLog(ConstParamLog.LOG_MODULE_PFM_ACCOUNT, ConstParamLog.LOG_OPER_OTHER,  ConstParamLog.LOG_TYPE_CONFIG,carInfo.getCarNumber());
+	AjaxUtil.ajaxWriteObject(pfmFeeRecDto,response);
+}
+/*
+ * 获取下拉列表框数据
+ */
+@RequestMapping("/GetSelectData.do")
+@ResponseBody
+public void GetSelectData(){
+	/*String selectinfo=request.getParameter("selectinfo");
+	String selectvalue=request.getParameter("selectvalue");
+	List<String>list=new ArrayList<String>();//车牌号
+	if(selectvalue==""&&Integer.valueOf(selectinfo)==0){
+		list=pfmChargeRuleService.selectAllCarNum();
+	}else{
+		if(Integer.valueOf(selectinfo)==0){//车牌号
+			list=pfmChargeRuleService.selectCarNumByValue(1, selectvalue);
+		}
+		if(Integer.valueOf(selectinfo)==1){//卡号
+			list=pfmChargeRuleService.selectCarNumByValue(2,selectvalue);
+		}
+		if(Integer.valueOf(selectinfo)==2){//电话号
+			list=pfmChargeRuleService.selectCarNumByValue(3,selectvalue);
+		}
+	}
+	AjaxUtil.ajaxWriteObject(list, response);*/
+	
+	String selectinfo=request.getParameter("selectinfo");
+	List<String>list=new ArrayList<String>();
+	if(Integer.valueOf(selectinfo)==0){//车牌号
+		list=PfmCarInfoMapper.selectAllByCarNumer();
+	}
+	else if(Integer.valueOf(selectinfo)==1){//卡号
+		
+		list=PfmCarInfoMapper.selectAllByCardId();
+		List<String> result=new ArrayList<String>();
+		for(int i=0;i<list.size();i++){
+			if(list.get(i)!=null&&!list.get(i).equals("")){
+				result.add(list.get(i));
+			}
+		}
+		list=result;
+	}
+	else{
+		list=PfmCarInfoMapper.selectAllByPhone();
+		List<String> result=new ArrayList<String>();
+		for(int i=0;i<list.size();i++){
+			if(list.get(i)!=null&&!list.get(i).equals("")){
+				result.add(list.get(i));
+			}
+		}
+		list=result;
+		
+		
+	}
+	AjaxUtil.ajaxWriteObject(list, response);
+}
+
+
+private List ArrayList() {
+	// TODO Auto-generated method stub
+	return null;
+}
+
+
+}

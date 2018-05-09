@@ -1,0 +1,21 @@
+package com.wadejerry.scms.weixin.util.message;
+
+public class TextMessage extends BaseMessage {
+
+	
+
+	public TextMessage(String toUserName, String fromUserName, long createTime, String msgType, String content) {
+		super(toUserName, fromUserName, createTime, msgType);
+		Content = content;
+	}
+
+	private String Content;
+
+    public String getContent() {
+        return Content;
+    }
+
+    public void setContent(String content) {
+        Content = content;
+    }
+}

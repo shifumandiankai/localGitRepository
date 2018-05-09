@@ -1,0 +1,20 @@
+package com.wadejerry.scms.frame.web;
+
+import javax.servlet.http.HttpServletRequest;
+
+public class SystemParams {
+	/**
+	 * 二级域名地址
+	 */
+	public static String path;
+	/**
+	 * 初始化系统参数
+	 * 
+	 * @param request 请求对象
+	 */
+	public SystemParams(HttpServletRequest request){
+		SystemParams.path = request.getContextPath();
+	}
+	
+	public static String lprPath="C:/lprPhoto/";
+}

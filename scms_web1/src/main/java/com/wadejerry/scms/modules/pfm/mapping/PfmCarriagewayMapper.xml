@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper  namespace="com.wadejerry.scms.modules.pfm.dao.PfmCarriagewayMapper">
+<resultMap type="com.wadejerry.scms.modules.pfm.model.PfmCarriageway" id="BaseMap">
+    <id column="carriageway_id" property="carriagewayId" jdbcType="INTEGER" /> 
+    <result column="carriageway_name" property="carriagewayName" jdbcType="VARCHAR" /> 
+    <result column="bim_company_id" property="bimCompanyId" jdbcType="INTEGER" /> 
+    <result column="entrance_id" property="entranceId" jdbcType="INTEGER" />
+    <result column="enabled" property="enabled" jdbcType="INTEGER" />
+    <result column="modle" property="modle" jdbcType="INTEGER" />
+    <result column="carriageway_type" property="carriagewayType" jdbcType="INTEGER" />
+    <result column="in_out" property="inOut" jdbcType="INTEGER" />
+    <result column="auto_release_fixed" property="autoReleaseFixed" jdbcType="INTEGER" />
+    <result column="auto_release_temp" property="autoReleaseTemp" jdbcType="INTEGER" />
+    <result column="release_fixed" property="releaseFixed" jdbcType="INTEGER" />
+    <result column="release_temp" property="releaseTemp" jdbcType="INTEGER" />
+    <result column="insert_time" property="insertTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="user_name" property="userName" jdbcType="VARCHAR" />
+    <result column="custom1" property="custom1" jdbcType="INTEGER" />
+    <result column="custom2" property="custom2" jdbcType="INTEGER" />
+    <result column="custom3" property="custom3" jdbcType="INTEGER" />
+</resultMap>
+<!-- 插入信息 -->
+<insert id="insertInfo" parameterType="com.wadejerry.scms.modules.pfm.model.PfmCarriageway" useGeneratedKeys="true" keyProperty="carriagewayId">
+insert into pfm_carriageway(carriageway_name,bim_company_id,entrance_id,enabled,modle,carriageway_type,in_out,auto_release_fixed,auto_release_temp,release_fixed,release_temp,insert_time,custom1,custom2,custom3) values(#{carriagewayName,jdbcType=VARCHAR},#{bimCompanyId,jdbcType=INTEGER},#{entranceId,jdbcType=INTEGER},#{enabled,jdbcType=INTEGER},#{modle,jdbcType=INTEGER},#{carriagewayType,jdbcType=INTEGER},#{inOut,jdbcType=INTEGER},#{autoReleaseFixed,jdbcType=INTEGER},#{autoReleaseTemp,jdbcType=INTEGER},#{releaseFixed,jdbcType=INTEGER},#{releaseTemp,jdbcType=INTEGER},#{insertTime,jdbcType=TIMESTAMP},#{custom1,jdbcType=INTEGER},#{custom2,jdbcType=INTEGER},#{custom3,jdbcType=INTEGER})
+</insert>
+<!-- 根据出入口id查询车道信息 -->
+<select id="selectInfoByEntranceId" parameterType="int" resultMap="BaseMap">
+select * from pfm_carriageway where entrance_id=#{0} and bim_company_id=#{1} and custom1=#{2}
+</select>
+<!-- 根据名称查询 -->
+<select id="selectByName" resultMap="BaseMap">
+select * from pfm_carriageway where carriageway_name=#{0} and entrance_id=#{1} and bim_company_id=#{2}
+</select>
+<!-- 查询出入口个数 -->
+<select id="selectCount" parameterType="int" resultType="int">
+select count(*) from pfm_carriageway where bim_company_id=#{0}
+</select>
+<!-- 查询最大id-->
+<select id="selectMax" parameterType="int" resultType="int">
+select max(carriageway_id) from pfm_carriageway where bim_company_id=#{0}
+</select>
+<!-- 根据出口id查询所有信息 -->
+<select id="selectAllInfoByEntranceId" resultMap="BaseMap">
+select * from pfm_carriageway where  entrance_id=#{0} and bim_company_id=#{1} order by carriageway_id
+</select>
+<!-- 根据carriagewayId查询信息 -->
+<select id="selectIfoBycarriagewayId" resultMap="BaseMap">
+select * from pfm_carriageway where carriageway_id=#{0}
+</select>
+<!-- 更新信息 -->
+<update id="updateInfo" parameterType="com.wadejerry.scms.modules.pfm.model.PfmCarriageway">
+update pfm_carriageway set carriageway_name=#{carriagewayName,jdbcType=VARCHAR},enabled=#{enabled,jdbcType=INTEGER},modle=#{modle,jdbcType=INTEGER},carriageway_type=#{carriagewayType,jdbcType=INTEGER},in_out=#{inOut,jdbcType=INTEGER},auto_release_fixed=#{autoReleaseFixed,jdbcType=INTEGER},auto_release_temp=#{autoReleaseTemp,jdbcType=INTEGER},release_fixed=#{releaseFixed,jdbcType=INTEGER},release_temp=#{releaseTemp,jdbcType=INTEGER},update_time=#{updateTime,jdbcType=TIMESTAMP} where entrance_id=#{entranceId,jdbcType=INTEGER} and custom1=#{custom1,jdbcType=INTEGER}
+</update>
+<!-- 根据id更新信息 -->
+<update id="updateInfoAway" parameterType="com.wadejerry.scms.modules.pfm.model.PfmCarriageway">
+update pfm_carriageway set carriageway_name=#{carriagewayName,jdbcType=VARCHAR},enabled=#{awayenabled,jdbcType=INTEGER},modle=#{modle,jdbcType=INTEGER},carriageway_type=#{carriagewayType,jdbcType=INTEGER},in_out=#{inOut,jdbcType=INTEGER},auto_release_fixed=#{autoReleaseFixed,jdbcType=INTEGER},auto_release_temp=#{autoReleaseTemp,jdbcType=INTEGER},release_fixed=#{releaseFixed,jdbcType=INTEGER},release_temp=#{releaseTemp,jdbcType=INTEGER},update_time=#{updateCarriawayTime,jdbcType=TIMESTAMP},custom1=#{autoCharge,jdbcType=INTEGER},custom2=#{carriageTimeInterval,jdbcType=INTEGER},custom3=#{custom3,jdbcType=INTEGER} where carriageway_id=#{carriagewayId,jdbcType=INTEGER} and bim_company_id=#{bimCompanyId,jdbcType=INTEGER}
+</update>
+<!-- 更新启用状态 -->
+<update id="updateCarriwayEnabled" parameterType="com.wadejerry.scms.modules.pfm.model.PfmCarriageway">
+update pfm_carriageway set enabled=#{awayenabled,jdbcType=INTEGER},update_time=#{updateCarriawayTime,jdbcType=TIMESTAMP} where carriageway_id=#{carriagewayId,jdbcType=INTEGER} and bim_company_id=#{bimCompanyId,jdbcType=INTEGER}
+</update>
+<!-- 删除信息 -->
+<delete id="deleteInfo" parameterType="com.wadejerry.scms.modules.pfm.model.PfmCarriageway">
+delete from pfm_carriageway where entrance_id=#{0}
+</delete>
+</mapper>

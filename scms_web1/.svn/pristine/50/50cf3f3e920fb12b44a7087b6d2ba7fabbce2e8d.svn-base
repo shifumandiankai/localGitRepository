@@ -1,0 +1,22 @@
+package com.wadejerry.scms.weixin.util.message;
+
+public class VoiceMessage extends BaseMessage {
+
+	
+
+	public VoiceMessage(String toUserName, String fromUserName, long createTime, String msgType,
+			com.wadejerry.scms.weixin.util.message.Voice voice) {
+		super(toUserName, fromUserName, createTime, msgType);
+		Voice = voice;
+	}
+
+	private Voice Voice;
+
+	    public Voice getVoice() {
+	        return Voice;
+	    }
+
+	    public void setVoice(Voice voice) {
+	        Voice = voice;
+	    }
+}

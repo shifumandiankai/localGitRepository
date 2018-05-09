@@ -1,0 +1,315 @@
+var wade = wade || {};
+wade.role = wade.role || {};
+var config1 = new Object();
+// 需要显示的按钮
+config1.btns = new Array({
+	'id' : '10001',
+	'name' : 'add',
+	'fun' : null
+}, {
+	'id' : '10002',
+	'name' : 'edit',
+	"fun" : null
+}, {
+	'id' : "10003",
+	'name' : 'del',
+	"fun" : null
+});
+
+
+// 查询控件 type:控件类型 placeholder:显示值 url: 获取数据的请求路径 index参数序号 最多不超过总列数
+config1.search = new Array(
+// {'type':'multiple_select','placeholder':'多选','url':'/role/GetSelectDataTest.do','index':2}
+// //select 多选
+{
+	'type' : 'search',
+	'placeholder' : '车场名称',
+	'url' : null,
+	'index' : 0
+}
+
+);
+
+config1.add_shown = function(devClone, operId,sel_obj) {
+	// ===========================填充数据及插件初始化==============================
+		
+	
+		
+
+		
+		if(operId==1){
+			//修改
+			var parkinglotname=sel_obj.attribution;
+			var selectvalue=devClone.find('*[name="attribution"]');
+		       if(parkinglotname!=null){  
+		    	   $.ajax({
+		  			 url: "/parkinglot/selectParkinglotInfo.do",
+		  		        dataType: 'json',
+		  		        type:'post',
+		  		        data:{parkinglotname:parkinglotname},
+		  		        success: function (data) {
+		  		        	var result=eval(data);
+		  		        	var pfmParkingLotId=result.pfmParkingLotId;
+		  		        	selectvalue.append('<option value="'+pfmParkingLotId+'">'+parkinglotname+'</option>');
+		  		        	selectvalue.attr('disabled',true);
+		  		        }
+		  		});
+		    	  
+		       }
+		       else{
+		    	   selectvalue.append('<option value="-2">无</option>');
+		    	   selectvalue.attr('disabled',true);
+		    	  
+		       }
+		}
+		else{
+			//添加
+			
+			$.ajax({	//获取角色数据
+		        url: "/parkinglot/GetParkingSelectData.do",
+		        dataType: 'json',
+		        type:'post',
+		        quietMillis: 250,
+		        //async : false,
+		        success: function (result) { 
+		        	var b=eval(result);
+		        	var selectvalue=devClone.find('*[name="attribution"]');
+		        	
+		        	//$(selectvalue).append('<option value="'+b[i].id+'">'+b[i].text+'</option>');
+		        	for(var i in b){
+		        		if(b[i].id!=undefined){
+		        			if(b[i].id==0&&b[i].text=='无归属车场'){
+			        			devClone.find("*[name=attribution]").attr("disabled", "disabled");
+			        			
+			        		}
+			        		selectvalue.append('<option value="'+b[i].id+'">'+b[i].text+'</option>');
+		        		}
+		        		
+		        		
+		        		
+		        	}
+		        }
+		    }); 
+		}
+      
+	
+	
+	//===================================验证相关=================================================
+	devClone.find('#submit').on('click',registerUser);	//绑定用户添加或修改事件
+	//车场数量光标移走后验证
+	devClone.find('input[name=carNumber]').on("blur", function () {
+		    
+		   /* var val = $(this).val();
+			if(val!=''){
+				 var errMsg;
+					var val = $(this).val();
+					var re = /^\+?[1-9]\d*$/;
+					if(!re.test(val)){
+						errMsg='请输入大于0的正整数';
+						devClone.find('.point-out').hide();
+						//$("#carNumberNotice").html('<span class="point-box errorbgTop dropdown"  ><i class="sprite icon_arrow_up2 pa"></i>' + errMsg + '</span>').show();
+						devClone.find("#carNumberNotice").html('<span class="point-box errorbgTop dropdown"  ><i class="sprite icon_arrow_up2 pa"></i>' + errMsg + '</span>').show();
+					}
+					else{
+						devClone.find("#carNumberNotice").hide();
+					}
+					
+			}*/
+		var re = /^\+?[1-9]\d*$/;
+		var carnumber=devClone.find("input[name=carNumber]").val();
+		if(!re.test(carnumber)||carnumber==''){
+			errMsg='请输入大于0的正整数';
+			//errMsg='请输入大于0的正整数';
+			devClone.find('.point-out').hide();
+			devClone.find("div[name=carNumberNotice]").html('<span class="point-box errorbgTop dropdown"  ><i class="sprite icon_arrow_up2 pa"></i>' + errMsg + '</span>').show();
+			
+		}
+		
+		if(carnumber!=''&&carnumber>10000){
+			errMsg='车位数量不能超过10000辆';
+			//errMsg='请输入大于0的正整数';
+			devClone.find('.point-out').hide();
+			devClone.find("div[name=carNumberNotice]").html('<span class="point-box errorbgTop dropdown"  ><i class="sprite icon_arrow_up2 pa"></i>' + errMsg + '</span>').show();
+			
+		}
+		
+		
+		
+	});
+	
+	devClone.find('input[name=carNumber]').on("focus", function () {
+		
+		devClone.find("div[name=carNumberNotice]").hide();
+	});
+	
+	//车场名称光标移走后验证
+	devClone.find('input[name=parkingLotName]').on("blur", function () {
+		   
+		var username = devClone.find("input[name=parkingLotName]").val();
+		if(username==""){
+			errMsg='车场名称不能为空';
+			devClone.find('.point-out').hide();
+			devClone.find("#parkNameNotice").html('<span class="point-box errorbgTop dropdown"  ><i class="sprite icon_arrow_up2 pa"></i>' + errMsg + '</span>').show();
+		}
+		
+		if(username.length>8){
+			errMsg='车场名称不能超过8个字';
+			devClone.find('.point-out').hide();
+			devClone.find("#parkNameNotice").html('<span class="point-box errorbgTop dropdown"  ><i class="sprite icon_arrow_up2 pa"></i>' + errMsg + '</span>').show();
+		}	
+	});
+	devClone.find('input[name=parkingLotName]').on("focus", function () {
+		
+		devClone.find("#parkNameNotice").hide();
+	});
+	
+	//预留车位光标移走后验证
+	/*devClone.find('input[name=reserveCarNumber]').on("blur", function () {
+		  
+		    var val = $(this).val();
+			if(val!=''){
+				var errMsg;
+				//var val = $(this).val();
+				var re = /^\+?[0-9]\d*$/;
+				
+				if(!re.test(val)){	
+					errMsg='请输入大于0的正整数';
+					devClone.find('.point-out').hide();
+					//devClone.find("#parkNameNotice").html('<span class="point-box errorbgTop dropdown"  ><i class="sprite icon_arrow_up2 pa"></i>' + errMsg + '</span>').show();
+					devClone.find("#remainNumberNotice").html('<span class="point-box errorbgTop dropdown"  ><i class="sprite icon_arrow_up2 pa"></i>' + errMsg + '</span>').show();
+				}
+				else{
+					devClone.find("#remainNumberNotice").hide();
+				}
+			}
+	});*/
+	//车场名称光标锁定
+	devClone.find('input[name=parkName]').on('change, keyup', function (){
+		devClone.find("#parkNameNotice").hide();
+	});
+	
+	//车位数量光标锁定
+	devClone.find('input[name=carNumber]').on('change, keyup', function (){
+		devClone.find("div[name=carNumberNotice]").hide();
+	});
+	
+	//预留车位数量光标锁定
+	/*devClone.find('input[name=reserveCarNumber]').on('change, keyup', function (){
+		devClone.find("div[name=remainNumberNotice]").hide();
+	});*/
+	
+	function registerUser(event){
+		var errMsg;
+		var re = /^\+?[1-9]\d*$/;
+		var re1=/^\+?[0-9]\d*$/;
+		//var re=/^[0-9]+$/;
+		var username = devClone.find("input[name=parkingLotName]").val();
+		var carnumber=devClone.find("input[name=carNumber]").val();
+		var note=devClone.find("input[name=note]").val();
+	    //var reserveCarNumber=devClone.find("input[name=reserveCarNumber]").val();
+		if(username==""){
+			errMsg='车场名称不能为空';
+			devClone.find('.point-out').hide();
+			devClone.find("#parkNameNotice").html('<span class="point-box errorbgTop dropdown"  ><i class="sprite icon_arrow_up2 pa"></i>' + errMsg + '</span>').show();
+			event.stopImmediatePropagation(); //阻止提交数据
+			 
+			  //devClone.find('.point-out').hide();
+			  
+			  return false;
+		}
+		
+		if(username.length>8){
+			errMsg='车场名称不能超过8个字';
+			devClone.find('.point-out').hide();
+			devClone.find("#parkNameNotice").html('<span class="point-box errorbgTop dropdown"  ><i class="sprite icon_arrow_up2 pa"></i>' + errMsg + '</span>').show();
+			event.stopImmediatePropagation(); //阻止提交数据
+			 
+			  //devClone.find('.point-out').hide();
+			  
+			return false;
+		}
+		
+		if(!re.test(carnumber)||carnumber==''){
+			errMsg='请输入大于0的正整数';
+			//errMsg='请输入大于0的正整数';
+			devClone.find('.point-out').hide();
+			devClone.find("div[name=carNumberNotice]").html('<span class="point-box errorbgTop dropdown"  ><i class="sprite icon_arrow_up2 pa"></i>' + errMsg + '</span>').show();
+			event.stopImmediatePropagation(); //阻止提交数据
+			return false;
+		}
+		
+		if(carnumber!=''&&carnumber>10000){
+			errMsg='车位数量不能超过10000辆';
+			//errMsg='请输入大于0的正整数';
+			devClone.find('.point-out').hide();
+			devClone.find("div[name=carNumberNotice]").html('<span class="point-box errorbgTop dropdown"  ><i class="sprite icon_arrow_up2 pa"></i>' + errMsg + '</span>').show();
+			event.stopImmediatePropagation(); //阻止提交数据
+			return false;
+		}
+		/*if(note!=''&&note.maxlength>30){
+			errMsg='备注不能超过30个字';
+			devClone.find('.point-out').hide();
+			devClone.find("div[name=noteNotice]").html('<span class="point-box errorbgTop dropdown"  ><i class="sprite icon_arrow_up2 pa"></i>' + errMsg + '</span>').show();
+			event.stopImmediatePropagation(); //阻止提交数据
+			return false;
+		}*/
+		
+		
+		
+		
+		/*if(!re1.test(reserveCarNumber)&&reserveCarNumber!=''){
+			errMsg='请输入大于0的正整数';
+			devClone.find('.point-out').hide();
+			devClone.find("div[name=remainNumberNotice]").html('<span class="point-box errorbgTop dropdown"  ><i class="sprite icon_arrow_up2 pa"></i>' + errMsg + '</span>').show();
+			event.stopImmediatePropagation(); //阻止提交数据
+			
+			  return false;
+		}*/
+	}
+}
+
+
+//删除车场
+config1.beforefun=function(sel_obj_arr){
+	var flag=true;
+	$.each(sel_obj_arr,function(index,value){
+		if(value.parkId!=null){
+			wade.libs.dialog(value.parkingLotName+'有服务关联，请先移除关联的停车场服务,如要删除车场,将会删除所有关联的出入口和车辆类型');
+			flag=false;
+			return flag;
+		}
+			
+	});
+	return flag;
+}
+
+
+
+
+
+
+config1.id = "example1"; // table id
+config1.addDiv = "exampleModal"; // 新增弹出的层 ID
+config1.editDiv = "exampleModal"; // 编辑 弹出层 ID
+config1.getUrl = "/parkinglot/getParkInfo.do"; // ajax获取数据请求地址
+config1.delUrl = "/parkinglot/delPark.do"; // ajax删除角色请求地址
+config1.saveUrl = "/parkinglot/savePark.do"; // 保存修改请求地址
+// 需要绑定数据的列
+config1.columns = new Array("pfmParkingLotId", "parkingLotName", "carNumber",
+		 "attribution", "note", "userType","parkId");
+// 需要隐藏的列
+config1.defs = new Array("pfmParkingLotId", "userType","parkId");
+
+wade.libs.datatable(config1);
+
+/**
+ * 配置权限信息
+ * 
+ * @param sel_tr
+ * @returns
+ */
+/*
+ * function set_auth(sel_tr,all_sel_tr){ //TODO 停车场权权限资源项目未加， 车场的权限未加
+ * wade.libs.dialog(function(){ alert("123123"); });
+ * //wade.libs.alert($('body')); //alert(sel_tr.size()+"-"+all_sel_tr.size()); }
+ */

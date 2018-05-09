@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.wadejerry.scms.modules.log.dao.ConfigurationLogMapper" >
+<resultMap id="ResultMapDto" type="com.wadejerry.scms.modules.log.dto.ConfigurationLogDto" >
+    <id column="operationlog_id" property="operationlogId" jdbcType="INTEGER" />
+    <result column="system_code" property="systemCode" jdbcType="INTEGER" />
+    <result column="module_code" property="moduleCode" jdbcType="INTEGER" />
+    <result column="oper_type" property="operType" jdbcType="INTEGER" />
+    <result column="log_info" property="logInfo" jdbcType="VARCHAR" />
+    <result column="user_name" property="userName" jdbcType="VARCHAR" />
+    <result column="login_add" property="loginAdd" jdbcType="VARCHAR" />
+    <result column="insert_time" property="insertTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  
+   <!-- 获取记录总数 -->
+  <select id="getRecordTotal" parameterType="com.wadejerry.scms.frame.entity.PageParamsDto"  resultType="java.lang.Integer" >
+  select count(operationlog_id) from bim_operation_log <where>
+  <!-- 如果不是企业操作员，就只有当前用户创建的操作员权限  -->
+  (#{loginUserLevel,jdbcType=INTEGER}=1) 
+   <if test="dateValue1!=null">and insert_time &gt;=#{dateValue1}</if>
+   <if test="dateValue2!=null">and insert_time &lt;=#{dateValue2}</if>
+   <if test="intValue4!=0">and system_code=#{intValue4}</if>
+   <if test="intValue5!=0">and user_id=#{intValue5}</if>
+  </where>
+  
+  	
+  </select>
+  
+  <!-- 分页获取操作员信息 -->
+  <select id="getConfigurationLogByPage" parameterType="com.wadejerry.scms.frame.entity.PageParamsDto" resultMap="ResultMapDto" >
+    select * from bim_operation_log 
+    <where>
+    <if test="dateValue1!=null">and insert_time &gt;=#{dateValue1}</if>
+   <if test="dateValue2!=null">and insert_time &lt;=#{dateValue2}</if>
+   <if test="intValue4!=0">and system_code=#{intValue4}</if>
+   <if test="intValue5!=0">and user_id=#{intValue5}</if>
+    </where> 
+     ${order} 
+	  	LIMIT  #{length,jdbcType=INTEGER} OFFSET  #{start,jdbcType=INTEGER}
+	  
+	  	
+	  	  	
+  </select>
+  
+</mapper>

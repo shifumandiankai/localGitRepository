@@ -1,0 +1,72 @@
+package com.wadejerry.scms.modules.pfm.dto;
+
+import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+import com.wadejerry.scms.utils.date.DateUtil;
+
+public class PfmChargeRecordDto {
+public Integer chargeRecordId;
+public String carTypeName;
+public Date insertTime;
+private Integer countNum;
+private BigDecimal czfee;
+private Integer type;//报表的类型(0:日报表，1:月报表，2:年报表)
+private String strtime;//当两个时间都不为空时拼接时间
+public String getCarTypeName() {
+	return carTypeName;
+}
+public void setCarTypeName(String carTypeName) {
+	this.carTypeName = carTypeName;
+}
+public String getInsertTime() {
+	String time=null;
+	if(type==0){
+		//
+		SimpleDateFormat sdf=new SimpleDateFormat("yyyy年MM月dd日");
+		time=sdf.format(insertTime);
+	}
+	if(type==1){
+		SimpleDateFormat sdf=new SimpleDateFormat("yyyy年MM月份");
+		
+		time=sdf.format(insertTime);
+	}
+	if(type==1&&strtime!=null){
+		time=strtime;
+	}
+   if(type==2){
+	   SimpleDateFormat sdf=new SimpleDateFormat("yyyy年");
+		
+		time=sdf.format(insertTime);
+   }
+   if(type==2&&strtime!=null){
+		time=strtime;
+	}
+	return time;
+}
+public void setInsertTime(Date insertTime,Integer type,String strtime) {
+	this.insertTime = insertTime;
+	this.type = type;
+	this.strtime=strtime;
+}
+public Integer getChargeRecordId() {
+	return chargeRecordId;
+}
+public void setChargeRecordId(Integer chargeRecordId) {
+	this.chargeRecordId = chargeRecordId;
+}
+public Integer getCountNum() {
+	return countNum;
+}
+public void setCountNum(Integer countNum) {
+	this.countNum = countNum;
+}
+public BigDecimal getCzfee() {
+	return czfee;
+}
+public void setCzfee(BigDecimal czfee) {
+	this.czfee = czfee;
+}
+
+}

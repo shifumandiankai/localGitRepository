@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.wadejerry.scms.modules.onecard.dao.BimCateMapper" >
+ <resultMap id="BaseResultMap" type="com.wadejerry.scms.modules.onecard.model.BimCate" >
+ <id column="bim_cate_id" property="bimCateId" jdbcType="INTEGER" />
+    <result column="bim_company_id" property="bimCompanyId" jdbcType="INTEGER" />
+    <result column="cate_code" property="cateCode" jdbcType="VARCHAR" />
+    <result column="cate_name" property="cateName" jdbcType="VARCHAR" />
+    <result column="cate_type" property="cateType" jdbcType="INTEGER" />
+    <result column="note" property="note" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="carddeposit" property="carddeposit" jdbcType="NUMERIC" />
+    <result column="issuefee" property="issuefee" jdbcType="NUMERIC" />
+    <result column="lossfee" property="lossfee" jdbcType="NUMERIC" />
+    <result column="changefee" property="changefee" jdbcType="NUMERIC" />
+    <result column="returnfee" property="returnfee" jdbcType="NUMERIC" />
+    <result column="unlossfee" property="unlossfee" jdbcType="NUMERIC" />
+    <result column="newcardfee" property="newcardfee" jdbcType="NUMERIC" />
+    <result column="custom1" property="custom1" jdbcType="INTEGER" />
+    <result column="custom2" property="custom2" jdbcType="INTEGER" />
+    <result column="custom3" property="custom3" jdbcType="INTEGER" />
+    <result column="custom4" property="custom4" jdbcType="INTEGER" />
+ </resultMap>
+ 
+ 
+ <select id="selectAllInfo" resultMap="BaseResultMap">
+ select * from bim_cate where cate_type=#{0} and custom1 is null order by bim_cate_id
+ </select>
+ 
+ <select id="selectRandom" resultType="java.lang.Integer">
+ select count(bim_cate_id) from bim_cate
+ </select>
+ 
+  <select id="selectByCateName" resultMap="BaseResultMap" parameterType="string">
+ select * from bim_cate where cate_name=#{0} and custom1 is null
+ </select> 
+ 
+ 
+ <insert id="insertCateInfo" parameterType="com.wadejerry.scms.modules.onecard.model.BimCate" useGeneratedKeys="true" keyProperty="bimCateId">
+ insert into bim_cate(cate_name,note,cate_type,create_time) values(#{cateName,jdbcType=VARCHAR},#{note,jdbcType=VARCHAR},#{cateType,jdbcType=INTEGER},#{createTime,jdbcType=TIMESTAMP})
+ </insert>
+ 
+ <update id="updateCateInfo">
+ update bim_cate set cate_name=#{1},note=#{2},update_time=#{3} where bim_cate_id=#{0}
+ </update>
+ 
+ <update id="deleteInfo">
+ update bim_cate set custom1=0 where bim_cate_id=#{0}
+ </update>
+</mapper>

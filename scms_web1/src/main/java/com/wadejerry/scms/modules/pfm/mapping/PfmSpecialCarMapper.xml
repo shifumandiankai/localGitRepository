@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.wadejerry.scms.modules.pfm.dao.PfmSpecialCarMapper" >
+  <resultMap id="BaseResultMap" type="com.wadejerry.scms.modules.pfm.model.PfmSpecialCar" >
+    <id column="pfm_special_car_id" property="pfmSpecialCarId" jdbcType="INTEGER" />
+    <result column="bim_company_id" property="bimCompanyId" jdbcType="INTEGER" />
+    <result column="note" property="note" jdbcType="VARCHAR" />
+    <result column="car_number" property="carNumber" jdbcType="VARCHAR" />
+    <result column="insert_time" property="insertTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="user_name" property="userName" jdbcType="VARCHAR" />
+    <result column="is_del" property="isDel" jdbcType="INTEGER" />
+  </resultMap>
+  <resultMap id="specialCarMap" type="com.wadejerry.scms.modules.pfm.dto.SpecialNumDto" >
+    <id column="pfm_special_car_id" property="pfmSpecialCarId" jdbcType="INTEGER" />
+    <result column="bim_company_id" property="bimCompanyId" jdbcType="INTEGER" />
+    <result column="note" property="note" jdbcType="VARCHAR" />
+    <result column="car_number" property="carNumber" jdbcType="VARCHAR" />
+    <result column="insert_time" property="insertTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="user_name" property="userName" jdbcType="VARCHAR" />
+    <result column="is_del" property="isDel" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    pfm_special_car_id, bim_company_id, note, car_number, insert_time, update_time, user_name, 
+    is_del
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from pfm_special_car
+    where pfm_special_car_id = #{pfmSpecialCarId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from pfm_special_car
+    where pfm_special_car_id = #{pfmSpecialCarId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.wadejerry.scms.modules.pfm.model.PfmSpecialCar" >
+    insert into pfm_special_car (pfm_special_car_id, bim_company_id, note, 
+      car_number, insert_time, update_time, 
+      user_name, is_del)
+    values (#{pfmSpecialCarId,jdbcType=INTEGER}, #{bimCompanyId,jdbcType=INTEGER}, #{note,jdbcType=VARCHAR}, 
+      #{carNumber,jdbcType=VARCHAR}, #{insertTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, 
+      #{userName,jdbcType=VARCHAR}, #{isDel,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" parameterType="com.wadejerry.scms.modules.pfm.model.PfmSpecialCar" >
+    insert into pfm_special_car
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="pfmSpecialCarId != null" >
+        pfm_special_car_id,
+      </if>
+      <if test="bimCompanyId != null" >
+        bim_company_id,
+      </if>
+      <if test="note != null" >
+        note,
+      </if>
+      <if test="carNumber != null" >
+        car_number,
+      </if>
+      <if test="insertTime != null" >
+        insert_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+      <if test="userName != null" >
+        user_name,
+      </if>
+      <if test="isDel != null" >
+        is_del,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="pfmSpecialCarId != null" >
+        #{pfmSpecialCarId,jdbcType=INTEGER},
+      </if>
+      <if test="bimCompanyId != null" >
+        #{bimCompanyId,jdbcType=INTEGER},
+      </if>
+      <if test="note != null" >
+        #{note,jdbcType=VARCHAR},
+      </if>
+      <if test="carNumber != null" >
+        #{carNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="insertTime != null" >
+        #{insertTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="userName != null" >
+        #{userName,jdbcType=VARCHAR},
+      </if>
+      <if test="isDel != null" >
+        #{isDel,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.wadejerry.scms.modules.pfm.model.PfmSpecialCar" >
+    update pfm_special_car
+    <set >
+      <if test="bimCompanyId != null" >
+        bim_company_id = #{bimCompanyId,jdbcType=INTEGER},
+      </if>
+      <if test="note != null" >
+        note = #{note,jdbcType=VARCHAR},
+      </if>
+      <if test="carNumber != null" >
+        car_number = #{carNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="insertTime != null" >
+        insert_time = #{insertTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="userName != null" >
+        user_name = #{userName,jdbcType=VARCHAR},
+      </if>
+      <if test="isDel != null" >
+        is_del = #{isDel,jdbcType=INTEGER},
+      </if>
+    </set>
+    where pfm_special_car_id = #{pfmSpecialCarId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.wadejerry.scms.modules.pfm.model.PfmSpecialCar" >
+    update pfm_special_car
+    set bim_company_id = #{bimCompanyId,jdbcType=INTEGER},
+      note = #{note,jdbcType=VARCHAR},
+      car_number = #{carNumber,jdbcType=VARCHAR},
+      insert_time = #{insertTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      user_name = #{userName,jdbcType=VARCHAR},
+      is_del = #{isDel,jdbcType=INTEGER}
+    where pfm_special_car_id = #{pfmSpecialCarId,jdbcType=INTEGER}
+  </update>
+  
+  <select id="selectAllCount" resultType="int">
+  		select count(pfm_special_car_id) from pfm_special_car
+  			where bim_company_id=#{pageParam.companyId} and is_del=0
+  		<if test="pageParam.searchValue0!=null and pageParam.searchValue0!=''">
+  		and car_number like concat('%', #{pageParam.searchValue0},'%')
+  		</if>
+  
+  </select>
+    <select id="selectAllDataBypage" resultMap="specialCarMap">
+  		select * from pfm_special_car
+  			where bim_company_id=#{pageParam.companyId} and is_del=0
+  		<if test="pageParam.searchValue0!=null and pageParam.searchValue0!=''">
+  		and car_number like concat('%', #{pageParam.searchValue0},'%')
+  		</if>
+  		 ${pageParam.order}
+		LIMIT
+		#{pageParam.length,jdbcType=INTEGER} OFFSET
+		#{pageParam.start,jdbcType=INTEGER}
+  </select>
+  
+  <update id="deleteByisdel" parameterType="int">
+  	
+  	update pfm_special_car set is_del=1 ,update_time = now() where pfm_special_car_id = #{id}
+  
+  </update>
+  <select id="selectIfHasCarNum" resultType="int">
+  
+  select count(*) from pfm_special_car where is_del=0 and car_number = #{carNum} and bim_company_id =#{companyId}
+  </select>
+  
+  <select id="selectIfHasCarNumExcepSelf" resultType="int">
+  
+  select count(*) from pfm_special_car where is_del=0 and car_number = #{carNum} and bim_company_id =#{companyId} and pfm_special_car_id &lt;&gt;#{pfmSpecialCarId}
+  </select>
+</mapper>

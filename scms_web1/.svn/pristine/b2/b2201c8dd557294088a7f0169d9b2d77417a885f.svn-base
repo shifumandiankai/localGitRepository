@@ -1,0 +1,135 @@
+<%@ page contentType="text/html; charset=UTF-8"%>
+	<style type="text/css">
+		.entrance-div {margin-left: 10px}
+	</style>
+	<link rel="stylesheet" type="text/css" href="/pages/pfm/carmanage/css/car_manage.css" >
+	<div class="tab-pane row" id="entrance">
+		<div class="col-md-2 panel panel-default">
+			<div class="panel-body">
+				<ul id="tree" class="ztree"></ul>
+			</div>
+		</div>
+		<div class="col-md-9 panel panel-default entrance-div">
+			<div class="panel-body">
+			<form id="form1" class="form-horizontal">
+				<input type="hidden" name ="custom1">
+				<input type="hidden" name ="selectId">
+				<input type="hidden" name ="parentId">
+				<input type="hidden" name ="etenabled">
+				<input type="hidden" name ="htimeId">
+				<input type="hidden" name ="hentranceName">
+				<input type="hidden" name ="hcarriagewayName">
+				<input type="hidden" name ="hcarriagewayType">
+				<input type="hidden" name ="hinOut">
+				<input type="hidden" name ="hcustom3">
+				<input type="hidden" name ="hreleaseFixed">
+				<input type="hidden" name ="hreleaseTemp">
+				<input type="hidden" name ="hautoReleaseFixed">
+				<input type="hidden" name ="hautoReleaseTemp">
+				<input type="hidden" name ="hdeviceId">
+				<input type="hidden" name ="htimeInterval">
+				<input type="hidden" name ="hcarriageTimeInterval">
+				<input type="hidden" name ="hautoCharge">    
+				<div class="form-group">
+		        	<label class="col-lg-2 control-label" >出入口名称</label>
+		        	<div class="col-lg-4">
+			       		<input type="text" name="entranceName" disabled="disabled" class="form-control"/>
+		        	</div>
+		            <input type="checkbox" name="enabled" value="0" disabled="disabled">
+		            <label for="recipient-name" class="control-label" >启用</label>
+	            </div>
+	            <div class="form-group">
+    				<label class="col-lg-2 control-label">选择时段</label>
+   					<div class="col-lg-4">
+			    		<select  class="form-control" disabled="disabled" name="timeId">
+								<option value="-1" selected="true">无</option>
+						</select>
+					</div>
+	            </div>
+	  			<div class="form-group">
+					<label  class="col-lg-2 control-label" >出入口车牌间隔时间(秒)</label>
+					<div class="col-lg-4">
+	        			<input type="text" name="timeInterval" disabled="disabled" class="form-control"/>
+	        		</div>
+	  			</div>
+				<div  class="nav-tabs-custom">
+					<ul class="nav nav-tabs" id="myTab">
+					<li class="active" name="li1" id="l1"><a href="#lane1" data-toggle="tab">车道1</a></li>
+					<li name="li1" id="l2"><a href="#lane2" data-toggle="tab">车道2</a></li> 
+					<li name="li1" id="l3"><a href="#lane3" data-toggle="tab">车道3</a></li>
+					<li name="li1" id="l4"><a href="#lane4" data-toggle="tab">车道4</a></li>  
+					</ul>
+				</div>
+				<div class="form-group">
+					<label  class="col-lg-2 control-label">车道名称</label>
+					<div class="col-lg-4">
+				        <input type="text" disabled="disabled" name="carriagewayName"  class="form-control"/>
+					</div>   
+					<input type="checkbox" name="awayenabled" disabled="disabled" value="0">
+					<label for="recipient-name" class="control-label">启用</label>
+				</div>
+				<div class="form-group">
+						<label   class="control-label col-lg-2">车卡模式</label> 
+						<div class="col-lg-2">
+							<select  class="form-control " disabled="disabled" name="model">
+								<option value="1">车牌模式</option>
+							</select>
+						</div>
+						<label class="control-label col-lg-1">车道类型</label> 
+						<div  class="col-lg-2">
+							<select  class="form-control" name="carriagewayType" disabled="disabled">
+								<option value="1">入口</option>
+								<option value="2">出口-不收费</option>
+								<option value="3">出口-收费</option>
+							</select>
+						</div>
+				</div>		
+				<div class="form-group">
+						<label class="control-label col-lg-2">放行模式</label> 
+						<div  class="col-lg-2">
+							<input type="checkbox" disabled="disabled" name="inOut" value="0"/>
+							<label class="control-label " >一进一出</label>
+						</div>
+						<label class="control-label col-lg-1">军警车辆</label>
+						<div  class="col-lg-2">
+							<input type="checkbox" disabled="disabled" name="custom3" value="0" />
+							<label for="recipient-name" class="control-label " >免费放行</label>
+						</div>
+				</div>
+				<div class="form-group">
+					<label  class="control-label col-lg-2">车道同车牌间隔时间(秒)</label> 
+					<div  class="col-lg-2">
+			            <input type="text" disabled="disabled" name="carriageTimeInterval"  class="form-control"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label  col-lg-2">自动放行规则</label>
+					<input type="checkbox" name="releaseFixed" disabled="disabled" value="0"/>
+					<label for="recipient-name" class="control-label ">固定车放行</label>
+					<input type="checkbox" name="releaseTemp" disabled="disabled" value="0"/>
+					<label for="recipient-name" class="control-label ">临时车放行</label>
+					<input type="checkbox" name="autoReleaseFixed" disabled="disabled" value="0"/>
+					<label for="recipient-name" class="control-label ">固定车若免费则自动放行</label>
+			
+				</div>
+				<div class="form-group">
+					<label class="control-label  col-lg-2"></label>
+					<input type="checkbox" name="autoReleaseTemp" disabled="disabled" value="0"/>
+					<label for="recipient-name" class="control-label ">临时车若免费则自动放行</label>
+					<input type="checkbox" name="autoCharge" disabled="disabled" value="0"/>
+					<label for="recipient-name" class="control-label ">储值车自动扣费放行</label>
+				</div>	 
+				<div class="form-group">
+					<label class="control-label col-lg-2">关联设备</label>
+					<div class="col-lg-4">
+						<select class="form-control" disabled="disabled" name="deviceId" style="width: 100%"></select>
+					</div>
+				</div>		
+	         	</form>
+				<div class="modal-footer bdFooter">
+	            	<button type="button" class="btn btn-primary" id="btnsmt" >保存</button>
+	           </div>
+           </div>
+        </div>
+	</div>
+ 	<script src="/pages/pfm/entrance/entrance.js"></script>

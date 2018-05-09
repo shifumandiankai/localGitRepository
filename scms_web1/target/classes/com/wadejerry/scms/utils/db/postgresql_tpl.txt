@@ -1,0 +1,18 @@
+CREATE TABLE #table-name#_#table-suffix# (
+	LIKE #table-name# INCLUDING ALL
+) INHERITS (#table-name#);
+
+ALTER TABLE #table-name#_#table-suffix# ADD CONSTRAINT #table-name#_#table-suffix#_ck1 CHECK (
+	#query-param# >= DATE '#start-time#'
+	AND #query-param# < DATE '#end-time#'
+);
+
+CREATE RULE insert_#table-name#_#table-suffix# AS ON INSERT TO #table-name#
+WHERE
+	(
+		#query-param# >= DATE '#start-time#'
+		AND #query-param# < DATE '#end-time#'
+	) DO
+		INSTEAD INSERT INTO #table-name#_#table-suffix#
+	VALUES
+		(NEW .*);

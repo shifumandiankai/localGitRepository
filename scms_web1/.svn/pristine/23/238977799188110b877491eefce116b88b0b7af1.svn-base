@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper  namespace="com.wadejerry.scms.modules.onecard.dao.BimCardMapper">
+<resultMap id="BaseResultMap" type="com.wadejerry.scms.modules.onecard.model.BimCard" >
+<id column="bim_card_id" property="bimCardId" jdbcType="INTEGER" />
+    <result column="bim_company_id" property="bimCompanyId" jdbcType="INTEGER" />
+    <result column="person_id" property="personId" jdbcType="INTEGER" />
+    <result column="card_id" property="cardId" jdbcType="VARCHAR" />
+     <result column="use_system" property="useSystem" jdbcType="VARCHAR" />
+    <result column="card_type" property="cardType" jdbcType="INTEGER" />
+    <result column="card_status" property="cardStatus" jdbcType="SMALLINT" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="custom1" property="custom1" jdbcType="INTEGER" />
+    <result column="custom2" property="custom2" jdbcType="INTEGER" />
+    <result column="custom3" property="custom3" jdbcType="VARCHAR" />
+    <result column="custom4" property="custom4" jdbcType="VARCHAR" />
+</resultMap>
+
+<resultMap id="DtoResultMap" type="com.wadejerry.scms.modules.onecard.dto.BimCardDto" >
+<id column="bim_card_id" property="bimCardId" jdbcType="INTEGER" />
+    <result column="bim_company_id" property="bimCompanyId" jdbcType="INTEGER" />
+    <result column="person_id" property="personId" jdbcType="INTEGER" />
+    <result column="card_id" property="cardId" jdbcType="VARCHAR" />
+     <result column="use_system" property="subSystemStr" jdbcType="VARCHAR" />
+    <result column="card_type" property="cardType" jdbcType="INTEGER" />
+    <result column="card_status" property="cardStatus" jdbcType="SMALLINT" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  
+</resultMap>
+
+<insert id="insertCardInfo"  parameterType="com.wadejerry.scms.modules.onecard.dto.BimCardDto">
+insert into bim_card(bim_company_id,person_id,card_id,use_system,card_status) values(#{bimCompanyId,jdbcType=INTEGER},#{personId,jdbcType=INTEGER},#{cardId,jdbcType=VARCHAR},#{subSystemStr,jdbcType=VARCHAR},#{cardStatus,jdbcType=SMALLINT})
+</insert>
+
+<select id="selectCardInfoByPage" resultMap="BaseResultMap">
+select * from bim_card where person_id=#{0} order by bim_card_id asc
+</select>
+</mapper>

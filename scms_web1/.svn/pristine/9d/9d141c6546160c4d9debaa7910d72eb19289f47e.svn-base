@@ -1,0 +1,5 @@
+package com.wadejerry.scms.modules.sysconfig.service;
+
+public interface BimsysParamService {
+public void SaveParams(int alarm,int config,int common,int work,int monitor,int validate,String AutoSetTimeTime);
+}

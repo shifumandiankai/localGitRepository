@@ -1,0 +1,60 @@
+package com.wadejerry.scms.modules.pfm.serviceImpl;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.wadejerry.scms.frame.entity.PageParamsDto;
+import com.wadejerry.scms.modules.pfm.dao.pfmTimeMapper;
+import com.wadejerry.scms.modules.pfm.dto.TimeDto;
+import com.wadejerry.scms.modules.pfm.model.PfmTime;
+import com.wadejerry.scms.modules.pfm.service.PfmTimeService;
+@Service("pfmtimeservice")
+public class PfmTimeServiceImpl implements PfmTimeService {
+@Autowired
+private pfmTimeMapper pfmtimeMapper;
+
+	public int getRecordTotal(PageParamsDto paramsDto) {
+		int iTotal=pfmtimeMapper.getRecordTotal(paramsDto);
+		return iTotal;
+	}
+
+	public List<TimeDto> getTimeListByPage(PageParamsDto paramsDto) {
+		List<TimeDto> roleDtoList=pfmtimeMapper.getTimeListByPage(paramsDto);
+		return roleDtoList;
+	}
+
+	
+
+	public PfmTime findByTimeName(String string, int i) {
+		PfmTime timeDto=pfmtimeMapper.findByTimeName(string,i);
+		return timeDto;
+	}
+
+	public void insertTimeDto(PfmTime inserttime) {
+		pfmtimeMapper.insertTimeDto(inserttime);
+	}
+
+	public void updateTimeDto(PfmTime inserttime) {
+		pfmtimeMapper.updateTimeDto(inserttime);
+		
+	}
+
+	public void deleteTimeById(Integer pfmTimeId) {
+		pfmtimeMapper.deleteTimeById(pfmTimeId);
+		
+	}
+
+
+	public PfmTime selectByTimeName(String timeName, int i) {
+		PfmTime timeDto=pfmtimeMapper.selectByTimeName(timeName,i);
+		return timeDto;
+	}
+
+	@Override
+	public List<TimeDto> configTime(int commpanyId) {
+		return pfmtimeMapper.configTime(commpanyId);
+	}
+
+}

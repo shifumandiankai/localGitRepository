@@ -1,0 +1,330 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.wadejerry.scms.modules.pfm.dao.PfmCarTypeMapper">
+	<resultMap id="BaseResultMap"
+		type="com.wadejerry.scms.modules.pfm.model.PfmCarType">
+		<id column="car_type_id" property="carTypeId" jdbcType="INTEGER" />
+		<result column="bim_company_id" property="bimCompanyId"
+			jdbcType="INTEGER" />
+		<result column="type_code" property="typeCode" jdbcType="VARCHAR" />
+		<result column="type_name" property="typeName" jdbcType="VARCHAR" />
+		<result column="in_id" property="inId" jdbcType="INTEGER" />
+		<result column="note" property="note" jdbcType="VARCHAR" />
+		<result column="status" property="status" jdbcType="SMALLINT" />
+		<result column="insert_time" property="insertTime" jdbcType="TIMESTAMP" />
+		<result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+		<result column="user_name" property="userName" jdbcType="VARCHAR" />
+		<result column="custom1" property="custom1" jdbcType="INTEGER" />
+		<result column="custom2" property="custom2" jdbcType="INTEGER" />
+		<result column="custom3" property="custom3" jdbcType="VARCHAR" />
+		<result column="custom4" property="custom4" jdbcType="VARCHAR" />
+		<result column="car_full" property="carFull" jdbcType="INTEGER" />
+		<result column="maxstop" property="maxstop" jdbcType="INTEGER" />
+	</resultMap>
+	<resultMap id="carTypeDtoMap" type="com.wadejerry.scms.modules.pfm.dto.CarTypeDto">
+		<id column="car_type_id" property="carTypeId" jdbcType="INTEGER" />
+		<result column="type_name" property="typeName" jdbcType="VARCHAR" />
+		<collection property="sonTypes"
+			ofType="com.wadejerry.scms.modules.pfm.dto.CarTypeDto">
+			<id column="son_car_type_id" property="carTypeId" jdbcType="INTEGER" />
+			<result column="son_type_name" property="typeName" jdbcType="VARCHAR" />
+		</collection>
+	</resultMap>
+	<resultMap id="zTreeMap" type="com.wadejerry.scms.modules.pfm.dto.ZTreeDto">
+		<id column="car_type_id" property="id" jdbcType="INTEGER" />
+		<result column="type_name" property="name" jdbcType="VARCHAR" />
+		<result column="in_id" property="pId" jdbcType="INTEGER" />
+		<result column="note" property="note" jdbcType="VARCHAR" />
+		<result column="type" property="type" jdbcType="VARCHAR" />
+		<result column="status" property="status" jdbcType="INTEGER" />
+		<result column="car_full" property="carFull" jdbcType="INTEGER" />
+		<result column="in_id" property="inId" jdbcType="INTEGER" />
+		<result column="custom1" property="custom1" jdbcType="INTEGER" />
+		<result column="has_permission" property="hasPermission" jdbcType="INTEGER" />
+		<result column="maxstop" property="maxstop" jdbcType="INTEGER" />
+	</resultMap>
+
+
+	<sql id="Base_Column_List">
+		car_type_id, bim_company_id, type_code, type_name, in_id, note, status,
+		insert_time,car_full,maxstop,
+		update_time, user_name, custom1, custom2, custom3, custom4
+	</sql>
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap"
+		parameterType="java.lang.Integer">
+		select
+		<include refid="Base_Column_List" />
+		from pfm_car_type
+		where car_type_id = #{carTypeId,jdbcType=INTEGER}
+	</select>
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+		delete from pfm_car_type
+		where car_type_id = #{carTypeId,jdbcType=INTEGER}
+	</delete>
+	<insert id="insert" parameterType="com.wadejerry.scms.modules.pfm.model.PfmCarType"
+		useGeneratedKeys="true" keyProperty="carTypeId">
+		insert into pfm_car_type (car_type_id, bim_company_id, type_code,
+		type_name, in_id, note,
+		status, insert_time, update_time,
+		user_name, custom1, custom2,
+		custom3, custom4,car_full,maxstop)
+		values (#{carTypeId,jdbcType=INTEGER}, #{bimCompanyId,jdbcType=INTEGER},
+		#{typeCode,jdbcType=VARCHAR},
+		#{typeName,jdbcType=VARCHAR}, #{inId,jdbcType=INTEGER}, #{note,jdbcType=VARCHAR},
+		#{status,jdbcType=SMALLINT}, #{insertTime,jdbcType=TIMESTAMP},
+		#{updateTime,jdbcType=TIMESTAMP},
+		#{userName,jdbcType=VARCHAR}, #{custom1,jdbcType=INTEGER}, #{custom2,jdbcType=INTEGER},
+		#{custom3,jdbcType=VARCHAR}, #{custom4,jdbcType=VARCHAR},#{carFull,jdbcType=VARCHAR},#{maxstop,jdbcType=INTEGER})
+	</insert>
+	<insert id="insertSelective" parameterType="com.wadejerry.scms.modules.pfm.model.PfmCarType"
+		useGeneratedKeys="true" keyProperty="carTypeId">
+		insert into pfm_car_type
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="carTypeId != null">
+				car_type_id,
+			</if>
+			<if test="bimCompanyId != null">
+				bim_company_id,
+			</if>
+			<if test="typeCode != null">
+				type_code,
+			</if>
+			<if test="typeName != null">
+				type_name,
+			</if>
+			<if test="inId != null">
+				in_id,
+			</if>
+			<if test="note != null">
+				note,
+			</if>
+			<if test="status != null">
+				status,
+			</if>
+			<if test="insertTime != null">
+				insert_time,
+			</if>
+			<if test="updateTime != null">
+				update_time,
+			</if>
+			<if test="userName != null">
+				user_name,
+			</if>
+			<if test="custom1 != null">
+				custom1,
+			</if>
+			<if test="custom2 != null">
+				custom2,
+			</if>
+			<if test="custom3 != null">
+				custom3,
+			</if>
+			<if test="custom4 != null">
+				custom4,
+			</if>
+			<if test="carFull != null">
+				car_full,
+			</if>
+			<if test="maxstop != null">
+				maxstop,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="carTypeId != null">
+				#{carTypeId,jdbcType=INTEGER},
+			</if>
+			<if test="bimCompanyId != null">
+				#{bimCompanyId,jdbcType=INTEGER},
+			</if>
+			<if test="typeCode != null">
+				#{typeCode,jdbcType=VARCHAR},
+			</if>
+			<if test="typeName != null">
+				#{typeName,jdbcType=VARCHAR},
+			</if>
+			<if test="inId != null">
+				#{inId,jdbcType=INTEGER},
+			</if>
+			<if test="note != null">
+				#{note,jdbcType=VARCHAR},
+			</if>
+			<if test="status != null">
+				#{status,jdbcType=SMALLINT},
+			</if>
+			<if test="insertTime != null">
+				#{insertTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="updateTime != null">
+				#{updateTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="userName != null">
+				#{userName,jdbcType=VARCHAR},
+			</if>
+			<if test="custom1 != null">
+				#{custom1,jdbcType=INTEGER},
+			</if>
+			<if test="custom2 != null">
+				#{custom2,jdbcType=INTEGER},
+			</if>
+			<if test="custom3 != null">
+				#{custom3,jdbcType=VARCHAR},
+			</if>
+			<if test="custom4 != null">
+				#{custom4,jdbcType=VARCHAR},
+			</if>
+			<if test="carFull != null">
+				
+				#{carFull,jdbcType=INTEGER},
+			</if>
+			<if test="maxstop != null">
+				
+				#{maxstop,jdbcType=INTEGER},
+			</if>
+		</trim>
+	</insert>
+	<update id="updateByPrimaryKeySelective" parameterType="com.wadejerry.scms.modules.pfm.model.PfmCarType">
+		update pfm_car_type
+		<set>
+			<if test="bimCompanyId != null">
+				bim_company_id = #{bimCompanyId,jdbcType=INTEGER},
+			</if>
+			<if test="typeCode != null">
+				type_code = #{typeCode,jdbcType=VARCHAR},
+			</if>
+			<if test="typeName != null">
+				type_name = #{typeName,jdbcType=VARCHAR},
+			</if>
+			<if test="inId != null">
+				in_id = #{inId,jdbcType=INTEGER},
+			</if>
+			<if test="note != null">
+				note = #{note,jdbcType=VARCHAR},
+			</if>
+			<if test="status != null">
+				status = #{status,jdbcType=SMALLINT},
+			</if>
+			<if test="insertTime != null">
+				insert_time = #{insertTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="updateTime != null">
+				update_time = #{updateTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="userName != null">
+				user_name = #{userName,jdbcType=VARCHAR},
+			</if>
+			<if test="custom1 != null">
+				custom1 = #{custom1,jdbcType=INTEGER},
+			</if>
+			<if test="custom2 != null">
+				custom2 = #{custom2,jdbcType=INTEGER},
+			</if>
+			<if test="custom3 != null">
+				custom3 = #{custom3,jdbcType=VARCHAR},
+			</if>
+			<if test="custom4 != null">
+				custom4 = #{custom4,jdbcType=VARCHAR},
+			</if>
+			<if test="carFull != null">
+				car_full= #{carFull,jdbcType=INTEGER},
+			</if>
+			<if test="maxstop != null">
+				maxstop= #{maxstop,jdbcType=INTEGER},
+			</if>
+		</set>
+		where car_type_id = #{carTypeId,jdbcType=INTEGER}
+	</update>
+	<update id="updateByPrimaryKey" parameterType="com.wadejerry.scms.modules.pfm.model.PfmCarType">
+		update pfm_car_type
+		set bim_company_id = #{bimCompanyId,jdbcType=INTEGER},
+		type_code = #{typeCode,jdbcType=VARCHAR},
+		type_name = #{typeName,jdbcType=VARCHAR},
+		in_id = #{inId,jdbcType=INTEGER},
+		note = #{note,jdbcType=VARCHAR},
+		status = #{status,jdbcType=SMALLINT},
+		insert_time = #{insertTime,jdbcType=TIMESTAMP},
+		update_time = #{updateTime,jdbcType=TIMESTAMP},
+		user_name = #{userName,jdbcType=VARCHAR},
+		custom1 = #{custom1,jdbcType=INTEGER},
+		custom2 = #{custom2,jdbcType=INTEGER},
+		custom3 = #{custom3,jdbcType=VARCHAR},
+		custom4 = #{custom4,jdbcType=VARCHAR},
+		car_full = #{carFull,jdbcType=INTEGER},
+		maxstop = #{maxstop,jdbcType=INTEGER}
+		where car_type_id = #{carTypeId,jdbcType=INTEGER}
+	</update>
+
+	<select id="ifparentbyNode" resultType="int">
+
+		select count(car_type_id) from pfm_car_type where in_id=
+		#{node,jdbcType=INTEGER} AND
+		bim_company_id=#{companyid,jdbcType=INTEGER}
+
+	</select>
+	<select id="selectCartypeBy1LotId" resultMap="BaseResultMap">
+
+		select * from pfm_car_type
+		where bim_company_id=#{companyid,jdbcType=INTEGER}
+		and custom1=#{id}
+
+	</select>
+
+	<select id="selectCartypes" parameterType="int" resultMap="zTreeMap">
+		select car_type_id ,in_id ,car_full,type_name ,status,note,case when in_id is
+		null then 'lot' else 'cartype' end as type,custom1,0 as has_permission,maxstop
+		from pfm_car_type
+		where bim_company_id=#{companyid,jdbcType=INTEGER} order by insert_time
+	</select>
+	<select id="configParkReport" resultMap="BaseResultMap">
+	select * from pfm_car_type
+	</select>
+	<select id="selectCartypesByAuth" resultMap="zTreeMap">
+		select car_type_id ,in_id ,car_full,type_name ,status,note,case when in_id is
+		null then 'lot' else 'cartype' end as type,custom1<if test="typeid.size()==0" >,1 as has_permission</if> <if test="typeid.size()!=0" > ,case when  car_type_id in  <foreach collection="typeid" index="index" item="item"
+			open="(" separator="," close=")"> #{item}
+		</foreach> then 0 else 1 end as has_permission</if>,maxstop
+		from pfm_car_type
+		where bim_company_id=#{companyid,jdbcType=INTEGER} order by insert_time
+	
+	</select>
+	<select id="selectCartypeById" resultMap="zTreeMap">
+		select car_type_id ,in_id,car_full ,type_name ,status,note,case when in_id is null
+		then 'lot' else 'cartype' end as type,custom1,maxstop
+		from pfm_car_type
+		where bim_company_id=#{companyid,jdbcType=INTEGER}
+		and car_type_id = #{id,jdbcType=INTEGER}
+	</select>
+	<select id="selectCountByCartypeName" resultType="int">
+	select count(car_type_id)
+		from pfm_car_type
+		where bim_company_id=#{companyid,jdbcType=INTEGER}
+		and type_name = #{name,jdbcType=VARCHAR}
+	</select>
+	<select id="selectIdBYName" resultType="int">
+	select car_type_id
+		from pfm_car_type
+		where bim_company_id=#{companyid,jdbcType=INTEGER}
+		and type_name = #{name,jdbcType=VARCHAR}
+	</select>
+	<select id="selectByCarInfoId" resultMap="BaseResultMap">
+	select c.* from pfm_car_info a left join pfm_car_type_rel b on
+	a.car_info_id = b.car_info_id
+	left join pfm_car_type c on b.car_type_id= c.car_type_id where
+	a.car_info_id=#{carinfoid} and a.bim_company_id=#{companyid}
+	
+	</select>
+	<delete id="updateStatusByPrimaryKey" parameterType="int">
+	
+	delete from pfm_car_type  where car_type_id=#{id}
+	</delete>
+	
+	<delete id="deleteCartType" parameterType="int">
+	
+	delete from pfm_car_type  where custom1=#{0}
+	</delete>
+	
+	<select id="selectByCustom1" resultMap="BaseResultMap">
+	select * from pfm_car_type where custom1=#{0}
+	</select>
+	
+	
+</mapper>

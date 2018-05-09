@@ -1,0 +1,91 @@
+var wade = wade || {};
+wade.role = wade.role || {};
+var config1 = new Object();
+//配置日志
+config1.columns = new Array("operationlogId","systemCode","moduleCode","operType","userName","loginAdd","insertTime","logInfo");
+/*config1.defs = new Array("chargeRecordId","inPhoto","outPhoto");*/
+config1.id="configurationlogexample";
+config1.getUrl="/log/selectAllInfo.do";
+config1.btns=[
+{'id':"10001",'name':'查询',"fun":selectfun},
+{'id':"10002",'name':'导出',"fun":exportfun},
+              ];
+config1.search = new Array(
+		{
+			'type' : 'search_hidden',
+			'placeholder' : null,
+			'url' : null,
+			'index' : 0
+		}
+		);
+
+wade.libs.datatable(config1);	//初始化datatable
+
+
+$.ajax({
+		 url: "/log/ConfigSystemCode.do",
+	        dataType: 'json',
+	        type:'post',
+	        success: function (data) {
+	        	var result=eval(data);
+	        	var SystemCode=$('select[name="systemCode"]');
+	        	
+	        	for(var i in result){
+	        		if(result[i].id!=undefined){
+	        			SystemCode.append('<option value="'+result[i].id+'" ">'+result[i].text+'</option>');
+	        		
+	        	}
+	        	}
+	        }
+	});
+
+
+$.ajax({
+	 url: "/log/ConfigUser.do",
+       dataType: 'json',
+       type:'post',
+       success: function (data) {
+       	var result=eval(data);
+       	var user=$('select[name="user"]');
+       	
+       	for(var i in result){
+       		if(result[i].id!=undefined){
+       			user.append('<option value="'+result[i].id+'" ">'+result[i].text+'</option>');
+       		
+       	}
+       	}
+       }
+});
+
+
+
+
+//查询
+function selectfun(){
+	var startTime=$('input[name="startTime"]').val();
+	var endTime=$('input[name="endTime"]').val();
+	if(startTime>endTime){
+		var errMsg='开始时间不能大于结束时间';
+		$("#startTimeNotice").html('<span class="point-box errorbgTop dropdown"  ><i class="sprite icon_arrow_up2 pa"></i>' + errMsg + '</span>').show();
+		setTimeout(function(){
+			$('.point-out').hide();
+		},2000);
+		return false;
+	}
+	var jsonuserinfo = $("#form1").serializeObject();
+	var formdata =JSON.stringify(jsonuserinfo);
+	var dev=$("#" + config1.id+'_wrapper');
+	dev.find('*[name="searchValue0_search_hidden"]').val(formdata);
+	dev.find('*[name="searchValue0_search_hidden"]').trigger("keyup.DT");
+	
+	
+};
+
+//导出
+function exportfun(){
+	/*var codeval=$("#form1").find('input[name="SystemCode"]').val()
+	$("#form1").find('input[name="systemCode"]').val(codeval);*/
+	var jsonuserinfo = $("#form1").serializeObject();
+	var formdata =JSON.stringify(jsonuserinfo);
+	window.open("/log/export/"+formdata+".do");
+}

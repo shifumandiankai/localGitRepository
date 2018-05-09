@@ -1,0 +1,507 @@
+<%@ page contentType="text/html; charset=UTF-8"%>
+<%@taglib prefix="shiro" uri="http://shiro.apache.org/tags"%>
+<!-- <style>
+th{
+width: 110px;
+padding-right:10px;
+}
+
+ #chargerecordexample_wrapper .col-sm-12{
+overflow:auto;
+} 
+#chargerecordexample_wrapper div:nth-child(1){
+padding-left:10px;
+}
+
+#chargerecordexample_wrapper div:nth-child(3){
+padding-left:10px;
+}
+
+.floatLeft{
+	float: left;
+	padding: 5px 10px 5px 10px;
+}
+
+.floatRight{
+	float: right;
+	padding: 2px;
+}
+.chaSear{
+	padding-top:5px;
+}
+.form-control[readonly]{
+background-color: rgba(255, 255, 255, 0)!important;
+}
+    
+
+
+/* div.col-sm-2{
+display:none!important;
+} */
+</style> -->
+
+	<link rel="stylesheet" type="text/css" href="/pages/pfm/carmanage/css/car_manage.css" >
+		
+		<!-- Content Wrapper. Contains page content -->
+		<div class="content-wrapper">
+			<!-- Content Header (Page header) -->
+			<section class="content-header">
+				<h1>
+					明细报表界面
+				</h1>
+				<ol class="breadcrumb">
+					<li><a href="/index.do"><i class="fa fa-dashboard"></i> 主页</a></li>
+					<li class="active">明细报表</li>
+				</ol>
+			</section>
+			<!-- Main content -->
+			
+			<section class="content">
+			<div class="box">
+			<div class="box-body"> 
+			
+			<div class="nav-tabs-custom">
+			<ul class="nav nav-tabs">
+			<li id="li1"><a href="#chargerecord" data-toggle="tab" id="a1">收费记录查询</a></li>
+			<li id="li2"><a href="#normal" data-toggle="tab" id="a2">正常通行记录查询</a></li>
+			<li id="li3"><a href="#abnormal" data-toggle="tab" id="a3">异常通行记录查询</a></li>
+			<li id="li4"><a href="#park" data-toggle="tab" id="a4">场内车辆记录查询</a></li>
+			</ul>						
+			</div> 
+            <div class="tab-content">
+            
+           
+            <div class="tab-pane fade in active" id="chargerecord">
+            <div>
+
+            
+            <form class="form-horizontal" id="form1">
+              <!-- <input type="hidden" name ="charge">
+              <input type="hidden" name ="parkId"> 
+             <input type="hidden" name ="entranceId">
+             <input type="hidden" name ="carriagewayId">
+              <input type="hidden" name ="hasPermission"> -->
+            <!-- <div class="form-group">
+            <div class="col-sm-12" style="padding-left:10px;"> -->
+            
+ <!--             aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa -->
+            <!-- <div class="floatLeft"><label class=" control-label">开始时间</label></div>
+            <div class="floatLeft">
+            <div id ="startTimeNotice" class="point-out" ></div>
+            <input type="text" class="form-control"  name="startTime" style="width: 210px;">
+            </div>
+            
+            
+            <div class="floatLeft"><label  class=" control-label">结束时间</label></div>
+            <div class="floatLeft">
+             <div id ="endTimeNotice" class="point-out" ></div>
+            <input type="text" class="form-control"   name="endTime" style="width: 210px;">
+            </div>
+            
+            
+            <div class="floatLeft"><label  class=" control-label">车牌号码</label></div>
+            <div class="floatLeft">
+            <div id ="endTimeNotice" class="point-out"></div>
+            <input type="text" class="form-control"   name="carNumber" style="width: 210px;">
+            </div>
+            
+            
+
+            
+             <div class="col-sm-3 chaSear"> 
+            <div class="col-sm-3 floatRight"><input type="button" class="form-control  btn  btn-default" value="查询" name="select " style="width: 42px;"></div>
+            <div class="col-sm-3  floatRight"><input type="button" class="form-control btn  btn-default" value="导出" id="exportcharge" style="width: 42px;"></div>
+            </div> -->
+            
+<!--             aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa -->
+            		
+ 
+           <!--  </div>
+            
+            </div> -->
+            <input type="hidden" name ="order1">
+               <input type="hidden" name ="order2">
+               <input type="hidden" name="selectclick">
+             <div class="form-group"> 
+            <div class="col-sm-10" style="padding-left:0px;">
+            <div class="col-sm-2"><label>开始时间</label></div>
+            <div class="col-sm-4">
+            <div id ="startTimeNotice" class="point-out" style="width: 348px;top:-38px; left:0px; display: none;"></div>
+            <input type="text" class="form-control"  name="startTime" onclick="WdatePicker({lang:'zh-cn',dateFmt:'yyyy-MM-dd HH:mm:ss',maxDate:'2099-12-31'})">
+            <!--  <span class="glyphicon glyphicon-calendar "></span> -->
+            </div>
+            
+            <div class="col-sm-2"><label  class=" control-label">结束时间</label></div>
+            <div class="col-sm-4">
+             <div id ="endTimeNotice" class="point-out" style="width: 348px;top:-38px; left:0px; display: none;"></div>
+           <!--  <input type="text" class="form-control"   name="endTime"style="cursor: not-allowed;"readonly="readonly" onclick="WdatePicker({lang:'zh-cn',dateFmt:'yyyy-MM-dd HH:mm:ss',maxDate:'2099-12-31'})"> -->
+            <input type="text" class="form-control"   name="endTime" onclick="WdatePicker({lang:'zh-cn',dateFmt:'yyyy-MM-dd HH:mm:ss',maxDate:'2099-12-31'})">
+            </div>
+            </div>
+             <!-- <div class="col-sm-4"> 
+            <div class="col-sm-4"><input type="button" class="form-control btn  btn-default" value="查询" name="select"></div>
+            <div class="col-sm-4"><input type="button" class="form-control btn  btn-default" value="导出" id="exportcharge"></div>
+            <div class="col-sm-4"><input type="button" class="form-control btn  btn-default" value="图片" id="photo1"></div> 
+            </div> -->
+            </div>
+            <div class="form-group">
+            <div class="col-sm-10" style="padding-left:0px;">
+            <div class="col-sm-2"><label  class=" control-label">车牌号码</label></div>
+            <div class="col-sm-4">
+            <div id ="carNumberNotice" class="point-out" style="width: 348px;top:-38px; left:0px; display: none;"></div>
+            <input type="text" class="form-control"   name="carNumber">
+            </div>
+             <div class="col-sm-2"><label  class=" control-label">出入口名称</label></div>
+            <div class="col-sm-4">
+           <select  class="form-control"  name="entranceId"></select>
+            </div>
+            </div> 
+            
+            
+            </div>
+            
+            <!-- <div class="form-group">
+            <div class="col-sm-8" style="padding-left:0px;">
+            <div class="col-sm-2"><label  class=" control-label">车牌号码</label></div>
+            <div class="col-sm-4">
+            <input type="text" class="form-control"   name="carNumber" style="width: 210px;">
+            </div>
+             <div class="col-sm-2"><label  class=" control-label">出入口名称</label></div>
+            <div class="col-sm-4">
+           <select  class="form-control"  name="entranceId"></select>
+            </div>
+            </div> 
+            
+            
+            </div> -->
+            </form>
+            
+
+            </div>
+            
+					
+						<table id="chargerecordexample" class="table table-bordered table-striped" >
+							<thead>
+								<tr>	
+								
+								    
+									<th>车牌</th>
+									<th>车主姓名</th>
+									<th>车辆类型</th>
+									<th>收费规则</th>
+									<th>停车时长(分钟)</th>
+									<th>收费金额</th>
+									<th>减免金额</th>
+									<th>减免规则</th>
+									<th>收费员</th>
+									<th>入场时间</th>
+									<th>出场时间</th>
+									<th></th>
+									<th></th>
+									<th></th>
+								</tr>
+							</thead>
+							<tbody>						
+							</tbody>
+							<tfoot>						
+							</tfoot>
+						</table>
+							
+			
+            </div>
+            
+            	<div class="tab-pane fade " id="normal">
+            <form class="form-horizontal" id="form2">
+            <!--  <input type="hidden" name ="normal"> 
+             <input type="hidden" name ="parkId"> 
+             <input type="hidden" name ="entranceId">
+             <input type="hidden" name ="carriagewayId">
+             <input type="hidden" name ="hasPermission"> -->
+            <input type="hidden" name ="order1">
+            <input type="hidden" name ="order2">
+             <input type="hidden" name="selectclick">
+            <div class="form-group">
+            <div class="col-sm-4" style="padding-left:0px;">
+            <div class="col-sm-4"><label>开始时间</label></div>
+            <div class="col-sm-8">
+            <div id ="startTimeNotice" class="point-out" style="width: 348px;top:-38px; left:0px; display: none;"></div>
+            <input type="text" class="form-control"  name="startTime" onclick="WdatePicker({lang:'zh-cn',dateFmt:'yyyy-MM-dd HH:mm:ss',maxDate:'2099-12-31'})">
+             
+            </div>
+            </div>
+            <div class="col-sm-4">
+            <div class="col-sm-4"><label  class=" control-label">结束时间</label></div>
+            <div class="col-sm-8">
+             <div id ="endTimeNotice" class="point-out" style="width: 348px;top:-38px; left:0px; display: none;"></div>
+            <input type="text" class="form-control"   name="endTime" onclick="WdatePicker({lang:'zh-cn',dateFmt:'yyyy-MM-dd HH:mm:ss',maxDate:'2099-12-31'})">
+             <!-- <span class="glyphicon glyphicon-calendar "></span> -->
+            </div>
+            </div>
+            <div class="col-sm-4">
+            <div class="col-sm-4"><label  class=" control-label">出入口名称</label></div>
+            <div class="col-sm-8">
+            <select  class="form-control"  name="entranceId" style="width:179px;"></select>
+            </div>
+            </div>
+             <!-- <div class="col-sm-4"> 
+            <div class="col-sm-6"><input type="button" class="form-control btn  btn-default" value="查询" name="select"></div>
+            <div class="col-sm-6"><input type="button" class="form-control btn  btn-default" value="导出" id="exportnormal"></div>
+            </div> -->
+            </div>
+            <div class="form-group">
+            <div class="col-sm-4" style="padding-left:0px;">
+            <div class="col-sm-4"><label  class=" control-label">方向</label></div>
+           
+           <div class="col-sm-8">
+           <select  name="direction" class="form-control selectfont">
+            <option value="0" >无</option>
+           <option value="1" >进</option>
+           <option value="2" >出</option>
+           </select>
+            </div> 
+            </div>
+            <div class="col-sm-4" >
+            <div class="col-sm-4"><label  class=" control-label">车牌号码</label></div>
+            <div class="col-sm-8">
+            <div id ="carNumberNotice" class="point-out" style="width: 348px;top:-38px; left:0px; display: none;"></div>
+            <input type="text" class="form-control"   name="carNumber">
+            </div>
+            </div>
+             
+            <!-- <div class="col-sm-4">
+            <div class="col-sm-4"><label  class=" control-label">出入口名称</label></div>
+            <div class="col-sm-8">
+            <select  class="form-control"  name="entranceId" style="width:179px;"></select>
+            </div>
+            </div> -->
+            </div>
+            </form>
+            
+						<table id="normalexample" class="table table-bordered table-striped" >
+							<thead>
+								<tr>	
+								<!-- (carNumber,direction,personName,carTypeName,parkName,entranceName,eventTime,carriagewayName,boothName,deviceName,cardId,userName) -->
+									
+									<th>车牌</th>
+									<th>进出方向</th>
+									<th>车主姓名</th>
+									<th>车辆类型</th>
+									<th>车场</th>
+									<th>出入口</th>
+									<th>通行时间</th>
+									<th>车道</th>
+									<th>岗亭</th>
+									<!-- <th>设备</th>
+									<th>卡号</th> -->
+									<th>操作员</th>
+									<th></th>
+									<th></th>
+								</tr>
+							</thead>
+							<tbody>						
+							</tbody>
+							<tfoot>						
+							</tfoot>
+						</table>
+					
+					
+            </div>
+            
+            <div class="tab-pane fade " id="abnormal">
+            <form class="form-horizontal" id="form3">
+            <input type="hidden" name ="order1">
+            <input type="hidden" name ="order2">
+            <input type="hidden" name="selectclick">
+            <div class="form-group">
+            <div class="col-sm-10" style="padding-left:0px;">
+            <div class="col-sm-2"><label>开始时间</label></div>
+            <div class="col-sm-4">
+            <div id ="startTimeNotice" class="point-out" style="width: 348px;top:-38px; left:0px; display: none;"></div>
+            <input type="text" class="form-control"  name="startTime" onclick="WdatePicker({lang:'zh-cn',dateFmt:'yyyy-MM-dd HH:mm:ss',maxDate:'2099-12-31'})">
+             <!-- <span class="glyphicon glyphicon-calendar "></span> -->
+            </div>
+            <div class="col-sm-2"><label  class=" control-label">结束时间</label></div>
+            <div class="col-sm-4">
+             <div id ="endTimeNotice" class="point-out" style="width: 348px;top:-38px; left:0px; display: none;"></div>
+            <input type="text" class="form-control"   name="endTime" onclick="WdatePicker({lang:'zh-cn',dateFmt:'yyyy-MM-dd HH:mm:ss',maxDate:'2099-12-31'})">
+             <!-- <span class="glyphicon glyphicon-calendar "></span> -->
+            </div>
+            </div>
+            <!--  <div class="col-sm-4"> 
+            <div class="col-sm-6"><input type="button" class="form-control btn  btn-default" value="查询" name="select"></div>
+            <div class="col-sm-6"><input type="button" class="form-control btn  btn-default" value="导出" id="exportabnormal"></div>
+            </div> -->
+            </div>
+            <div class="form-group">
+            <div class="col-sm-10" style="padding-left:0px;">
+            <div class="col-sm-2"><label  class=" control-label">方向</label></div>
+           
+           <div class="col-sm-4">
+           <select  name="direction" class="form-control selectfont">
+            <option value="0" >无</option>
+           <option value="1" >进</option>
+           <option value="2" >出</option>
+           </select>
+            </div> 
+            <div class="col-sm-2"><label  class=" control-label">出入口名称</label></div>
+            <div class="col-sm-4"><select  class="form-control"  name="entranceId" style="width:247.2px;"></select></div>
+            </div>
+            </div>
+            </form>
+            
+						<table id="abnormalexample" class="table table-bordered table-striped" >
+							<thead>
+								<tr>	
+								<!-- (direction,eventTime,parkName,entranceName,carriagewayName,boothName,deviceName,userName) -->
+									
+									<th>进出方向</th>
+									<th>通行时间</th>
+									<th>车场</th>
+									<th>出入口</th>
+									<th>车道</th>
+									<th>岗亭</th>
+									<!-- <th>设备</th> -->
+									<th>操作员</th>
+									<th></th>
+								</tr>
+							</thead>
+							<tbody>						
+							</tbody>
+							<tfoot>						
+							</tfoot>
+						</table>
+					
+            </div>
+            
+            <div class="tab-pane fade " id="park">
+            <form class="form-horizontal" id="form4">
+            <!--   <input type="hidden" name ="charge">
+              <input type="hidden" name ="parkId"> 
+             <input type="hidden" name ="entranceId">
+             <input type="hidden" name ="carriagewayId">
+              <input type="hidden" name ="hasPermission"> -->
+            <input type="hidden" name ="order1">
+            <input type="hidden" name ="order2">
+             <input type="hidden" name="selectclick">
+            <div class="form-group">
+            <div class="col-sm-4" style="padding-left:0px;">
+            <div class="col-sm-4"><label>开始时间</label></div>
+            <div class="col-sm-8">
+            <div id ="startTimeNotice" class="point-out" style="width: 348px;top:-38px; left:0px; display: none;"></div>
+            <input type="text" class="form-control"  name="startTime" onclick="WdatePicker({lang:'zh-cn',dateFmt:'yyyy-MM-dd HH:mm:ss',maxDate:'2099-12-31'})">
+            <!--  <span class="glyphicon glyphicon-calendar "></span> -->
+            </div>
+            </div>
+            <div class="col-sm-4">
+            <div class="col-sm-4"><label  class=" control-label">结束时间</label></div>
+            <div class="col-sm-8">
+             <div id ="endTimeNotice" class="point-out" style="width: 348px;top:-38px; left:0px; display: none;"></div>
+            <input type="text" class="form-control"   name="endTime" onclick="WdatePicker({lang:'zh-cn',dateFmt:'yyyy-MM-dd HH:mm:ss',maxDate:'2099-12-31'})">
+             <!-- <span class="glyphicon glyphicon-calendar "></span> -->
+            </div>
+            </div>
+            <div class="col-sm-4">
+            <div class="col-sm-4"><label  class=" control-label">出入口名称</label></div>
+            <div class="col-sm-8">
+            <select  class="form-control"  name="entranceId" style="width:179px;"></select>
+            </div>
+            </div>
+             <!-- <div class="col-sm-4"> 
+            <div class="col-sm-6"><input type="button" class="form-control btn  btn-default" value="查询" name="select"></div>
+            <div class="col-sm-6"><input type="button" class="form-control btn  btn-default" value="导出" id="exportnormal"></div>
+            </div> -->
+            </div>
+            <div class="form-group">
+            
+            <div class="col-sm-4" style="padding-left:0px;">
+            <div class="col-sm-4"><label  class=" control-label">车牌号码</label></div>
+            <div class="col-sm-8">
+            <div id ="carNumberNotice" class="point-out" style="width: 348px;top:-38px; left:0px; display: none;"></div>
+            <input type="text" class="form-control"   name="carNumber">
+            </div>
+             </div>
+              <div class="col-sm-4" >
+             <div class="col-sm-4"><label  class=" control-label">车辆类型</label></div>
+             <div class="col-sm-8"> 
+           <select  name="carTypeId"  class="form-control">
+           
+           </select>
+            </div>
+           </div>
+            <!-- <div class="col-sm-4">
+            <div class="col-sm-4"><label  class=" control-label">出入口名称</label></div>
+            <div class="col-sm-8">
+            <select  class="form-control"  name="entranceId" style="width:179px;"></select>
+            </div>
+            </div> -->
+            </div>
+            </form>
+            
+						<table id="parkreportexample" class="table table-bordered table-striped" >
+							<thead>
+								<tr>	
+									<th>车牌</th>
+									<th>车主姓名</th>
+									<th>车辆类型</th>
+									<th>车场</th>
+									<th>出入口</th>
+									<th>通行时间</th>
+									<th>车道</th>
+									<th>岗亭</th>
+									<th>操作员</th>
+									<th></th>
+								</tr>
+							</thead>
+							<tbody>						
+							</tbody>
+							<tfoot>						
+							</tfoot>
+						</table>
+					
+					
+            </div>
+            </div>
+           <!--  </div> -->
+			</div> 
+			</div>
+			</section>
+			</div>
+		
+		<%@ include file="ChargeImg.jsp"%>
+		<%@ include file="ChargeInPhoto.jsp"%>
+		<%@ include file="ChargeOutPhoto.jsp"%>
+		<%@ include file="/common/jsp/footer.jsp"%>
+		<%@ include file="/common/jsp/sidebar.jsp"%>	
+	<%--  <%@ include file="/pages/pfm/report/basic_js.jsp"%> --%>
+	<script src="/pages/pfm/report/Czreport/jquery-ui-timepicker-addon.js" type="text/javascript"></script> 
+   <!--  <script src="/pages/pfm/report/Czreport/jquery.ui.datepicker-zh-CN.js.js"  type="text/javascript"></script> -->
+    <script src="/pages/pfm/report/Czreport/jquery-ui-timepicker-zh-CN.js" type="text/javascript"></script> 
+	
+	
+    <script src="/pages/pfm/report/ChargeRecord.js">
+    </script> 
+   
+	<script type="text/javascript">
+	
+		function Buttonpermission(){
+			<shiro:lacksPermission name="ParkingAdd">$("#example1_wrapper a[name='wade.libs.datatable_add']").remove();</shiro:lacksPermission>
+			<shiro:lacksPermission name="ParkingDelete">$("#example1_wrapper a[name='wade.libs.datatable_del']").remove();</shiro:lacksPermission>
+			<shiro:lacksPermission name="ParkingEdit">$("#example1_wrapper a[name='wade.libs.datatable_edit']").remove();</shiro:lacksPermission>
+			
+		}
+		function Seepermission(){
+			<shiro:lacksPermission name="ParkingSee">$("#example1 tbody td").text("没有浏览权限");</shiro:lacksPermission>
+			//$("#chargerecordexample tbody td").text("请点击查询获取数据");
+		}
+	
+		function drawInit(){
+			
+			$("#chargerecordexample tbody td").text("请点击查询获取数据");
+			$("#normalexample tbody td").text("请点击查询获取数据");
+			$("#abnormalexample tbody td").text("请点击查询获取数据");
+			$("#parkreportexample tbody td").text("请点击查询获取数据");
+		} 
+		
+	</script> 
+	
+	 <script src="/plugins/My97DatePicker/WdatePicker.js"></script>

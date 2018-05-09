@@ -1,0 +1,5 @@
+package com.wadejerry.scms.modules.license.controller;
+
+public class LicenseController {
+
+}

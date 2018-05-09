@@ -1,0 +1,435 @@
+var wade = wade || {};
+wade.role = wade.role || {};
+$(".nav-tabs li:first").addClass("active");
+$(".tab-content .tab-pane:first").addClass("active");
+var config1 = new Object();//LPR管理
+var config2 = new Object();//显示屏设备
+//需要显示的按钮
+config1.btns = new Array({
+	'id' : '10001',
+	'name' : 'add',
+	'fun' : null
+}, {
+	'id' : '10002',
+	'name' : 'edit',
+	"fun" : null
+}, {
+	'id' : "10003",
+	'name' : 'del',
+	"fun" : null
+}
+);
+//查询控件 type:控件类型 placeholder:显示值 url: 获取数据的请求路径 index参数序号 最多不超过总列数
+config1.search = new Array(
+
+{
+	'type' : 'search',
+	'placeholder' : '编号',
+	'url' : null,
+	'index' : 0
+});
+config1.id = "LPRexample"; // table id
+config1.addDiv = "exampleModal"; // 新增弹出的层 ID
+config1.editDiv = "exampleModal"; // 编辑 弹出层 ID
+config1.getUrl ="/devicelpr/getdevicelprInfo.do"; // ajax获取数据请求地址
+config1.saveUrl = "/devicelpr/savedevicelprInfo.do"; // 保存修改请求地址
+config1.delUrl = "/devicelpr/deldevicelprInfo.do"; // 保存修改请求地址
+//需要绑定数据的列
+config1.columns = new Array("pfmDeviceLprId", "deviceCode", "deviceName",
+		"ip", "port","serverName","loginId","loginPassword","insertTime","pfmServerId");
+//需要隐藏的列
+config1.defs = new Array("pfmDeviceLprId","pfmServerId");
+wade.libs.datatable(config1);
+//需要显示的按钮
+config2.btns = new Array({
+	'id' : '10001',
+	'name' : 'add',
+	'fun' : null
+}, {
+	'id' : '10002',
+	'name' : 'edit',
+	"fun" : null
+}, {
+	'id' : "10003",
+	'name' : 'del',
+	"fun" : null
+}
+);
+//查询控件 type:控件类型 placeholder:显示值 url: 获取数据的请求路径 index参数序号 最多不超过总列数
+config2.search = new Array(
+
+{
+	'type' : 'search',
+	'placeholder' : '编号',
+	'url' : null,
+	'index' : 0
+});
+
+config2.id = "screenexample"; // table id
+config2.addDiv = "screenModal"; // 新增弹出的层 ID
+config2.editDiv = "screenModal"; // 编辑 弹出层 ID
+config2.getUrl ="/devicelpr/getscreenInfo.do"; // ajax获取数据请求地址
+config2.saveUrl = "/devicelpr/savescreenInfo.do"; // 保存修改请求地址
+config2.delUrl = "/devicelpr/delscreenInfo.do"; // 保存修改请求地址
+//需要绑定数据的列
+config2.columns = new Array("pfmDeviceScreenId", "deviceCode", "deviceName","updateTime","deviceIdArr");
+//需要隐藏的列
+config2.defs = new Array("pfmDeviceScreenId");
+wade.libs.datatable(config2);
+$(".nav-tabs-custom .nav-tabs li:first").addClass("active");
+$(".tab-content .tab-pane:first").addClass("active");
+config2.add_shown=function(devClone, operId,sel_obj){
+	$.ajax({
+		 url: "/devicelpr/configDeviceLpr.do",
+	     dataType: 'json',
+	     type:'post',
+	     quietMillis: 250,
+	     success: function (result) {
+	    	 devClone.find('*[name="listarr"]').select2({
+	      		//dropdownParent:devClone,
+	      		multiple:true,
+	      		allowClear: true,
+	      		//placeholder:'请选择',
+	      		data:result
+	      	});
+	    	 if(operId==1){
+	    			devClone.find('*[name="listarr"]').select2().val(sel_obj.listarr).trigger("change");
+	    		}
+	     }
+	});
+	
+	
+	devClone.find('#submit').on('click',registerScreen);
+	function registerScreen(event){
+		var deviceCode=devClone.find('*[name="deviceCode"]').val();
+		var deviceName=devClone.find('*[name="deviceName"]').val();
+		/*var ip=devClone.find('*[name="ip"]').val();
+		var port=devClone.find('*[name="port"]').val();
+		var ipre =  /^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$/   
+		var portre=/^([0-9]|[1-9]\d|[1-9]\d{2}|[1-9]\d{3}|[1-5]\d{4}|6[0-4]\d{3}|65[0-4]\d{2}|655[0-2]\d|6553[0-5])$/
+*/		if(deviceCode==''){
+			var errMsg='编号不能为空';
+			devClone.find('.point-out').hide();
+			devClone.find("#deviceCodeNotice").html('<span class="point-box errorbgTop dropdown" ><i class="sprite icon_arrow_up2 pa"></i>' + errMsg + '</span>').show();
+			event.stopImmediatePropagation(); //阻止提交数据
+			return false;
+		}
+		if(deviceName==''){
+			var errMsg='名称不能为空';
+			devClone.find('.point-out').hide();
+			devClone.find("#deviceNameNotice").html('<span class="point-box errorbgTop dropdown" ><i class="sprite icon_arrow_up2 pa"></i>' + errMsg + '</span>').show();
+			event.stopImmediatePropagation(); //阻止提交数据
+			return false;
+		}
+		/*if(ip==''){
+			var errMsg='ip地址不能为空';
+			devClone.find('.point-out').hide();
+			devClone.find("#ipNotice").html('<span class="point-box errorbgTop dropdown" ><i class="sprite icon_arrow_up2 pa"></i>' + errMsg + '</span>').show();
+			event.stopImmediatePropagation(); //阻止提交数据
+			return false;
+		}
+		if(port==''){
+			var errMsg='端口不能为空';
+			devClone.find('.point-out').hide();
+			devClone.find("#portNotice").html('<span class="point-box errorbgTop dropdown" ><i class="sprite icon_arrow_up2 pa"></i>' + errMsg + '</span>').show();
+			event.stopImmediatePropagation(); //阻止提交数据
+			return false;
+		}
+		if(!ipre.test(ip)){
+	 		var errMsg="请输入127.0.0.1的ip格式"
+	 		devClone.find('.point-out').hide();
+			devClone.find("#ipNotice").html('<span class="point-box errorbgTop dropdown"><i class="sprite icon_arrow_up2 pa"></i>' + errMsg + '</span>').show();
+			event.stopImmediatePropagation(); //阻止提交数据
+			return false;
+	 	}
+		if(!portre.test(port)){
+			var errMsg="请输入0-65535的端口号"
+			devClone.find('.point-out').hide();
+			devClone.find("#portNotice").html('<span class="point-box errorbgTop dropdown"><i class="sprite icon_arrow_up2 pa"></i>' + errMsg + '</span>').show();
+			event.stopImmediatePropagation(); //阻止提交数据
+			return false;
+		}*/
+	}
+	//光标验证
+	devClone.find('*[name="deviceCode"]').blur(function(){
+		
+		devClone.find('#deviceCodeNotice').hide();
+	});
+     devClone.find('*[name="deviceCode"]').focus(function(){
+		
+		devClone.find('#deviceCodeNotice').hide();
+	});
+    devClone.find('input[name=deviceName]').blur(function(){
+		
+		devClone.find('#deviceNameNotice').hide();
+	});
+    devClone.find('input[name=deviceName]').focus(function(){
+		
+		devClone.find('#deviceNameNotice').hide();
+	});
+    
+  /*devClone.find('input[name=ip]').blur(function(){
+		
+		devClone.find('#ipNotice').hide();
+	});
+  devClone.find('input[name=ip]').focus(function(){
+		
+		devClone.find('#ipNotice').hide();
+	});
+  devClone.find('input[name=port]').blur(function(){
+		
+		devClone.find('#portNotice').hide();
+	});
+   devClone.find('input[name=port]').focus(function(){
+		
+		devClone.find('#portNotice').hide();
+	});*/
+  
+	
+	
+};
+
+
+
+config1.add_shown=function(devClone, operId,sel_obj){
+	$.ajax({
+		 url: "/devicelpr/configservice.do",
+	        dataType: 'json',
+	        //data:{serverName:serverName},
+	        type:'post',
+	        success: function (data) {
+	        	var result=eval(data);
+	        	
+	        	for(var i in result){
+	        		
+	        		if(result[0].id==0&&result.length==1){
+	        			//alert(0);
+	        			devClone.find('#congfigsel').append('<option value="'+result[0].id+'">'+result[0].text+'</option>');
+	        			break;
+	        		}
+	        		else{
+	        			
+	        			devClone.find('#congfigsel').append('<option value="'+result[i].id+'">'+result[i].text+'</option>');
+	        			
+	        		}
+	        		
+	        	}
+	        	if(operId==1){
+	        		devClone.find('option[value="'+sel_obj.pfmServerId+'"]').attr('selected',true);
+	        	}
+	        }
+	});
+	
+	//提交验证
+	devClone.find('#submit').on('click',registerMac);
+	function registerMac(event){
+		//alert(0);
+		var re=/^[0-9]*[1-9][0-9]*$/;
+		var ipre =  /^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$/   
+		var portre=/^([0-9]|[1-9]\d|[1-9]\d{2}|[1-9]\d{3}|[1-5]\d{4}|6[0-4]\d{3}|65[0-4]\d{2}|655[0-2]\d|6553[0-5])$/
+		var portval=devClone.find("input[name=port]").val();
+		var codeval=devClone.find("input[name=deviceCode]").val();
+		var nameval=devClone.find("input[name=deviceName]").val();
+		var ipval=devClone.find("input[name=ip]").val();
+		//var macval=devClone.find("input[name=mac]").val();
+		var loginIdval=devClone.find("input[name=loginId]").val();
+		var loginPasswordval=devClone.find("input[name=loginPassword]").val();//登陆密码
+		var length=$.trim(portval).length;
+		//alert(length);
+		//alert(val.length);
+		if(codeval==''){
+			var errMsg='内容不能为空';
+			devClone.find('.point-out').hide();
+			devClone.find("div[name=deviceCodeNotice]").html('<span class="point-box errorbgTop dropdown" ><i class="sprite icon_arrow_up2 pa"></i>' + errMsg + '</span>').show();
+			event.stopImmediatePropagation(); //阻止提交数据
+			return false;
+		}
+		
+		
+		
+		if(nameval==''){
+			//alert(0);
+			var errMsg='内容不能为空';
+			//errMsg='请输入大于0的正整数';
+			devClone.find('.point-out').hide();
+			devClone.find("div[name=deviceNameNotice]").html('<span class="point-box errorbgTop dropdown"><i class="sprite icon_arrow_up2 pa"></i>' + errMsg + '</span>').show();
+			event.stopImmediatePropagation(); //阻止提交数据
+			return false;
+		}
+		//checkIp(ipval);
+		if(ipval==""){
+			var errMsg='内容不能为空';
+			devClone.find('.point-out').hide();
+			devClone.find("div[name=ipNotice]").html('<span class="point-box errorbgTop dropdown"><i class="sprite icon_arrow_up2 pa"></i>' + errMsg + '</span>').show();
+			event.stopImmediatePropagation(); //阻止提交数据
+			return false;
+	 	}else if(ipval.indexOf(" ")!=-1){
+	 		var errMsg="请不要携带空格！"
+	 			devClone.find('.point-out').hide();
+			devClone.find("div[name=ipNotice]").html('<span class="point-box errorbgTop dropdown"><i class="sprite icon_arrow_up2 pa"></i>' + errMsg + '</span>').show();
+			event.stopImmediatePropagation(); //阻止提交数据
+			return false;
+	 	}else if(!ipre.test(ipval)){
+	 		var errMsg="请输入127.0.0.1的ip格式"
+	 		devClone.find('.point-out').hide();
+			devClone.find("div[name=ipNotice]").html('<span class="point-box errorbgTop dropdown"><i class="sprite icon_arrow_up2 pa"></i>' + errMsg + '</span>').show();
+			event.stopImmediatePropagation(); //阻止提交数据
+			return false;
+	 	}
+		
+		if(portval==""){
+			var errMsg="不能为空！";
+			devClone.find('.point-out').hide();
+			devClone.find("div[name=portNotice]").html('<span class="point-box errorbgTop dropdown"><i class="sprite icon_arrow_up2 pa"></i>' + errMsg + '</span>').show();
+			event.stopImmediatePropagation(); //阻止提交数据
+			return false;
+		}else if(portval.indexOf(" ")!=-1){
+			var errMsg="请不要携带空格！"
+				devClone.find('.point-out').hide();
+			devClone.find("div[name=portNotice]").html('<span class="point-box errorbgTop dropdown"><i class="sprite icon_arrow_up2 pa"></i>' + errMsg + '</span>').show();
+			event.stopImmediatePropagation(); //阻止提交数据
+			return false;
+		}else if(!portre.test(portval)){
+			var errMsg="请输入0-65535的端口号"
+			devClone.find('.point-out').hide();
+			devClone.find("div[name=portNotice]").html('<span class="point-box errorbgTop dropdown"><i class="sprite icon_arrow_up2 pa"></i>' + errMsg + '</span>').show();
+			event.stopImmediatePropagation(); //阻止提交数据
+			return false;
+		}
+		if(loginIdval==''){
+			var errMsg='内容不能为空';
+			//errMsg='请输入大于0的正整数';
+			devClone.find('.point-out').hide();
+			devClone.find("div[name=loginIdNotice]").html('<span class="point-box errorbgTop dropdown"  ><i class="sprite icon_arrow_up2 pa"></i>' + errMsg + '</span>').show();
+			event.stopImmediatePropagation(); //阻止提交数据
+			return false;
+		}
+		if(loginPasswordval==''){
+			var errMsg='内容不能为空';
+			//errMsg='请输入大于0的正整数';
+			devClone.find('.point-out').hide();
+			devClone.find("div[name=loginPasswordNotice]").html('<span class="point-box errorbgTop dropdown"  ><i class="sprite icon_arrow_up2 pa"></i>' + errMsg + '</span>').show();
+			event.stopImmediatePropagation(); //阻止提交数据
+			return false;
+		}
+		/*if(!RegExpObj.isNumber(loginPasswordval)){
+			var errMsg='密码必须是数字';
+			//errMsg='请输入大于0的正整数';
+			devClone.find('.point-out').hide();
+			devClone.find("div[name=loginPasswordNotice]").html('<span class="point-box errorbgTop dropdown"  ><i class="sprite icon_arrow_up2 pa"></i>' + errMsg + '</span>').show();
+			event.stopImmediatePropagation(); //阻止提交数据
+			return false;
+		}*/
+		
+	};
+	
+	
+	
+//光标验证
+	devClone.find('input[name=deviceCode]').blur(function(){
+		
+		devClone.find('div[name=deviceCodeNotice]').hide();
+	});
+     devClone.find('input[name=deviceCode]').focus(function(){
+		
+		devClone.find('div[name=deviceCodeNotice]').hide();
+	});
+    devClone.find('input[name=deviceName]').blur(function(){
+		
+		devClone.find('div[name=deviceNameNotice]').hide();
+	});
+    devClone.find('input[name=deviceName]').focus(function(){
+		
+		devClone.find('div[name=deviceNameNotice]').hide();
+	});
+    
+  devClone.find('input[name=ip]').blur(function(){
+		
+		devClone.find('div[name=ipNotice]').hide();
+	});
+  devClone.find('input[name=ip]').focus(function(){
+		
+		devClone.find('div[name=ipNotice]').hide();
+	});
+  devClone.find('input[name=port]').blur(function(){
+		
+		devClone.find('div[name=portNotice]').hide();
+	});
+   devClone.find('input[name=port]').focus(function(){
+		
+		devClone.find('div[name=portNotice]').hide();
+	});
+  devClone.find('input[name=loginId]').blur(function(){
+		
+		devClone.find('div[name=loginIdNotice]').hide();
+	});
+devClone.find('input[name=loginId]').focus(function(){
+		
+		devClone.find('div[name=loginIdNotice]').hide();
+	});
+devClone.find('input[name=loginPassword]').blur(function(){
+	
+	devClone.find('div[name=loginPasswordNotice]').hide();
+});
+devClone.find('input[name=loginPasswordId]').focus(function(){
+	
+	devClone.find('div[name=loginPasswordNotice]').hide();
+});
+};
+//配置服务器
+/*function configservice(sel_tr,all_tr,sel_obj_arr,sel_obj){
+	if(!sel_obj){
+        wade.libs.alert('请选择设备！',2);
+        return;
+    }
+	var dev=$("#configModal");
+	dev.modal('show');
+	
+	dev.find('#congfigsel').html('');//重新加载select
+	
+	//dev.find('*[name="sel"]').html('');
+	 var boothid = sel_obj.pfmDeviceLprId;
+	 $.ajax({
+		 url: "/devicelpr/configservice.do",
+	        dataType: 'json',
+	       // async:false,
+	        data:{boothid:boothid},
+	        success: function (data) {
+	        	var result=eval(data);
+	        	
+	        	for(var i in result){
+	        		
+	        		if(result[0].id==0||result.length==1){
+	        			
+	        			dev.find('#congfigsel').append('<option value="'+result[0].id+'">'+result[0].text+'</option>');
+	        			break;
+	        		}
+	        		else{
+	        			
+	        			dev.find('#congfigsel').append('<option value="'+result[i].id+'">'+result[i].text+'</option>');
+	        			
+	        		}
+	        		
+	        	}
+	        }
+	});
+	 
+	 dev.find('#submit').click(function(){
+		 var serverid=dev.find('#congfigsel option:selected').val();
+		 $.ajax({
+			 url: "/devicelpr/updateconfig.do",
+		        dataType: 'json',
+		       // async:false,
+		        data:{serverid:serverid,boothid:boothid},
+		        success: function (data) {
+		        	wade.libs.alert('服务器配置成功',null,dev.find('div:first'));	
+		        	$(".paginate_button.active").click();  //点击分页获取最新数据
+		        	}
+		        
+		});
+		 
+	 });
+};*/
+
+
+

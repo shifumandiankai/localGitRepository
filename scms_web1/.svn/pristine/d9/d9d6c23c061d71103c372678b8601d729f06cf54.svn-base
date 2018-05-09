@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.wadejerry.scms.modules.basic.dao.PfmAccountMapper">
+<resultMap type="com.wadejerry.scms.modules.basic.dto.AccountDto" id="DtoResultMap">
+<id column="car_info_id" property="carInfoId" jdbcType="INTEGER"/>
+<result column="person_name" property="personName" jdbcType="VARCHAR"  />
+<result column="car_number" property="carNumber" jdbcType="VARCHAR"  />
+<result column="card_id" property="cardId" jdbcType="VARCHAR"  />
+<result column="value1" property="bdvalue1" jdbcType="NUMERIC"  />
+<result column="type_name" property="typeName" jdbcType="VARCHAR" />
+<result column="note" property="note" jdbcType="VARCHAR" />
+</resultMap>
+
+ <resultMap type="com.wadejerry.scms.modules.basic.model.PfmAccount" id="pfmAccount">
+<id column="pfm_fee_rec_id" property="pfmFeeRecId" jdbcType="INTEGER"/>
+<result column="card_id" property="cardId" jdbcType="VARCHAR"/>
+<result column="car_number" property="carNumber" jdbcType="VARCHAR" />
+<result column="person_name" property="personName" jdbcType="VARCHAR" />
+<result column="phone" property="phone" jdbcType="VARCHAR"  />
+<result column="fee" property="bdfee" jdbcType="NUMERIC"  />
+<result column="last_fee" property="bdlastfee" jdbcType="NUMERIC"  />
+<result column="time" property="time" jdbcType="TIMESTAMP" />
+<result column="user_name" property="userName" jdbcType="VARCHAR"  />
+</resultMap> 
+<!-- 获取充值记录总数 -->
+  <select id="getRecordTotal"   resultType="java.lang.Integer" >
+  select count(pfm_fee_rec_id) from pfm_fee_rec where type_id=#{0} and card_id=#{1}
+  </select>
+  
+  <!-- 获取退款记录总数 -->
+  
+  <select id="getReturnRecordTotal"   resultType="java.lang.Integer" >
+  select count(pfm_fee_rec_id) from pfm_fee_rec where type_id=1 and card_id=#{0}
+  </select>
+  
+ <!-- 分页获取充值操作信息 -->
+  
+  <select id="getAccountListByPage" parameterType="com.wadejerry.scms.frame.entity.PageParamsDto" resultMap="pfmAccount" >
+   select pfm_fee_rec_id, person_name,fee,last_fee,time,user_name from pfm_fee_rec where type_id=#{typeid} and card_id=#{cardid} ${paramsDto.order} LIMIT  #{paramsDto.length} OFFSET  #{paramsDto.start} 
+  </select> 
+  
+  <!-- 模糊查询信息 -->
+  <select id="selectData" resultMap="pfmAccount" parameterType="com.wadejerry.scms.modules.basic.model.PfmAccount">
+  select <if test="carNumber!=null">car_number</if><if test="cardId!=null">card_id</if><if test="phone!=null">phone</if> from pfm_car_info where is_del=0
+  </select>
+  
+  
+ 
+<!-- 查询账户记录信息 -->
+
+<select id="selectRecording" resultMap="pfmAccount">
+select type_id,fee,last_fee,time,car_id from pfm_fee_rec where car_id=#{0} order by trade_id desc limit 10
+</select>
+
+
+
+<!-- 查找流水号 ,无论消费还是充值-->
+
+<select id="selectTradeId" resultType="java.lang.Integer">
+select max(trade_id) from pfm_fee_rec
+</select>
+
+<!-- 查找流水号 -->
+
+<select id="selectAllTradeId" resultType="java.lang.Integer">
+select max(trade_id) from pfm_fee_rec where car_id=#{0}
+</select>
+
+<!-- 查询上次交易时间 -->
+
+<select id="selectLastUseTime" resultType="java.util.Date" >
+select max(time) from pfm_fee_rec where car_id=#{0}
+</select>  
+
+<!-- 查询最后一次充值时间 -->
+
+<select id="selectlastDepositTime" resultType="java.util.Date" >
+select max(time) from pfm_fee_rec where car_id=#{0} and type_id=0
+</select> 
+
+
+<!-- 查询最大到期时间 -->
+
+<select id="MaxDisableTime" resultType="java.util.Date">
+	select max(disable_time) from (select disable_time from  pfm_fee_rec where car_id=#{0} and trade_id=#{1} )as a 
+</select>
+
+<!-- 查找最大流水号 -->
+
+<select id="selectMaxTradeId" resultType="java.lang.Integer">
+select max(trade_id) from pfm_fee_rec where car_id=#{0}
+</select>
+
+<!-- 根据查询-->
+<select id="selectAllByTypeAndCarid" resultType="java.lang.Integer">
+select count(*) from pfm_fee_rec where  car_id=#{1}
+</select>
+</mapper>

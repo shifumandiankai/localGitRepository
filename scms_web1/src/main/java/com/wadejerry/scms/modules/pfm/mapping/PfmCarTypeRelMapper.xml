@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.wadejerry.scms.modules.pfm.dao.PfmCarTypeRelMapper" >
+  <resultMap id="BaseResultMap" type="com.wadejerry.scms.modules.pfm.model.PfmCarTypeRel" >
+    <id column="car_type_rel_id" property="carTypeRelId" jdbcType="INTEGER" />
+    <result column="car_info_id" property="carInfoId" jdbcType="INTEGER" />
+    <result column="car_type_id" property="carTypeId" jdbcType="INTEGER" />
+    <result column="insert_time" property="insertTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="user_name" property="userName" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    car_type_rel_id, car_info_id, car_type_id, insert_time, update_time, user_name
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from pfm_car_type_rel
+    where car_type_rel_id = #{carTypeRelId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from pfm_car_type_rel
+    where car_type_rel_id = #{carTypeRelId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.wadejerry.scms.modules.pfm.model.PfmCarTypeRel" >
+    insert into pfm_car_type_rel (car_type_rel_id, car_info_id, car_type_id, 
+      insert_time, update_time, user_name
+      )
+    values (#{carTypeRelId,jdbcType=INTEGER}, #{carInfoId,jdbcType=INTEGER}, #{carTypeId,jdbcType=INTEGER}, 
+      #{insertTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{userName,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.wadejerry.scms.modules.pfm.model.PfmCarTypeRel" >
+    insert into pfm_car_type_rel
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="carTypeRelId != null" >
+        car_type_rel_id,
+      </if>
+      <if test="carInfoId != null" >
+        car_info_id,
+      </if>
+      <if test="carTypeId != null" >
+        car_type_id,
+      </if>
+      <if test="insertTime != null" >
+        insert_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+      <if test="userName != null" >
+        user_name,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="carTypeRelId != null" >
+        #{carTypeRelId,jdbcType=INTEGER},
+      </if>
+      <if test="carInfoId != null" >
+        #{carInfoId,jdbcType=INTEGER},
+      </if>
+      <if test="carTypeId != null" >
+        #{carTypeId,jdbcType=INTEGER},
+      </if>
+      <if test="insertTime != null" >
+        #{insertTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="userName != null" >
+        #{userName,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.wadejerry.scms.modules.pfm.model.PfmCarTypeRel" >
+    update pfm_car_type_rel
+    <set >
+      <if test="carInfoId != null" >
+        car_info_id = #{carInfoId,jdbcType=INTEGER},
+      </if>
+      <if test="carTypeId != null" >
+        car_type_id = #{carTypeId,jdbcType=INTEGER},
+      </if>
+      <if test="insertTime != null" >
+        insert_time = #{insertTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="userName != null" >
+        user_name = #{userName,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where car_type_rel_id = #{carTypeRelId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.wadejerry.scms.modules.pfm.model.PfmCarTypeRel" >
+    update pfm_car_type_rel
+    set car_info_id = #{carInfoId,jdbcType=INTEGER},
+      car_type_id = #{carTypeId,jdbcType=INTEGER},
+      insert_time = #{insertTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      user_name = #{userName,jdbcType=VARCHAR}
+    where car_type_rel_id = #{carTypeRelId,jdbcType=INTEGER}
+  </update>
+  
+  
+  <select id="selectifHasCarsbyCarTypeId" resultType="int" parameterType="int" >
+  
+  select count(car_type_rel_id) from pfm_car_type_rel a left join pfm_car_info b on a.car_info_id=b.car_info_id where car_type_id=#{id,jdbcType=INTEGER} and b.is_del=0
+  
+  </select>
+  <delete id="deleteByCarTypeId" parameterType="int">
+  delete from pfm_car_type_rel where car_type_id=#{id}
+  
+  </delete>
+  
+   <select id="selectByCarTypeId" resultMap="BaseResultMap"  parameterType="int" >
+   select * from pfm_car_type_rel where car_type_id=#{0}
+   </select>
+  
+</mapper>

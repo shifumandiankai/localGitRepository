@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.wadejerry.scms.modules.auth.dao.BimUserDoorGroupMapper" >
+  <resultMap id="BaseResultMap" type="com.wadejerry.scms.modules.auth.model.BimUserDoorGroup" >
+    <id column="bim_use_door_group_id" property="bimUseDoorGroupId" jdbcType="INTEGER" />
+    <result column="bim_door_group_id" property="bimDoorGroupId" jdbcType="INTEGER" />
+    <result column="user_id" property="userId" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="custom1" property="custom1" jdbcType="INTEGER" />
+    <result column="custom2" property="custom2" jdbcType="INTEGER" />
+    <result column="custom3" property="custom3" jdbcType="VARCHAR" />
+    <result column="custom4" property="custom4" jdbcType="VARCHAR" />
+    <result column="column_10" property="column10" jdbcType="CHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    bim_use_door_group_id, bim_door_group_id, user_id, create_time, update_time, custom1, 
+    custom2, custom3, custom4, column_10
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from bim_user_door_group
+    where bim_use_door_group_id = #{bimUseDoorGroupId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from bim_user_door_group
+    where bim_use_door_group_id = #{bimUseDoorGroupId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.wadejerry.scms.modules.auth.model.BimUserDoorGroup" >
+    insert into bim_user_door_group (bim_use_door_group_id, bim_door_group_id, 
+      user_id, create_time, update_time, 
+      custom1, custom2, custom3, 
+      custom4, column_10)
+    values (#{bimUseDoorGroupId,jdbcType=INTEGER}, #{bimDoorGroupId,jdbcType=INTEGER}, 
+      #{userId,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, 
+      #{custom1,jdbcType=INTEGER}, #{custom2,jdbcType=INTEGER}, #{custom3,jdbcType=VARCHAR}, 
+      #{custom4,jdbcType=VARCHAR}, #{column10,jdbcType=CHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.wadejerry.scms.modules.auth.model.BimUserDoorGroup" >
+    insert into bim_user_door_group
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="bimUseDoorGroupId != null" >
+        bim_use_door_group_id,
+      </if>
+      <if test="bimDoorGroupId != null" >
+        bim_door_group_id,
+      </if>
+      <if test="userId != null" >
+        user_id,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+      <if test="custom1 != null" >
+        custom1,
+      </if>
+      <if test="custom2 != null" >
+        custom2,
+      </if>
+      <if test="custom3 != null" >
+        custom3,
+      </if>
+      <if test="custom4 != null" >
+        custom4,
+      </if>
+      <if test="column10 != null" >
+        column_10,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="bimUseDoorGroupId != null" >
+        #{bimUseDoorGroupId,jdbcType=INTEGER},
+      </if>
+      <if test="bimDoorGroupId != null" >
+        #{bimDoorGroupId,jdbcType=INTEGER},
+      </if>
+      <if test="userId != null" >
+        #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="custom1 != null" >
+        #{custom1,jdbcType=INTEGER},
+      </if>
+      <if test="custom2 != null" >
+        #{custom2,jdbcType=INTEGER},
+      </if>
+      <if test="custom3 != null" >
+        #{custom3,jdbcType=VARCHAR},
+      </if>
+      <if test="custom4 != null" >
+        #{custom4,jdbcType=VARCHAR},
+      </if>
+      <if test="column10 != null" >
+        #{column10,jdbcType=CHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.wadejerry.scms.modules.auth.model.BimUserDoorGroup" >
+    update bim_user_door_group
+    <set >
+      <if test="bimDoorGroupId != null" >
+        bim_door_group_id = #{bimDoorGroupId,jdbcType=INTEGER},
+      </if>
+      <if test="userId != null" >
+        user_id = #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="custom1 != null" >
+        custom1 = #{custom1,jdbcType=INTEGER},
+      </if>
+      <if test="custom2 != null" >
+        custom2 = #{custom2,jdbcType=INTEGER},
+      </if>
+      <if test="custom3 != null" >
+        custom3 = #{custom3,jdbcType=VARCHAR},
+      </if>
+      <if test="custom4 != null" >
+        custom4 = #{custom4,jdbcType=VARCHAR},
+      </if>
+      <if test="column10 != null" >
+        column_10 = #{column10,jdbcType=CHAR},
+      </if>
+    </set>
+    where bim_use_door_group_id = #{bimUseDoorGroupId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.wadejerry.scms.modules.auth.model.BimUserDoorGroup" >
+    update bim_user_door_group
+    set bim_door_group_id = #{bimDoorGroupId,jdbcType=INTEGER},
+      user_id = #{userId,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      custom1 = #{custom1,jdbcType=INTEGER},
+      custom2 = #{custom2,jdbcType=INTEGER},
+      custom3 = #{custom3,jdbcType=VARCHAR},
+      custom4 = #{custom4,jdbcType=VARCHAR},
+      column_10 = #{column10,jdbcType=CHAR}
+    where bim_use_door_group_id = #{bimUseDoorGroupId,jdbcType=INTEGER}
+  </update>
+</mapper>

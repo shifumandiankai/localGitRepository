@@ -1,0 +1,358 @@
+package com.wadejerry.scms.modules.pfm.controller;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.wadejerry.scms.frame.Authority.AuthorityGetter;
+import com.wadejerry.scms.frame.constant.ConstParamLog;
+//import com.wadejerry.scms.frame.const1.user.ConstUser;
+import com.wadejerry.scms.frame.entity.DataTableDto;
+import com.wadejerry.scms.frame.entity.LoginInfo;
+import com.wadejerry.scms.frame.entity.OperateResult;
+import com.wadejerry.scms.frame.entity.PageParamsDto;
+import com.wadejerry.scms.frame.entity.SelectDataDto;
+import com.wadejerry.scms.frame.log.LogRecord;
+import com.wadejerry.scms.modules.pfm.dto.ParkingLotDto;
+import com.wadejerry.scms.modules.pfm.model.PfmEntrance;
+import com.wadejerry.scms.modules.pfm.model.PfmParkingLot;
+import com.wadejerry.scms.modules.pfm.model.PfmParkingLotInfo;
+import com.wadejerry.scms.modules.pfm.service.EntranceService;
+import com.wadejerry.scms.modules.pfm.service.PfmParkingLotService;
+import com.wadejerry.scms.utils.AjaxUtil;
+import com.wadejerry.scms.utils.Log.LogManager;
+import com.wadejerry.scms.utils.json.JacksonUtil;
+
+@Controller
+public class ParkingLotControler {
+	@Autowired
+	private HttpServletResponse response;
+	@Autowired
+	private HttpServletRequest request;
+	@Autowired
+	private PfmParkingLotService pfmParkingLotService; // 角色Service
+	@Autowired
+	private LogRecord logRecord;
+	@Autowired
+	private EntranceService entranceService;
+	@Autowired
+	private AuthorityGetter authorityGetter;
+	
+	/**
+	 * 分页获取用户 信息
+	 * 
+	 * @author
+	 * @param
+	 * @modificationHistory=========================逻辑或功能性重大变更记录
+	 * @modify by user:
+	 * @modify by reason:
+	 */
+
+	@RequestMapping("/parkinglot/getParkInfo.do")
+	@ResponseBody
+	public void GetParkingLotInfoByPage() {
+		List<Integer> listtype=authorityGetter.parkAuth();
+		List<Integer> listtypeId=null;
+		PageParamsDto paramsDto = new PageParamsDto(request); // 获取分 页参数
+		int iTotal =0;
+		List<ParkingLotDto> dtoList = null;
+		Integer flag=null;
+		if(listtype!=null){//不是企业管理员，需要权限
+			if(listtype.size()>0){
+				//有权限
+				listtypeId=listtype;
+		}else{
+			//操作员但是没给权限
+			flag=0;
+		}
+			}
+		/*if(!SecurityUtils.getSubject().isPermitted("ParkingSee")){
+		}else{*/
+			iTotal=pfmParkingLotService.getRecordTotal(paramsDto,listtypeId,flag); // 获取记录总数
+		if (iTotal > 0) {
+			//有数据存在
+			if (paramsDto.getLength() == -1) { // 查询所有记录
+				paramsDto.setLength(iTotal);
+			}
+			dtoList = pfmParkingLotService.getPfmParkingListByPage(paramsDto,listtypeId,flag); // 获取分页记录
+			for(int i=0;i<dtoList.size();i++){
+				if(dtoList.get(i).getInId()!=null){
+					int inId=dtoList.get(i).getInId();
+					ParkingLotDto park=pfmParkingLotService.selectByinId(inId);//根据上级编号查询车场名称
+					dtoList.get(i).setAttribution(park.getParkingLotName());//用于分页页面上显示车场的名称
+				}
+			}
+			
+		}
+		//}
+		DataTableDto data = new DataTableDto(); // 返回数据封装
+		data.setDataList(dtoList);
+		data.setDraw(paramsDto.getDraw());
+		data.setRecordsFiltered(iTotal);
+		data.setRecordsTotal(iTotal);
+		AjaxUtil.ajaxWriteDataTable(data, response);
+	}
+	/**
+	 * 保存用户信息
+	 * 
+	 * @author
+	 * @param
+	 * @modificationHistory=========================逻辑或功能性重大变更记录
+	 * @modify by user:
+	 * @modify by reason:
+	 */
+	@RequestMapping("/parkinglot/savePark.do")
+	@ResponseBody
+	private void SaveParkInfo() {
+		String formData = request.getParameter("condition");
+		ParkingLotDto parkinglotDto = JacksonUtil.toObject(formData, ParkingLotDto.class); // 获取表单数据
+		PageParamsDto paramsDto = new PageParamsDto(request); // 获取分 页参数
+		PfmParkingLotInfo park = null;
+		PfmParkingLotInfo parkAll = pfmParkingLotService.findByParkName(parkinglotDto.getParkingLotName(),paramsDto.getCompanyId());
+		PfmParkingLotInfo parkByCode=pfmParkingLotService.selectByCode(parkinglotDto.getParkingLotCode());
+		int totalCar=0;
+		int carNumber=0;
+		if (parkinglotDto.getPfmParkingLotId() == null) { // 新增角色信息
+			if (parkAll != null) {
+				AjaxUtil.ajaxWrite(false, "车场名称已使用", response);
+				return;
+			}
+			if(parkByCode!=null){
+				AjaxUtil.ajaxWrite(false, "车场序号已使用", response);
+				return;
+			}
+			if(!parkinglotDto.getAttribution().equals("-1")){//有所属车场
+				PfmParkingLot parkByInId=pfmParkingLotService.selectByPrimaryKey(Integer.valueOf(parkinglotDto.getAttribution()));//上级车场车辆总数
+				int count=pfmParkingLotService.selectCountByInId(Integer.valueOf(parkinglotDto.getAttribution()));//上级车场是否有子车场
+				if(count==0){//没有子车场
+					 totalCar=parkinglotDto.getCarNumber();
+				}else{
+					 carNumber=pfmParkingLotService.selectSumByInId(Integer.valueOf(parkinglotDto.getAttribution()));//下级车场车辆的总数
+					 totalCar=parkinglotDto.getCarNumber()+carNumber;
+				}
+				
+				int ptotalCar=parkByInId.getCarNumber();
+				if(totalCar>ptotalCar){//添加的车场数量+下级车场的数量>上级车场的数量
+					Integer lastNumber=parkByInId.getCarNumber()-carNumber;
+					if(lastNumber==0){
+						AjaxUtil.ajaxWrite(false,parkByInId.getParkingLotName()+"车场车位已满,请换个车场添加", response);
+					}else{
+						AjaxUtil.ajaxWrite(false,parkByInId.getParkingLotName()+"剩余可添加车位数量为"+lastNumber, response);
+					}
+					//AjaxUtil.ajaxWrite(false,parkByInId.getParkingLotName()+"剩余可添加车位数量为"+lastNumber, response);
+					return;
+				}
+			}
+			
+			
+			park = new PfmParkingLotInfo();
+			park.setBimCompanyId(paramsDto.getCompanyId());
+			park.setParkingLotName(parkinglotDto.getParkingLotName());
+			park.setCarNumber(parkinglotDto.getCarNumber());
+			park.setReserveCarNumber(parkinglotDto.getReserveCarNumber());
+			if(parkinglotDto.getAttribution()!=null&&Integer.valueOf(parkinglotDto.getAttribution())!=-1){
+				
+				park.setInId(Integer.valueOf(parkinglotDto.getAttribution()));
+			}
+			park.setParkingLotCode(parkinglotDto.getParkingLotCode());
+			park.setNote(parkinglotDto.getNote());
+			park.setInsertTime(new Date());
+			pfmParkingLotService.insertParkingDto(park);// 添加信息
+			logRecord.recordLog(ConstParamLog.LOG_MODULE_PFM_PARK, ConstParamLog.LOG_OPER_ADD,  ConstParamLog.LOG_TYPE_CONFIG,parkinglotDto.getParkingLotName());
+			
+		} else { // 修改角色信息  修改的时候能获取到formID，可以根据id查询提交之前的数据
+			if (parkAll!=null) {
+				int a=parkinglotDto.getPfmParkingLotId();
+				int b=parkAll.getPfmParkingLotId();
+				if(a!=b){
+					AjaxUtil.ajaxWrite(false, "车场名称已使用", response);
+					return;
+				}
+				
+			}
+			if(parkByCode!=null){
+				int a=parkByCode.getPfmParkingLotId();
+				int b=parkinglotDto.getPfmParkingLotId();
+				if(a!=b){
+					AjaxUtil.ajaxWrite(false, "车场序号已使用", response);
+					return;
+				}
+				
+			}
+			if(parkinglotDto.getInId()!=null){//有所属车场
+				
+				PfmParkingLot parkByInId=pfmParkingLotService.selectByPrimaryKey(parkinglotDto.getInId());//上级车场车辆总数
+				int count=pfmParkingLotService.selectSomeCountByInId(parkinglotDto.getInId(),parkinglotDto.getPfmParkingLotId());//上级车场是否有子车场
+				if(count==0){//没有子车场
+					 totalCar=parkinglotDto.getCarNumber();
+				}else{
+					 carNumber=pfmParkingLotService.selectSomeSumByInId(parkinglotDto.getInId(),parkinglotDto.getPfmParkingLotId());//下级车场车辆的总数
+					 totalCar=parkinglotDto.getCarNumber()+carNumber;
+				}
+				
+				int ptotalCar=parkByInId.getCarNumber();
+				if(totalCar>ptotalCar){//添加的车场数量+下级车场的数量>上级车场的数量
+					Integer lastNumber=parkByInId.getCarNumber()-carNumber;
+					if(lastNumber==0){
+						AjaxUtil.ajaxWrite(false,parkByInId.getParkingLotName()+"车场车位已满,请换个车场添加", response);
+					}else{
+						AjaxUtil.ajaxWrite(false,parkByInId.getParkingLotName()+"剩余可添加车位数量为"+lastNumber, response);
+					}
+					return;
+				}
+				
+				
+			}
+			
+			park = pfmParkingLotService.getUserById(parkinglotDto.getPfmParkingLotId()); // 获取用户信息
+			if (park != null) {
+				park.setPfmParkingLotId(parkinglotDto.getPfmParkingLotId());
+				park.setParkingLotName(parkinglotDto.getParkingLotName());
+				park.setCarNumber(parkinglotDto.getCarNumber());
+				park.setReserveCarNumber(parkinglotDto.getReserveCarNumber());
+			    park.setUpdateTime(new Date());
+				park.setNote(parkinglotDto.getNote());
+				park.setParkingLotCode(parkinglotDto.getParkingLotCode());
+				pfmParkingLotService.updateParkingDto(park);// 更新角色信息
+				logRecord.recordLog(ConstParamLog.LOG_MODULE_PFM_PARK, ConstParamLog.LOG_OPER_UPDATE, ConstParamLog.LOG_TYPE_CONFIG,parkinglotDto.getParkingLotName());
+			}
+		}
+		
+		AjaxUtil.ajaxWrite(true, "", response);
+		
+		
+
+	}
+
+	/**
+	 * 删除角色信息
+	 * 
+	 *
+	 * @param
+	 * @modificationHistory=========================逻辑或功能性重大变更记录
+	 * @modify by user:
+	 * @modify by reason:
+	 */
+	@RequestMapping("/parkinglot/delPark.do")
+	@ResponseBody
+	private void DelParkInfo() {
+		String jsonArrayStr = request.getParameter("condition");
+		//List<String> strlist=new ArrayList<String>();
+		try {
+			List<ParkingLotDto> delDtoList = JacksonUtil.json2list(jsonArrayStr, ParkingLotDto.class);
+			for (ParkingLotDto parkingLotDto : delDtoList) {
+				OperateResult result=new OperateResult();
+				List<PfmEntrance> list=entranceService.selectentranceId(parkingLotDto.getPfmParkingLotId());
+				 if(list!=null&&list.size()>0){
+					 
+					 result.setMsg("车场名为"+parkingLotDto.getParkingLotName()+"下的"+list.get(0).getEntranceName()+"出入口绑定了岗亭，请先移除该出入口下的岗亭");
+					 result.setResult(false);
+					 AjaxUtil.ajaxWrite(result,response);
+				 }else{
+					 result.setResult(true);
+					 pfmParkingLotService.deleteParkById(parkingLotDto.getPfmParkingLotId());	
+					 logRecord.recordLog(ConstParamLog.LOG_MODULE_PFM_PARK, ConstParamLog.LOG_OPER_DELETE, ConstParamLog.LOG_TYPE_CONFIG,parkingLotDto.getParkingLotName()); 
+					 AjaxUtil.ajaxWrite(result,response);
+				 
+				 }
+				 
+				 
+			}
+			
+			
+		} catch (Exception e) {
+			LogManager.logException(e);
+			AjaxUtil.ajaxWrite(false, e.getMessage(), response); // 返回失败
+			return;
+		}
+		//AjaxUtil.ajaxWrite(true, "", response); // 返回成功
+	}
+	/**
+	* 获取角色下拉框数据
+	* 
+	* @param   
+	* @modificationHistory=========================逻辑或功能性重大变更记录
+	* @modify by user: 
+	* @modify by reason:
+	 */
+	@RequestMapping("/parkinglot/GetParkingSelectData.do")
+	@ResponseBody
+	private void GetParkingSelectData(){
+		//查询车场里面是否有信息存在
+		List<ParkingLotDto> listDto=pfmParkingLotService.selectParkInfo(LoginInfo.getCompanyId());
+		List<SelectDataDto> list = new ArrayList<SelectDataDto>(); 
+		SelectDataDto selectDataDto = null;
+		SelectDataDto select= new SelectDataDto();
+		if(listDto.size()==0){
+			//车场表中无数据
+			selectDataDto=new SelectDataDto();
+			selectDataDto.setId(0);
+			selectDataDto.setText("无归属车场");
+			list.add(selectDataDto);
+			AjaxUtil.ajaxWriteObject(list, response);
+			return ;
+		}
+		else{
+			
+			
+			for(ParkingLotDto ParkingLotDto : listDto){	//封装Select2 插件数据类型
+				if(ParkingLotDto.getInId()==null){
+					//当上级车场为null时才是上级车场
+					selectDataDto = new  SelectDataDto();
+					selectDataDto.setText(ParkingLotDto.getParkingLotName());
+					selectDataDto.setId(ParkingLotDto.getPfmParkingLotId());
+					list.add(selectDataDto);
+				}
+			}
+			select.setId(-1);
+			select.setText("无");
+			list.add(select);
+			AjaxUtil.ajaxWriteObject(list, response);
+		}
+		
+	}
+	/*
+	  * 修改时select默认选中上级车场
+	  */
+		@RequestMapping("/parkinglot/selectParkinglotInfo.do")
+		@ResponseBody
+		public void SelectParkinglotInfo(){
+			String parkinglotname=request.getParameter("parkinglotname");
+			//String boothid=request.getParameter("boothid");
+			ParkingLotDto parkingLotDto=pfmParkingLotService.selectparkInfo(parkinglotname);
+			AjaxUtil.ajaxWriteObject(parkingLotDto, response);
+		}   
+		
+		/*
+		 * 删除时查找车辆信息
+		 */
+		@RequestMapping("/parkinglot/selectCarInfoByType.do")
+		@ResponseBody
+		public void SelectCarInfoByType(){
+			String parkId=request.getParameter("parkId");
+			OperateResult result=new OperateResult();
+			//result.setResult(true);
+			List<String> list=pfmParkingLotService.selectCarInfoByType(Integer.valueOf(parkId));
+			if(list.size()==0){
+				//车场没有关联车辆信息，不需要提示
+				result.setResult(true);
+				
+			}else{
+				result.setResult(false);
+			}
+			AjaxUtil.ajaxWriteObject(result, response);
+			
+			
+			
+		}
+		
+		
+}

@@ -1,0 +1,20 @@
+package com.wadejerry.scms.weixin.util.message;
+
+public class ImageMessage extends BaseMessage {
+
+	 private Image Image;
+
+	    public Image getImage() {
+	        return Image;
+	    }
+
+	    public void setImage(Image image) {
+	        Image = image;
+	    }
+
+		public ImageMessage(String toUserName, String fromUserName, long createTime, String msgType,
+				com.wadejerry.scms.weixin.util.message.Image image) {
+			super(toUserName, fromUserName, createTime, msgType);
+			Image = image;
+		}
+}

@@ -1,0 +1,702 @@
+package com.wadejerry.scms.modules.pfm.serviceImpl;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.wadejerry.scms.frame.entity.LoginInfo;
+import com.wadejerry.scms.frame.entity.OperateResult;
+import com.wadejerry.scms.frame.entity.PageParamsDto;
+import com.wadejerry.scms.modules.auth.dao.BimUserMapper;
+import com.wadejerry.scms.modules.auth.dao.BimUserRoleMapper;
+import com.wadejerry.scms.modules.auth.dto.UserRoleRelDto;
+import com.wadejerry.scms.modules.auth.model.BimUser;
+import com.wadejerry.scms.modules.pfm.dao.PfmAnshiMapper;
+import com.wadejerry.scms.modules.pfm.dao.PfmBaoqiMapper;
+import com.wadejerry.scms.modules.pfm.dao.PfmCarInfoMapper;
+import com.wadejerry.scms.modules.pfm.dao.PfmChargeRuleMapper;
+import com.wadejerry.scms.modules.pfm.dao.PfmDaynightMapper;
+import com.wadejerry.scms.modules.pfm.dao.PfmJianmianReleaseMapper;
+import com.wadejerry.scms.modules.pfm.dao.PfmPeriodMapper;
+import com.wadejerry.scms.modules.pfm.dao.PfmPeriodTimeMapper;
+import com.wadejerry.scms.modules.pfm.dao.PfmPertimeMapper;
+import com.wadejerry.scms.modules.pfm.dao.PfmTimeChargeMapper;
+import com.wadejerry.scms.modules.pfm.dao.PfmTimeChargeTimeMapper;
+import com.wadejerry.scms.modules.pfm.dao.PfmUnitPeriodMapper;
+import com.wadejerry.scms.modules.pfm.dao.PfmUnitPeriodTimeMapper;
+import com.wadejerry.scms.modules.pfm.dao.PfmCarTypeMapper;
+import com.wadejerry.scms.modules.pfm.dto.ChargeRuleDto;
+import com.wadejerry.scms.modules.pfm.model.PfmAnshi;
+import com.wadejerry.scms.modules.pfm.model.PfmBaoqi;
+import com.wadejerry.scms.modules.pfm.model.PfmCarInfo;
+import com.wadejerry.scms.modules.pfm.model.PfmChargeRule;
+import com.wadejerry.scms.modules.pfm.model.PfmDaynight;
+import com.wadejerry.scms.modules.pfm.model.PfmJianmianRelease;
+import com.wadejerry.scms.modules.pfm.model.PfmPeriod;
+import com.wadejerry.scms.modules.pfm.model.PfmPeriodTime;
+import com.wadejerry.scms.modules.pfm.model.PfmPertime;
+import com.wadejerry.scms.modules.pfm.model.PfmTimeCharge;
+import com.wadejerry.scms.modules.pfm.model.PfmTimeChargeTime;
+import com.wadejerry.scms.modules.pfm.model.PfmUnitPeriod;
+import com.wadejerry.scms.modules.pfm.model.PfmUnitPeriodTime;
+import com.wadejerry.scms.modules.pfm.model.PfmCarType;
+import com.wadejerry.scms.modules.pfm.service.PfmChargeRuleService;
+
+@Service("pfmChargeRuleService")
+public class PfmChargeRuleServiceImpl implements PfmChargeRuleService {
+	@Autowired
+	private PfmChargeRuleMapper pcrm;
+	@Autowired
+	private PfmChargeRuleMapper pcrnm;
+	@Autowired
+	private PfmTimeChargeMapper ptcm;
+	@Autowired
+	private PfmTimeChargeTimeMapper ptctm;
+	@Autowired
+	private PfmPeriodMapper ppm;
+	@Autowired
+	private PfmPeriodTimeMapper pptm;
+	@Autowired
+	private PfmUnitPeriodMapper pupm;
+	@Autowired
+	private PfmUnitPeriodTimeMapper puptm;
+	@Autowired
+	private PfmPertimeMapper pptmc;
+	@Autowired
+	private PfmAnshiMapper pam;
+	@Autowired
+	private PfmDaynightMapper pdm;
+	@Autowired
+	private PfmBaoqiMapper pbm;
+	@Autowired
+	private PfmJianmianReleaseMapper pjrm;
+	@Autowired
+	private PfmCarInfoMapper pcim;
+	@Autowired
+	private PfmCarTypeMapper pctm;
+	@Autowired
+	private BimUserRoleMapper bimUserRoleMapper;
+	@Autowired
+	private BimUserMapper userMapper;
+	@Override
+	public List<ChargeRuleDto> getChargeRuleListByPage(PageParamsDto ppd) {
+		List<UserRoleRelDto> userroles=	bimUserRoleMapper.selectUserRoleDtoByUserId(LoginInfo.getLoginId());
+
+		List<Integer> carTypeIds =new ArrayList();
+
+		for(UserRoleRelDto temp:userroles){
+			BimUser user = userMapper.selectByPrimaryKey(temp.getRoleId());
+			if(user!=null){
+				if(user.getCustom3()!=null&&user.getCustom3().length()!=0){
+					List<String> list=Arrays.asList(user.getCustom3().split(","));
+					for(String temp1:list){
+						carTypeIds.add(Integer.parseInt(temp1));
+					}
+				}
+			}
+
+		}
+		return pcrnm.selectByCompanyid(ppd, LoginInfo.getCompanyId(),carTypeIds);
+	}
+
+	@Override
+	public int getChargeRuleCount(PageParamsDto ppd) {
+		List<UserRoleRelDto> userroles=	bimUserRoleMapper.selectUserRoleDtoByUserId(LoginInfo.getLoginId());
+
+		List<Integer> carTypeIds =new ArrayList();
+
+		for(UserRoleRelDto temp:userroles){
+			BimUser user = userMapper.selectByPrimaryKey(temp.getRoleId());
+			if(user!=null){
+				if(user.getCustom3()!=null&&user.getCustom3().length()!=0){
+					List<String> list=Arrays.asList(user.getCustom3().split(","));
+					for(String temp1:list){
+						carTypeIds.add(Integer.parseInt(temp1));
+					}
+				}
+			}
+
+		}
+		return pcrnm.selectAllCount(ppd, LoginInfo.getCompanyId(),carTypeIds);
+	}
+
+	@Override
+	@Transactional
+	public int deleteChargeRule(List<ChargeRuleDto> dtolist) throws Exception {
+		
+		for (ChargeRuleDto dto : dtolist) {
+
+			pcrnm.deleteByPrimaryKey(dto.getRuleId());
+			if(dto.getJianmianId()!=null){
+			pjrm.deleteByPrimaryKey(dto.getJianmianId());
+			}
+			if(dto.getYichangId()!=null)
+			{
+			pjrm.deleteByPrimaryKey(dto.getYichangId());}
+
+		}
+		return 0;
+		
+	}
+
+	@Override
+	@Transactional
+	public OperateResult addFenShiRule(PfmChargeRule rule, PfmTimeCharge timecharge, List<PfmTimeChargeTime> timelist,PfmJianmianRelease reducerule,PfmJianmianRelease exceptionrule)
+			throws Exception {
+		OperateResult or = new OperateResult();
+		if(pcrnm.selectByCarTypeId(rule.getCarTypeId())>0){
+			or.setResult(false);
+			or.setMsg("已有收费规则，添加失败");
+			return or;
+		}
+			pcrnm.insertSelective(rule);
+			timecharge.setRuleId(rule.getRuleId());
+			ptcm.insertSelective(timecharge);
+			for (PfmTimeChargeTime p : timelist) {
+				p.setTimeChargeId(timecharge.getTimeChargeId());
+				ptctm.insertSelective(p);
+			}
+			addJianmianRule(reducerule);
+			addJianmianRule(exceptionrule);
+			or.setResult(true);
+		
+		return or;
+
+	}
+
+	@Override
+	@Transactional
+	public OperateResult addFenShiDuanRule(PfmChargeRule rule, PfmPeriod period, List<PfmPeriodTime> timelist,PfmJianmianRelease reducerule,PfmJianmianRelease exceptionrule)
+			throws Exception {
+		OperateResult or = new OperateResult();
+		if(pcrnm.selectByCarTypeId(rule.getCarTypeId())>0){
+			or.setResult(false);
+			or.setMsg("已有收费规则，添加失败");
+			return or;
+		}
+		
+
+			pcrnm.insertSelective(rule);
+			period.setRuleId(rule.getRuleId());
+			ppm.insertSelective(period);
+			for (PfmPeriodTime p : timelist) {
+				p.setPeriodId(period.getPeriodId());
+				pptm.insertSelective(p);
+			}
+			addJianmianRule(reducerule);
+			addJianmianRule(exceptionrule);
+			or.setResult(true);
+		
+		return or;
+
+	}
+
+	@Override
+	@Transactional
+	public OperateResult addFenDanweiShiDuanRule(PfmChargeRule rule, PfmUnitPeriod period,
+			List<PfmUnitPeriodTime> timelist,PfmJianmianRelease reducerule,PfmJianmianRelease exceptionrule) throws Exception {
+		OperateResult or = new OperateResult();
+		if(pcrnm.selectByCarTypeId(rule.getCarTypeId())>0){
+			or.setResult(false);
+			or.setMsg("已有收费规则，添加失败");
+			return or;
+		}
+		
+			pcrnm.insertSelective(rule);
+			period.setRuleId(rule.getRuleId());
+			pupm.insertSelective(period);
+			for (PfmUnitPeriodTime p : timelist) {
+				p.setUnitPeriodId(period.getUnitPeriodId());
+				puptm.insertSelective(p);
+			}
+			addJianmianRule(reducerule);
+			addJianmianRule(exceptionrule);
+			or.setResult(true);
+		
+		return or;
+
+	}
+
+	@Override
+	@Transactional
+	public OperateResult addAnciRule(PfmChargeRule rule, PfmPertime time,PfmJianmianRelease reducerule,PfmJianmianRelease exceptionrule) throws Exception {
+		OperateResult or = new OperateResult();
+		if(pcrnm.selectByCarTypeId(rule.getCarTypeId())>0){
+			or.setResult(false);
+			or.setMsg("已有收费规则，添加失败");
+			return or;
+		}
+		
+			pcrnm.insertSelective(rule);
+			time.setRuleId(rule.getRuleId());
+			pptmc.insertSelective(time);
+			addJianmianRule(reducerule);
+			addJianmianRule(exceptionrule);
+			or.setResult(true);
+		 
+		return or;
+
+	}
+
+	@Override
+	@Transactional
+	public OperateResult addAnshiRule(PfmChargeRule rule, PfmAnshi anshi,PfmJianmianRelease reducerule,PfmJianmianRelease exceptionrule) throws Exception {
+		OperateResult or = new OperateResult();
+		if(pcrnm.selectByCarTypeId(rule.getCarTypeId())>0){
+			or.setResult(false);
+			or.setMsg("已有收费规则，添加失败");
+			return or;
+		}
+		
+			pcrnm.insertSelective(rule);
+			anshi.setRuleId(rule.getRuleId());
+			pam.insertSelective(anshi);
+			addJianmianRule(reducerule);
+			addJianmianRule(exceptionrule);
+			or.setResult(true);
+		
+		return or;
+
+	}
+
+	@Override
+	@Transactional
+	public OperateResult addFreeRule(PfmChargeRule rule,PfmJianmianRelease reducerule,PfmJianmianRelease exceptionrule) throws Exception {
+		OperateResult or = new OperateResult();
+		if(pcrnm.selectByCarTypeId(rule.getCarTypeId())>0){
+			or.setResult(false);
+			or.setMsg("已有收费规则，添加失败");
+			return or;
+		}
+		
+			pcrnm.insertSelective(rule);
+			addJianmianRule(reducerule);
+			addJianmianRule(exceptionrule);
+			or.setResult(true);
+		
+		return or;
+	}
+
+	@Override
+	@Transactional
+	public OperateResult addDaynightRule(PfmChargeRule rule, PfmDaynight daynight,PfmJianmianRelease reducerule,PfmJianmianRelease exceptionrule) throws Exception {
+		OperateResult or = new OperateResult();
+		if(pcrnm.selectByCarTypeId(rule.getCarTypeId())>0){
+			or.setResult(false);
+			or.setMsg("已有收费规则，添加失败");
+			return or;
+		}
+	
+			pcrnm.insertSelective(rule);
+			daynight.setRuleId(rule.getRuleId());
+			pdm.insertSelective(daynight);
+			addJianmianRule(reducerule);
+			addJianmianRule(exceptionrule);
+			or.setResult(true);
+		
+		return or;
+	}
+
+	@Override
+	@Transactional
+	public OperateResult addBaoqiRule(PfmChargeRule rule, PfmBaoqi baoqi,PfmJianmianRelease reducerule,PfmJianmianRelease exceptionrule) throws Exception {
+		OperateResult or = new OperateResult();
+		if(pcrnm.selectByCarTypeId(rule.getCarTypeId())>0){
+			or.setResult(false);
+			or.setMsg("已有收费规则，添加失败");
+			return or;
+		}
+		
+			pcrnm.insertSelective(rule);
+			baoqi.setRuleId(rule.getRuleId());
+			pbm.insertSelective(baoqi);
+			addJianmianRule(reducerule);
+			addJianmianRule(exceptionrule);
+			or.setResult(true);
+		
+		return or;
+	}
+
+	@Override
+	@Transactional
+	public OperateResult addJianmianRule(PfmJianmianRelease rule) throws Exception {
+		OperateResult or = new OperateResult();
+//		if(rule.getType()!=null){//添加减免规则
+//			if(pjrm.selectJianmianByCarTypeId(rule.getCarTypeId())>0){
+//				pjrm.deleteByCarType(rule.getCarTypeId());
+//			}
+//		}
+//		else{
+//			if(pjrm.selectYichangByCarTypeId(rule.getCarTypeId())>0){
+//				pjrm.deleteByCarType(rule.getCarTypeId());
+//			}
+//		}
+			pjrm.insertSelective(rule);
+			or.setResult(true);
+		
+		return or;
+	}
+	
+	@Override
+	@Transactional
+	public OperateResult updateJianmianRule(PfmJianmianRelease rule) throws Exception {
+		OperateResult or = new OperateResult();
+			
+				PfmJianmianRelease oldrule = pjrm.selectByPrimaryKey(rule.getAbnormalReleaseId());
+			pjrm.deleteByPrimaryKey(rule.getAbnormalReleaseId());
+			rule.setAbnormalReleaseId(null);
+			rule.setCarTypeId(oldrule.getCarTypeId());
+			pjrm.insertSelective(rule);
+			or.setResult(true);
+		
+		return or;
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public Map getChargeRuleByID(int id) {
+		Map map = new HashMap();
+		
+		PfmChargeRule rule = pcrnm.selectByPrimaryKey(id);
+		Short ruleType = rule.getRuleType();
+		switch(ruleType){
+		case 0:{
+			PfmTimeCharge timeCharge = ptcm.selectByRuleId(rule.getRuleId());
+			map.put("ruleType", 0);
+			map.put("rule", rule);
+			map.put("timecharge", timeCharge);
+			
+		}break;
+		case 1:{
+			PfmPeriod period = ppm.selectByRuleId(rule.getRuleId());
+			map.put("ruleType", 1);
+			map.put("rule", rule);
+			map.put("period", period);
+			
+		}break;
+		case 2:{
+			PfmUnitPeriod unitperiod = pupm.selectByRuleId(rule.getRuleId());
+			map.put("ruleType",2);
+			map.put("rule", rule);
+			map.put("unitperiod", unitperiod);
+			
+		}break;
+		case 3:{
+			PfmPertime pertime = pptmc.selectByRuleId(rule.getRuleId());
+			map.put("ruleType",3);
+			map.put("rule", rule);
+			map.put("pertime", pertime);
+			
+		}break;
+		case 4:{
+			PfmAnshi anshi = pam.selectByRuleId(rule.getRuleId());
+			map.put("ruleType",4);
+			map.put("rule", rule);
+			map.put("anshi", anshi);
+		}break;
+		case 5:{
+			PfmBaoqi baoqi = pbm.selectByRuleId(rule.getRuleId());
+			map.put("ruleType",5);
+			map.put("rule", rule);
+			map.put("baoqi", baoqi);
+		}break;
+		case 6:{
+			map.put("ruleType",6);
+			map.put("rule", rule);
+			
+		}break;
+		case 7:{
+			PfmDaynight daynight = pdm.selectByRuleId(rule.getRuleId());
+			map.put("ruleType",7);
+			map.put("rule", rule);
+			map.put("daynight", daynight);
+		}break;
+		case 8:{
+			map.put("ruleType",8);
+			map.put("rule", rule);
+		}break;
+		default:break;
+		
+		}
+		
+		return map;
+		
+	}
+	@SuppressWarnings("unchecked")
+	@Override
+	public Map getJianmianRuleByID(int id) {
+		Map map = new HashMap();
+		PfmJianmianRelease rule = pjrm.selectByPrimaryKey(id);
+		map.put("jianmianyichangrule", rule);
+		return map;
+	}
+
+	@Override
+	public List<PfmTimeChargeTime> getFenshiTimeArray(int id) {
+		
+		return ptctm.selectByRuleId(id);
+	}
+	@Override
+	public List<PfmPeriodTime> getFenshiduanTimeArray(int id) {
+		
+		return pptm.selectByRuleId(id);
+	}
+
+	@Override
+	public List<PfmUnitPeriodTime> getDanweishiduanTimeArray(int id) {
+		
+		return puptm.selectByRuleId(id);
+	}
+	@Override
+	@Transactional
+	public OperateResult updateFenshiRule(PfmChargeRule rule, PfmTimeCharge timecharge,
+			List<PfmTimeChargeTime> timelist,PfmJianmianRelease reducerule,PfmJianmianRelease exceptionrule) throws Exception {
+		
+		OperateResult or = new OperateResult();
+		
+			PfmChargeRule ruleold = pcrnm.selectByPrimaryKey(rule.getRuleId());
+			pcrnm.deleteByPrimaryKey(rule.getRuleId());
+			//rule.setRuleId(ruleold.getRuleId());
+			rule.setInsertTime(ruleold.getInsertTime());
+			pcrnm.insertSelective(rule);
+			timecharge.setRuleId(rule.getRuleId());
+			ptcm.insertSelective(timecharge);
+			for (PfmTimeChargeTime p : timelist) {
+				p.setTimeChargeId(timecharge.getTimeChargeId());
+				ptctm.insertSelective(p);
+			}
+			updateJianmianRule(reducerule);
+			updateJianmianRule(exceptionrule);
+			or.setResult(true);
+		
+		return or;
+		
+		
+	}
+
+	@Override
+	@Transactional
+	public OperateResult updateFenshiDuanRule(PfmChargeRule rule, PfmPeriod period, List<PfmPeriodTime> timelist,PfmJianmianRelease reducerule,PfmJianmianRelease exceptionrule)
+			throws Exception {
+		OperateResult or = new OperateResult();
+		
+			PfmChargeRule ruleold = pcrnm.selectByPrimaryKey(rule.getRuleId());
+			pcrnm.deleteByPrimaryKey(rule.getRuleId());
+			//rule.setRuleId(ruleold.getRuleId());
+			rule.setInsertTime(ruleold.getInsertTime());
+			pcrnm.insertSelective(rule);
+			period.setRuleId(rule.getRuleId());
+			ppm.insertSelective(period);
+			for (PfmPeriodTime p : timelist) {
+				p.setPeriodId(period.getPeriodId());
+				pptm.insertSelective(p);
+			}
+			updateJianmianRule(reducerule);
+			updateJianmianRule(exceptionrule);
+			or.setResult(true);
+		
+		return or;
+	}
+
+	@Override
+	@Transactional
+	public OperateResult updateDanweishiDuanRule(PfmChargeRule rule, PfmUnitPeriod unitperiod,
+			List<PfmUnitPeriodTime> timelist,PfmJianmianRelease reducerule,PfmJianmianRelease exceptionrule) throws Exception {
+		OperateResult or = new OperateResult();
+		
+			PfmChargeRule ruleold = pcrnm.selectByPrimaryKey(rule.getRuleId());
+			pcrnm.deleteByPrimaryKey(rule.getRuleId());
+			//rule.setRuleId(ruleold.getRuleId());
+			rule.setInsertTime(ruleold.getInsertTime());
+			pcrnm.insertSelective(rule);
+			unitperiod.setRuleId(rule.getRuleId());
+			pupm.insertSelective(unitperiod);
+			for (PfmUnitPeriodTime p : timelist) {
+				p.setUnitPeriodId(unitperiod.getUnitPeriodId());
+				puptm.insertSelective(p);
+			}
+			updateJianmianRule(reducerule);
+			updateJianmianRule(exceptionrule);
+			or.setResult(true);
+		
+		return or;
+	}
+
+	@Override
+	@Transactional
+	public OperateResult updateAnciRule(PfmChargeRule rule, PfmPertime time,PfmJianmianRelease reducerule,PfmJianmianRelease exceptionrule) throws Exception {
+		OperateResult or = new OperateResult();
+		
+			PfmChargeRule ruleold = pcrnm.selectByPrimaryKey(rule.getRuleId());
+			pcrnm.deleteByPrimaryKey(rule.getRuleId());
+			//rule.setRuleId(ruleold.getRuleId());
+			rule.setInsertTime(ruleold.getInsertTime());
+			pcrnm.insertSelective(rule);
+			time.setRuleId(rule.getRuleId());
+			pptmc.insertSelective(time);
+			updateJianmianRule(reducerule);
+			updateJianmianRule(exceptionrule);
+			or.setResult(true);
+		
+		return or;
+	}
+
+	@Override
+	@Transactional
+	public OperateResult updateAnShiRule(PfmChargeRule rule, PfmAnshi time,PfmJianmianRelease reducerule,PfmJianmianRelease exceptionrule) throws Exception {
+		OperateResult or = new OperateResult();
+		
+			PfmChargeRule ruleold = pcrnm.selectByPrimaryKey(rule.getRuleId());
+			pcrnm.deleteByPrimaryKey(rule.getRuleId());
+			//rule.setRuleId(ruleold.getRuleId());
+			rule.setInsertTime(ruleold.getInsertTime());
+			pcrnm.insertSelective(rule);
+			time.setRuleId(rule.getRuleId());
+			pam.insertSelective(time);
+			updateJianmianRule(reducerule);
+			updateJianmianRule(exceptionrule);
+			or.setResult(true);
+		
+		return or;
+	}
+
+	@Override
+	@Transactional
+	public OperateResult updateBaoqiRule(PfmChargeRule rule, PfmBaoqi baoqi,PfmJianmianRelease reducerule,PfmJianmianRelease exceptionrule) throws Exception {
+		OperateResult or = new OperateResult();
+		
+			PfmChargeRule ruleold = pcrnm.selectByPrimaryKey(rule.getRuleId());
+			pcrnm.deleteByPrimaryKey(rule.getRuleId());
+			//rule.setRuleId(ruleold.getRuleId());
+			rule.setInsertTime(ruleold.getInsertTime());
+			pcrnm.insertSelective(rule);
+			baoqi.setRuleId(rule.getRuleId());
+			pbm.insertSelective(baoqi);
+			updateJianmianRule(reducerule);
+			updateJianmianRule(exceptionrule);
+			or.setResult(true);
+		
+		return or;
+	}
+
+	@Override
+	@Transactional
+	public OperateResult updateFreeRule(PfmChargeRule rule,PfmJianmianRelease reducerule,PfmJianmianRelease exceptionrule) throws Exception {
+		OperateResult or = new OperateResult();
+		
+			PfmChargeRule ruleold = pcrnm.selectByPrimaryKey(rule.getRuleId());
+			pcrnm.deleteByPrimaryKey(rule.getRuleId());
+			//rule.setRuleId(ruleold.getRuleId());
+			rule.setInsertTime(ruleold.getInsertTime());
+			pcrnm.insertSelective(rule);
+			updateJianmianRule(reducerule);
+			updateJianmianRule(exceptionrule);
+			or.setResult(true);
+		
+		return or;
+	}
+
+	@Override
+	@Transactional
+	public OperateResult updateDaynightRule(PfmChargeRule rule, PfmDaynight daynight,PfmJianmianRelease reducerule,PfmJianmianRelease exceptionrule) throws Exception {
+		OperateResult or = new OperateResult();
+		
+			PfmChargeRule ruleold = pcrnm.selectByPrimaryKey(rule.getRuleId());
+			pcrnm.deleteByPrimaryKey(rule.getRuleId());
+			//rule.setRuleId(ruleold.getRuleId());
+			rule.setInsertTime(ruleold.getInsertTime());
+			pcrnm.insertSelective(rule);
+			daynight.setRuleId(rule.getRuleId());
+			pdm.insertSelective(daynight);
+			updateJianmianRule(reducerule);
+			updateJianmianRule(exceptionrule);
+			or.setResult(true);
+		
+		return or;
+	}
+
+
+
+	@Override
+	public PfmBaoqi baoqiRule(int carInfoId) {
+		PfmChargeRule rule = null;
+		rule= pcrm.selectBaoqi(carInfoId);
+		return pbm.selectByRuleId(rule.getRuleId());
+	}
+
+	@Override
+	public boolean isBaoqi(int carInfoId) {
+		
+	PfmChargeRule rule = null;
+	rule= pcrm.selectBaoqi(carInfoId);
+	if(rule==null)
+		return false;
+	else
+		return true;
+	}
+
+	@Override
+	public PfmCarInfo selectByCarNum(String carNum) {
+		PfmCarInfo carInfo = null;
+		carInfo=pcim.selectByCarNum(carNum,LoginInfo.getCompanyId());
+		return carInfo;
+		
+	}
+
+	@Override
+	public PfmCarType selectByCarinfoId(int carInfoId) {
+		
+		return pctm.selectByCarInfoId(carInfoId, LoginInfo.getCompanyId());
+	}
+
+	@Override
+	public List<String> selectCarNumByValue(int index, String value) {
+
+		List<String> list = null;
+		switch(index){
+		case 1:{ list=pcim.selectCarNumByCarNum(value, LoginInfo.getCompanyId());}break;//按车牌查询
+		case 2:{list = pcim.selectCarNumByKaHao(value, LoginInfo.getCompanyId());}break;//按卡号查询
+		case 3:{list = pcim.selectCarNumByPhone(value,LoginInfo.getCompanyId());}break;//按手机号查询
+		
+		}
+		return list;
+	}
+
+	@Override
+	public List<String> selectAllCarNum() {
+		// TODO Auto-generated method stub
+		return pcim.selectAllCarNum(LoginInfo.getCompanyId());
+	}
+
+	@Override
+	public PfmCarInfo selectByCardid(String cardid) {
+		// TODO Auto-generated method stub
+		return pcim.selectByCardID(cardid, LoginInfo.getCompanyId());
+	}
+
+	@Override
+	public List<PfmCarInfo> selectCarInfoByValue(int index, String value) {
+		List<PfmCarInfo> list = null;
+		switch(index){
+		case 1:{ list=pcim.selectCarInfoByCarNum(value, LoginInfo.getCompanyId());}break;//按车牌查询
+		case 2:{list = pcim.selectCarInfoByKaHao(value, LoginInfo.getCompanyId());}break;//按卡号查询
+		case 3:{list = pcim.selectCarInfoByPhone(value,LoginInfo.getCompanyId());}break;//按手机号查询
+		
+		}
+		return list;
+	}
+
+
+
+
+
+
+
+	
+}

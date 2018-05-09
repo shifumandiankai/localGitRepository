@@ -1,0 +1,454 @@
+package com.wadejerry.scms.frame.entity;
+
+import java.text.MessageFormat;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.codehaus.jettison.json.JSONArray;
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
+
+import com.wadejerry.scms.utils.StringUtil;
+import com.wadejerry.scms.utils.Validator;
+import com.wadejerry.scms.utils.date.DateUtil;
+
+public class ReportPageParamsDto {
+	private int draw; 
+	private int start; // 开始记录数
+	private int length; // 每页记录数量
+	//private String searchValue; // 搜索关键字	
+	private int companyId; //企业ID，公用参数
+
+
+	private int loginUserLevel; // 的用户级别 
+	private int loginUserId; //登录的用户Id
+	
+	private String order; //排序列
+
+	/************ 预留自定义的查询条件 **************/
+	//private String searchValue0;
+	//private String searchValue1;
+	private String searchValue2;
+	private String searchValue3;
+	private String searchValue4;
+	private String searchValue5;
+	private String searchValue6;
+	private String searchValue7;
+	private String searchValue8;
+	private String searchValue9;
+	//private String searchValue10;
+    private Date searchValue0;
+    private Date searchValue1;
+	private int intValue0;
+	private int intValue1;
+	private int intValue2;
+	private int intValue3;
+	private int intValue4;
+	private int intValue5;	
+	private int intValue7;
+	private List<Integer> listType;
+	private List<Integer> entranceIdList;
+	private String size;
+	private String hasPermission;
+	
+	/*public String getSearchValue1() {
+		return searchValue1;
+	}
+
+	public void setSearchValue1(String searchValue1) {
+		this.searchValue1 = searchValue1;
+	}*/
+
+	public int getIntValue7() {
+		return intValue7;
+	}
+
+	
+
+	public List<Integer> getEntranceIdList() {
+		return entranceIdList;
+	}
+
+
+
+	public void setEntranceIdList(List<Integer> entranceIdList) {
+		this.entranceIdList = entranceIdList;
+	}
+
+
+
+	public void setIntValue7(int intValue7) {
+		this.intValue7 = intValue7;
+	}
+
+	public String getSearchValue2() {
+		return searchValue2;
+	}
+
+	public void setSearchValue2(String searchValue2) {
+		this.searchValue2 = searchValue2;
+	}
+
+	public String getSearchValue3() {
+		return searchValue3;
+	}
+
+	public void setSearchValue3(String searchValue3) {
+		this.searchValue3 = searchValue3;
+	}
+
+	public String getSearchValue4() {
+		return searchValue4;
+	}
+
+	public void setSearchValue4(String searchValue4) {
+		this.searchValue4 = searchValue4;
+	}
+
+	public String getSearchValue5() {
+		return searchValue5;
+	}
+
+	public void setSearchValue5(String searchValue5) {
+		this.searchValue5 = searchValue5;
+	}
+
+	public String getSearchValue6() {
+		return searchValue6;
+	}
+
+	public void setSearchValue6(String searchValue6) {
+		this.searchValue6 = searchValue6;
+	}
+	
+	public String getSearchValue7() {
+		return searchValue7;
+	}
+
+	public void setSearchValue7(String searchValue7) {
+		this.searchValue7 = searchValue7;
+	}
+
+	public String getSearchValue8() {
+		return searchValue8;
+	}
+
+	public void setSearchValue8(String searchValue8) {
+		this.searchValue8 = searchValue8;
+	}
+
+	public String getSearchValue9() {
+		return searchValue9;
+	}
+
+	public void setSearchValue9(String searchValue9) {
+		this.searchValue9 = searchValue9;
+	}
+
+	/*public String getSearchValue0() {
+		return searchValue0;
+	}
+
+	public void setSearchValue0(String searchValue0) {
+		this.searchValue0 = searchValue0;
+	}*/
+
+
+	public int getDraw() {
+		return draw;
+	}
+
+	public Date getSearchValue0() {
+		return searchValue0;
+	}
+
+	public void setSearchValue0(Date searchValue0) {
+		this.searchValue0 = searchValue0;
+	}
+
+	public Date getSearchValue1() {
+		return searchValue1;
+	}
+
+	public void setSearchValue1(Date searchValue1) {
+		this.searchValue1 = searchValue1;
+	}
+
+	public void setDraw(int draw) {
+		this.draw = draw;
+	}
+
+	public int getStart() {
+		return start;
+	}
+
+	public void setStart(int start) {
+		this.start = start;
+	}
+
+	public int getLength() {
+		return length;
+	}
+
+	public void setLength(int length) {
+		this.length = length;
+	}
+//
+//	public String getSearchValue() {
+//		return searchValue;
+//	}
+//
+//	public void setSearchValue(String searchValue) {
+//		this.searchValue = searchValue;
+//	}
+	
+	public int getCompanyId() {
+		return companyId;
+	}
+
+	public void setCompanyId(int companyId) {
+		this.companyId = companyId;
+	}
+
+	
+	public int getIntValue1() {
+		return intValue1;
+	}
+
+	public void setIntValue1(int intValue1) {
+		this.intValue1 = intValue1;
+	}
+
+	public int getIntValue2() {
+		return intValue2;
+	}
+
+	public void setIntValue2(int intValue2) {
+		this.intValue2 = intValue2;
+	}
+
+	public int getIntValue3() {
+		return intValue3;
+	}
+
+	public void setIntValue3(int intValue3) {
+		this.intValue3 = intValue3;
+	}
+
+	public int getIntValue4() {
+		return intValue4;
+	}
+
+	public void setIntValue4(int intValue4) {
+		this.intValue4 = intValue4;
+	}
+
+	public int getIntValue5() {
+		return intValue5;
+	}
+
+	public void setIntValue5(int intValue5) {
+		this.intValue5 = intValue5;
+	}
+
+	public int getIntValue0() {
+		return intValue0;
+	}
+
+	public void setIntValue6(int intValue0) {
+		this.intValue0 = intValue0;
+	}
+	public int getLoginUserLevel() {
+		return loginUserLevel;
+	}
+
+	public void setLoginUserLevel(int loginUserLevel) {
+		this.loginUserLevel = loginUserLevel;
+	}
+
+	public int getLoginUserId() {
+		return loginUserId;
+	}
+
+	public void setLoginUserId(int loginUserId) {
+		this.loginUserId = loginUserId;
+	}
+	
+	public String getOrder() {
+		return order;
+	}
+
+	public void setOrder(String order) {
+		this.order = order;
+	}
+
+	
+	
+	
+
+	
+	
+	
+	public List<Integer> getListType() {
+		return listType;
+	}
+
+
+
+	public void setListType(List<Integer> listType) {
+		this.listType = listType;
+	}
+
+
+
+	public String getHasPermission() {
+		return hasPermission;
+	}
+
+	public void setHasPermission(String hasPermission) {
+		this.hasPermission = hasPermission;
+	}
+
+	public String getSize() {
+		return size;
+	}
+
+	public void setSize(String size) {
+		this.size = size;
+	}
+
+	/**
+	 * 添加默认构造函数，获取登陆操作员信息
+	* <p>Title: </p>
+	* <p>Description: </p>
+	 */
+	/*public PageParamsDto(){
+		//TODO 企业ID是根据用户名获取到的，先写死
+		this.companyId = 1;
+		this.loginUserLevel= 1;
+		this.loginUserId = 1;		
+	}*/
+public ReportPageParamsDto(){
+	this.companyId = 1;
+	this.loginUserLevel= 1;
+	this.loginUserId = 1;
+}
+	public static ReportPageParamsDto GetParamsDtoByRequest(HttpServletRequest request) throws ParseException, JSONException {
+		
+		ReportPageParamsDto dto = new ReportPageParamsDto();
+		String val=request.getParameter("columns[0][search][value]");
+		if(!val.equals("")){
+			JSONObject json=new JSONObject(val);
+			if(json.has("parkId")&&!json.getString("parkId").equals("")){
+				dto.setSearchValue6(json.getString("parkId"));
+				dto.setIntValue4(Integer.valueOf(json.getString("parkId")));
+			}
+			if(json.has("entranceId")&&!json.getString("entranceId").equals("")){
+				/*dto.setSearchValue7(json.getString("entranceId"));
+				dto.setIntValue5(Integer.valueOf(json.getString("entranceId")));*/
+				if(json.get("entranceId") instanceof JSONArray){
+					//如果出入口有多个
+					JSONArray a=json.getJSONArray("entranceId");
+					List list=new ArrayList();
+					for(int i=0;i<a.length();i++){
+						
+						list.add( Integer.valueOf((String) a.get(i)));
+					}
+					dto.setEntranceIdList(list);
+			}else{
+				//车辆类型只有一个
+				List list=new ArrayList();
+				list.add(Integer.valueOf(json.getString("entranceId").toString()));
+				dto.setEntranceIdList(list);
+			}
+				
+			}
+			if(json.has("carriagewayId")&&!json.getString("carriagewayId").equals("")){
+				dto.setSearchValue8(json.getString("carriagewayId"));
+				dto.setIntValue7(Integer.valueOf(json.getString("carriagewayId")));
+			}
+			if(json.has("startTime")&&!json.getString("startTime").equals("")){
+				if(Validator.isDate(json.getString("startTime"))){
+					String str=json.getString("startTime")+" 00:00:00";
+					dto.setSearchValue0(DateUtil.YMDHMdf.parse(str));
+				}else{
+					dto.setSearchValue0(DateUtil.YMDHMdf.parse(json.getString("startTime")));
+				}
+				
+			}
+			if(json.has("endTime")&&!json.getString("endTime").equals("")){
+				if((Validator.isDate(json.getString("endTime")))){
+					String str=json.getString("endTime")+" 23:59:59";
+					dto.setSearchValue1(DateUtil.YMDHMdf.parse(str));
+				}else{
+					dto.setSearchValue1(DateUtil.YMDHMdf.parse(json.getString("endTime")));
+				}
+				
+			}
+			if(json.has("carNumber")&&!json.getString("carNumber").equals("")){
+				dto.setSearchValue2(json.getString("carNumber"));
+			}
+			if(json.has("direction")&&!json.getString("direction").equals("")){
+				if(!json.getString("direction").equals("0")){
+					dto.setSearchValue4(json.getString("direction"));
+					dto.setIntValue2(Integer.valueOf(json.getString("direction")));
+				}	
+			}
+			if(json.has("hasPermission")&&!json.getString("hasPermission").equals("")){
+				if(json.getString("hasPermission").equals("1")){
+					dto.setHasPermission(json.getString("hasPermission"));
+				}
+			}
+			if(json.has("carType")&&!json.getString("carType").equals("")){
+				/*if(!json.getString("carType").equals("0")){
+					dto.setIntValue3(Integer.valueOf(json.getString("carType")));
+				}*/
+				if(json.get("carType") instanceof JSONArray){
+					//如果车辆类型有多个
+					JSONArray a=json.getJSONArray("carType");
+					List list=new ArrayList();
+					for(int i=0;i<a.length();i++){
+						
+						list.add( Integer.valueOf((String) a.get(i)));
+					}
+					dto.setListType(list);
+			}else{
+				//车辆类型只有一个
+				List list=new ArrayList();
+				list.add(Integer.valueOf(json.getString("carType").toString()));
+				dto.setListType(list);
+			}
+				
+			
+		}
+			if(json.has("carTypeId")&&!json.getString("carTypeId").equals("")){
+				dto.setIntValue3(Integer.valueOf(json.getString("carTypeId")));
+			}
+			
+		}
+		
+		int draw = Integer.parseInt(request.getParameter("draw"));
+		int start = Integer.parseInt(request.getParameter("start")); // 开始记录数 
+		int length = Integer.parseInt(request.getParameter("length")); //每页记录数
+		
+		String colIndex = request.getParameter("order[0][column]"); //获取排序列序号
+		
+		dto.order= request.getParameter("columns["+colIndex +"][data]");
+		
+		dto.order  =MessageFormat.format("  order by {0} {1}", 
+				StringUtil.objNameToTableColName(dto.order)
+				, request.getParameter("order[0][dir]"));
+							
+		//String searchValue = request.getParameter("search[value]").toString(); //搜索关键字
+		dto.draw = draw;
+		dto.start = start;
+		dto.length = length;	
+		return dto ;
+	
+	
+}
+}

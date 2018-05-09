@@ -1,0 +1,1167 @@
+/**
+ * 重写jquery ajax方法
+ */
+(function($){
+
+    //备份jquery的ajax方法
+
+    var _ajax=$.ajax;
+    //重写jquery的ajax方法
+
+    $.ajax=function(opt){
+    	
+        //扩展增强处理
+
+        var _opt = $.extend(opt,{
+        	error:function(){
+        		
+        	},
+        	complete:function(XMLHttpRequest, textStatus){
+        	if(XMLHttpRequest.status==999){
+        		alert("登录超时，请重新登录！")
+        		window.location.href="/login";
+        	}
+
+        	}
+
+        });
+        _ajax(_opt);
+    };
+
+})(jQuery);
+/*****************/
+var wade = wade || {};
+wade.libs = wade.libs || {};
+wade.tree=wade.tree||{};
+
+/**
+ * [get_ctl_data 请求后台数据并绑定到控件]
+ * @param  {[type]} url   [description]
+ * @param  {[type]} itype [description]
+ * @param  {[type]} name  [description]
+ * @return {[type]}       [description]
+ */
+wade.libs.get_ctl_data = function(url,itype,name){
+	var result = null;
+	 $.ajax({
+			url :url, 
+			type:'post',
+			success: function(data){
+				// result = JSON.parse(data);
+				// var option_data ='';
+				// if(itype == 'select') {
+				// 	 for(var j = 0;j < result.length; j ++){
+				// 		 option_data =option_data+'<option>'+result[j]+'</option>'
+				// 	 }
+				// } else if(itype == 'select_group'){
+				// 	 for(var j = 0;j < result.length; j ++){
+				// 		 if(result[j].level == 0){
+				// 			 option_data =option_data+'<optgroup label="'+result[j].value+'">';
+				// 			 var id = result[j].id ;
+				// 			 $.each(result,function(index,obj){ //获取子类型
+				// 				 if(obj.inId == id){
+				// 					 option_data = option_data +'<option>'+obj.value+'</option>'
+				// 				 }
+				// 			 });
+				// 			 option_data = option_data+'</optgroup>';
+				// 		 }
+				// 	 }
+					
+				// }
+				// if(option_data !='') {
+				// 	$('*[name="'+name+'"]').append(option_data);
+				// 	$('*[name="'+name+'"]').select2();
+				// }
+			}
+		 });
+}
+
+/**
+ * [datatable datatable插件封装]
+ * @param  {[type]} config [配置参数]
+ * @return {[type]}        [无]
+ */
+wade.libs.datatable = function(config) {	
+	var strAuth = null;
+	var oaData = null;
+
+	//TODO 获取功能权限
+	//TODO 过滤功能权限
+	
+	//添加按钮及事件
+	var btn_html = ''
+	for (var i = 0; i < config.btns.length; i++) {
+		var ctl = config.btns[i];
+		if (ctl.name== "add") { // 新增
+			btn_html = btn_html+'<a class="btn  btn-default"  tabindex="-1" href="javascript:;" unselectable="on" name="wade.libs.datatable_add">添加</a> ';
+		} else if (ctl.name == "edit") { // 编辑
+			btn_html = btn_html +'<a class="btn  btn-default"  tabindex="-1" href="javascript:;" unselectable="on" name="wade.libs.datatable_edit">编辑</a>';
+		} else if (ctl.name == "del") { // 删除
+			btn_html = btn_html+'<a class="btn  btn-default"  tabindex="-1" href="javascript:;" unselectable="on" name="wade.libs.datatable_del">删除</a>';
+		} else { // 自定义按钮
+			btn_html = btn_html+'<a class="btn  btn-default"  tabindex="-1" href="javascript:;" unselectable="on" id="wade.libs.datatable_custom_'+ctl.name+'" name="wade.libs.datatable_custom">'+ctl.name+'</a>';
+		}
+	}
+	//查询条件
+	var search_html ='';
+	for(var i= 0;i < config.search.length; i++){
+		var ctl = config.search[i];
+		if(ctl.type=='search' ){ //搜索文本框
+			search_html = search_html +'<li><div><input type="search" class="form-control" name="searchValue'+ctl.index+'_search'+'" placeholder="搜索：'+ctl.placeholder+'"></input></div></li>';
+		} else if(ctl.type =='select') { //单选
+			var name ='searchValue'+ctl.index+'_select';
+			search_html = search_html + '<li><div class="form-group"><select class="form-control select2" data-placeholder="'+ctl.placeholder+'" name="'+name+'"><option></option></select><div></li>'; 
+		} else if(ctl.type =='select_group') { //单选分组	
+			var name ='searchValue'+ctl.index+'_select';
+			search_html = search_html + '<li><div class="form-group"><select class="form-control select2" data-placeholder="'+ctl.placeholder+'" name="'+name+'"><option></option></select><div></li>'; 
+		} else if(ctl.type=='multiple_select') { // 多选
+			//search_html = search_html + '<li><div class="form-group"><select class="form-control select2" data-placeholder="'+ctl.placeholder+'" name="searchValue'+ctl.index+'"  multiple="multiple">'+option_data+'</select><div></li>';
+		} else if(ctl.type =='multiple_select_group'){ //多选分组
+			
+		} else if(ctl.type =='date'){ //日期
+			search_html= search_html + '<li><div class="form-group"><div class="input-group date"><div class="input-group-addon"><i class="fa fa-calendar"></i></div><input type="text"  placeholder="'+ctl.placeholder+'" name="searchValue'+ctl.index+'_date'+'" class="form-control pull-right"></div></div><li>';
+		} else if(ctl.type=="date_range"){ //开始日期-结束日期
+			search_html = search_html + '<li><div class="form-group"><div class="input-group"><div class="input-group-addon"> <i class="fa fa-calendar"></i></div><input type="text" placeholder="'+ctl.placeholder+'" name="searchValue'+ctl.index+'_date_range'+'" class="form-control pull-right" ></div></div></li>';
+		}else if(ctl.type=="search_hidden"){
+			search_html = search_html +'<li><div><input type="hidden" class="form-control" name="searchValue'+ctl.index+'_search_hidden'+'" placeholder="'+ctl.placeholder+'"></input></div></li>';
+
+		}
+	}
+	
+	//数据列绑定
+	var colCount = config.columns.length;
+	var colNameArr = new Array(colCount);
+	for (var i = 0; i < colCount; i++) {
+		colNameArr[i] = {
+			"data" : config.columns[i]
+		};
+	}
+	
+	//需要隐藏的列
+	if (config.defs) {
+		var hideColCount = config.defs.length;
+		var hideColArr = new Array(hideColCount);
+		for (var i = 0; i < hideColCount; i++) {
+			var index = config.columns.indexOf(config.defs[i]);
+			hideColArr[i] = {
+				"targets" : [ index ],
+				"visible" : false,
+				"searchable" : false
+			};
+		}
+	}
+
+	var table = $("#" + config.id).DataTable({
+		language : { // 语言中文
+			"url" : "/common/json/Chinese.json"
+		},
+		processing : true, // 显示加载进度
+		serverSide : true, // 服务器分页
+		ajax : {
+			url : config.getUrl, // 请求数据地址
+		},
+		columns : colNameArr, // 绑定数据列
+		columnDefs : hideColArr,// 隐藏的列
+		lengthMenu : [ [ 10, 25, 50, -1 ], [ 10, 25, 50, "全部" ] ],
+		bFilter:true,
+		initComplete: function(){
+			var html ='<ul class="wysihtml5-toolbar">'+search_html + //添加搜索条件
+				'<li>'+
+				' <div class="btn-group">'+btn_html+' </div> '+  //添加操作按钮
+				'</li> '+
+				'</ul>';	
+		
+		 	$('#'+config.id+'_wrapper div:first div').eq(2).find('div').remove();	//删除dataTable默认搜索框 	
+			$('#'+config.id+'_wrapper div:first div').eq(0).removeClass('col-sm-6').addClass('col-sm-2'); 
+			$('#'+config.id+'_wrapper div:first div').eq(2).removeClass('col-sm-6').addClass('col-sm-10').append($(html));	//添加查询条件及按钮，并增加菜单栏长度
+			
+			for(var i= 0;i < config.search.length; i++){
+				var ctl = config.search[i];
+				if(ctl.url){
+					if(ctl.type =='select' || ctl.type =='select_group') { //单选
+						var name ='searchValue'+ctl.index+'_select';		
+						wade.libs.get_ctl_data(ctl.url,ctl.type,name);
+					}
+				} 
+			}
+			
+			//新增
+			var add  = $("#" + config.id+'_wrapper').find('a[name="wade.libs.datatable_add"]');
+			if(add.size() > 0){
+				add.click(function(){			
+					var devClone = $("#" + config.addDiv).clone(true);
+					var title  ='添加'+ devClone.find('.modal-title').text();
+					devClone.find('.modal-title').text(title);
+					devClone.on('shown.bs.modal',function(){
+					})
+					devClone.modal({backdrop: 'static', keyboard: false}).on('hidden.bs.modal',function(event){
+						$(this).remove();
+					});
+					if(config.add_shown) {
+						config.add_shown(devClone,0); //模态框弹出后执行的函数
+					}
+					
+					//$("#" + config.addDiv + " .btn-primary").unbind("click").click(function() { // 保存按钮添加事件
+					devClone.find(".btn-primary").click(function() { // 保存按钮添加事件
+				        var jsoninfo = devClone.find("form:first").serializeObject(); 
+                        if(config.fromDataFormat) {
+                        	jsoninfo = config.fromDataFormat(jsoninfo);
+                        }
+				        var formdata = "condition=" + JSON.stringify(jsoninfo);
+				        $(this).attr("disabled","disabled");
+						// 提交表单
+						$.ajax({
+							url : config.saveUrl,
+							type: "POST",
+							data :formdata, // 默认获取div下第一个from数据
+							success : function(data) {
+								result = JSON.parse(data);
+								if (result.success) {
+									devClone.modal("hide");
+									wade.libs.alert('添加成功');							
+									if($("#" + config.id+'_wrapper').find(".paginate_button.active").size() >0){
+										$("#" + config.id+'_wrapper').find(".paginate_button.active").click(); //点击分页按钮获取新数据
+									} else{
+										$("#" + config.id+'_wrapper').find('#' + config.id + " th:first").click(); //数据表中没有数据，通过排序列获取数据
+									}					
+								} else {
+
+									wade.libs.alert(result.msg,0 ,devClone.find('div:first'));	
+								}
+								devClone.find(".btn-primary").removeAttr("disabled");
+							}
+						});
+					});
+				});
+			}
+			
+			//编辑
+			var edit  = $("#" + config.id+'_wrapper').find('a[name="wade.libs.datatable_edit"]');
+			if(edit.size() > 0){
+				edit.click( function() {
+							var all_tr = $('#' + config.id + ' tr');
+							var sel_obj = null;
+							$.each(all_tr,function(index,value){
+								
+								if($(value).hasClass('active')) {
+									if(oaData[index-1]==undefined){
+										return false;
+									}
+									sel_obj = oaData[index-1]._aData;
+									return;
+								}
+							});
+							console.log(sel_obj);
+							if(!sel_obj){
+								wade.libs.alert('请选择编辑项',2);
+								return;
+							}											
+							var devClone = $("#" + config.editDiv).clone(true);
+							var title  ='编辑'+ devClone.find('.modal-title').text();
+							devClone.find('.modal-title').text(title);
+							devClone.modal({backdrop: 'static', keyboard: false}).on('hidden.bs.modal',function(event){
+								$(this).remove();
+							});
+							
+							if(config.add_shown) {
+								config.add_shown(devClone,1,sel_obj); //模态框弹出后执行的函数
+							}	
+							$.each(sel_obj,function(name,value){						
+								wade.libs.datatable_fill_form_data(name,value,devClone);
+							});	
+							devClone.find(".btn-primary").click(function() { // 保存按钮添加事件
+						        var jsoninfo = devClone.find("form:first").serializeObject();
+						        if(config.fromDataFormat) {
+		                        	jsoninfo = config.fromDataFormat(jsoninfo);
+		                        }
+								var formdata = "condition=" + JSON.stringify(jsoninfo);	
+								 $(this).attr("disabled","disabled");
+								// 提交表单
+								$.ajax({
+									url : config.saveUrl,
+									type :"POST",
+									data : formdata, // 默认获取div下第一个from数据
+									success : function(data) {
+										result = JSON.parse(data);
+										if (result.success) {
+											wade.libs.alert('信息修改成功');
+									   		//wade.libs.alert('信息保存成功',null ,devClone.find('div:first'));
+									   		$("#" + config.id+'_wrapper').find(".paginate_button.active").click();  //点击分页获取最新数据
+											devClone.modal('hide');					
+										} else {
+											wade.libs.alert(result.msg,0 ,devClone.find('div:first'));	
+										}
+										devClone.find(".btn-primary").removeAttr("disabled");
+									}
+								});
+							});
+						}
+				)
+			}
+			//删除
+			var del  = $("#" + config.id+'_wrapper').find('a[name="wade.libs.datatable_del"]');
+			if(del.size() > 0){
+				del.click(function() {
+					var all_tr = $('#' + config.id + ' tr');
+					var sel_obj_arr = new Array();
+					var i = 0;
+					$.each(all_tr,function(index,value){
+						if($(value).is('.active') || $(value).is('.info')) {
+							if(oaData[index-1]==undefined){
+								return false;
+							}
+							sel_obj_arr[i] = oaData[index-1]._aData;
+							i = i + 1;
+							
+						}
+					});
+					if(sel_obj_arr.length == 0){
+						wade.libs.alert('请选择删除项',2);
+						return;
+					}
+					if(config.beforedel){
+						if(!config.beforedel()){
+							return ;
+						}
+					}
+					
+					if(config.beforefun){
+						//config.beforefun(sel_obj_arr);
+						if(!config.beforefun(sel_obj_arr)){
+							return;
+						}
+					}
+					
+					wade.libs.dialog('确定删除'+sel_obj_arr.length+'项数据？',function(){
+						$.ajax({
+							url :config.delUrl,
+							type:"post",
+							data : "condition=" + JSON.stringify(sel_obj_arr),
+							success: function(data){
+								result = JSON.parse(data);
+								if(result.success){
+									wade.libs.alert('删除成功');
+									$("#" + config.id+'_wrapper').find(".paginate_button.active").click(); //触发请求分页数据
+								} else {		
+									wade.libs.alert(result.msg, 0);
+									$("#" + config.id+'_wrapper').find(".paginate_button.active").click(); //触发请求分页数据
+								}
+							}
+						});		
+					});	
+				})	
+			}
+			
+			//自定义按钮
+			var custom  = $("#" + config.id+'_wrapper').find('a[name="wade.libs.datatable_custom"]');
+			if(custom.size() >0 ){
+				custom.click(function(){
+					var sel_tr =  $('#' + config.id + " tr.active");
+					var all_tr=$('#' + config.id + " tr");
+					var i=0;
+					var sel_obj_arr=[];
+					var sel_obj = null;
+					$.each(all_tr,function(index,value){
+						if($(value).is('.active') || $(value).is('.info')) {
+							if(oaData[index-1]==undefined){
+								return false;
+							}
+							sel_obj_arr[i] = oaData[index-1]._aData;
+							i = i + 1;
+							//return;
+						}
+						if($(value).is('.active')){
+							
+							sel_obj = oaData[index-1]._aData;	
+						}
+					});
+				   //console.log(sel_obj);
+					var name =$(this).html();
+				    $.each(config.btns,function(index,value){		    	
+				    	if(value.name == name){
+				    		//alert(sel_obj);
+				    		value.fun(sel_tr,all_tr,sel_obj_arr,sel_obj);
+						}
+				    });
+				});
+			}
+			
+			
+			//搜索条件绑定列触发搜索事件
+            this.api().columns().every( function () {
+            	var column = this;
+            	/*1.type search */
+                var ctl = $("#" + config.id+'_wrapper').find('*[name=searchValue'+column.index()+'_search]');
+                var last_input_text = null;
+                if(ctl.size() > 0) {
+                	ctl.bind('keyup.DT search.DT input.DT paste.DT cut.DT',
+						function(){
+//						   var val = $.fn.dataTable.util.escapeRegex(
+//			                            $(this).val()
+//			                        ); 
+                		 var val =  $(this).val();
+							 if(last_input_text != val) {
+								
+								 last_input_text = val; //防止触发多次事件
+								 column.search( val ? val : '', true, false ).draw();
+							 }
+						}
+					).bind( 'keypress.DT', function(e) {
+						/* Prevent form submission */
+						if ( e.keyCode == 13 ) {
+							return false;
+						}
+					} )
+                }
+                /*隐藏搜索条件*/
+                var ctl = $("#" + config.id+'_wrapper').find('*[name=searchValue'+column.index()+'_search_hidden]');
+                var last_input_text = null;
+                if(ctl.size() > 0) {
+                	ctl.bind('keyup.DT search.DT input.DT paste.DT cut.DT',
+						function(){
+//						   var val = $.fn.dataTable.util.escapeRegex(
+//                        $(this).val()
+//                    ); 
+		 var val =  $(this).val();
+							 if(last_input_text != val) {
+								
+								 last_input_text = val; //防止触发多次事件
+								 column.search( val ? val : '', true, false ).draw();
+							 }
+						}
+					).bind( 'keypress.DT', function(e) {
+						/* Prevent form submission */
+						if ( e.keyCode == 13 ) {
+							return false;
+						}
+					} )
+                }
+                //2.type select
+                ctl = $("#" + config.id+'_wrapper').find('*[name=searchValue'+column.index()+'_select]');
+                if(ctl.size() > 0){
+                	ctl.select2({
+		  				  language:"zh-CN",
+		  				  allowClear: true,
+		  				  
+		  			 });
+                	ctl.on('change', function (evt) {
+//						   var val = $.fn.dataTable.util.escapeRegex(
+//                        $(this).val()
+//                    ); 
+		 var val =  $(this).val();
+                		 column.search( val ? val : '', true, false ).draw();
+		  			});		                	
+                }
+                //3.type date
+                ctl = $("#" + config.id+'_wrapper').find('*[name=searchValue'+column.index()+'_date]');
+                var last_select_date = null;
+                if(ctl.size() > 0 &&  ctl.parent().hasClass('date')){
+                	ctl.datepicker({
+                	      language: 'zh-CN',
+	                	  autoclose: true
+	                  }).on('change',function(data){
+//						   var val = $.fn.dataTable.util.escapeRegex(
+//                          $(this).val()
+//                      ); 
+  		 var val =  $(this).val();
+	               		 if(last_select_date != val){  //防止事件多次触发
+	               			last_select_date = val;
+	               			column.search( val ? val : '', true, false ).draw();
+	               		 }
+	                  });
+                }
+                //type date range
+                ctl = $("#" + config.id+'_wrapper').find('*[name=searchValue'+column.index()+'_date_range]');
+                if(ctl.size() >0 ){
+                	ctl.daterangepicker({
+                		locale : daterangepicker_locale_zh_CN
+                	}).on('change',function(data){
+//						   var val = $.fn.dataTable.util.escapeRegex(
+//                        $(this).val()
+//                    ); 
+		 var val =  $(this).val();
+             			column.search( val ? val : '', true, false ).draw();
+                	});
+                }         
+           });
+		},
+	}).on( 'init.dt', function ( e, settings){
+		if(window.Buttonpermission){
+			Buttonpermission();//进行权限判断
+		}
+		var html  = '<div class="icheckbox_square-blue" aria-checked="false" aria-disabled="false" style="position: relative;margin-right:10px;"><input type="checkbox" id="rememberMe" style="position: absolute; top: -20%; left: -20%; display: block; width: 140%; height: 140%; margin: 0px; padding: 0px; border: 0px; opacity: 0; background: rgb(255, 255, 255);"><ins class="iCheck-helper" style="position: absolute; top: -20%; left: -20%; display: block; width: 140%; height: 140%; margin: 0px; padding: 0px; border: 0px; opacity: 0; background: rgb(255, 255, 255);"></ins></div><lable></lable>';
+		$("#" + config.id+" th").eq(0).prepend($(html)); //添加全选/全不选 checkBox
+		$('#' + config.id + ' th div').click(
+			function(){
+				if($(this).hasClass('checked')){ // 全不选
+					$(this).removeClass('checked');
+					$('#' + config.id + " tr").not(":first").removeClass('active').removeClass("info");
+				
+				}else {	 //全选
+					$(this).addClass('checked'); 
+					$('#' + config.id + " tr").not(":first").addClass('info');	
+				}				
+				return false;			
+			}
+		);	
+	}).on( 'draw', function (e, settings) {
+		if(window.Seepermission){
+			Seepermission();//进行权限判断
+		}
+		var api = new $.fn.dataTable.Api(settings );
+		oaData = settings.aoData; //获取包含隐藏列数据
+		$('#' + config.id + ' th div').removeClass('checked'); //翻页恢复默认不选中
+	} );
+
+	$('#' + config.id + ' tbody').on('click', 'tr', function() {
+		if ($(this).hasClass('active')) {
+			$(this).removeClass('active').removeClass("info");
+		} else {
+			// table.$('tr.active').removeClass('active');
+			table.$('tr.active').removeClass('active').addClass("info");
+			$(this).removeClass("info").addClass('active');
+		}
+	});
+}
+
+/**
+ * [datatable_fill_form_data 根据对象名称，填充数据到表单]
+ * @param  {[type]} 对象名称  [description]
+ * @param  {[type]} 数值 [description]
+ * @param  {[type]} 包含from的div [description]
+ * @return {[type]}       [description]
+ */
+wade.libs.datatable_fill_form_data = function(name, value,div) {
+	var form = div.find("form:first");
+ 
+	var input = form.find('input[name=' + name + '][type=text]').val(value);
+/*	if(input.parent().hasClass('date')) { //datepicker 插件赋值
+		input.datepicker('setDate', value);
+	}*/
+	var input = form.find('input[name=' + name + '][type=hidden]').val(value);
+	//var input = form.find('input[type=hidden][name=' + name + ']').val(value);
+
+	form.find('textarea[name=' + name + ']').val(value);
+	form.find('select[name=' + name + ']').val(value).trigger("change");	//select2 插件赋值	
+	
+	
+	// TODO 用到在扩展吧 
+	// 文本字段 text
+	// 密码 password
+	// 隐藏域 hidden
+	// 文本区域 textarea
+	// 复选框 checkbox
+	// 单选按钮 radio
+	// 选择列表 select
+	// 图像域 image
+	// 文件域 file
+	// 按钮 button
+	// 提交按钮 submit
+}
+
+/**
+ * [serializeObject Jquery 序列化对象转JSON]
+ * @return {[type]} [json数据]
+ */
+$.fn.serializeObject = function(){    
+   var o = {};    
+   var a = this.serializeArray();    
+   $.each(a, function() {    
+       if (o[this.name]) {    
+           if (!o[this.name].push) {    
+               o[this.name] = [o[this.name]];    
+           }    
+           o[this.name].push(this.value || '');    
+       } else {    
+           o[this.name] = this.value || '';    
+       }    
+   });    
+   return o;    
+};  
+
+
+/**
+ * [RegExpObj JS验证规则]
+ * @type {Object}
+ */
+var RegExpObj = {
+    //雅虎邮箱
+    yahooemail: function (str) {
+        return /^(([0-9a-zA-Z]+)|([0-9a-zA-Z]+[_.0-9a-zA-Z-]*))@yahoo.(\S)+$/.test(str);
+    },
+    //邮箱
+    email: function (str) {
+        return /^(([0-9a-zA-Z]+)|([0-9a-zA-Z]+[_.0-9a-zA-Z-]*))@([a-zA-Z0-9-]+[.])+([a-zA-Z]{2}|net|com|gov|mil|org|edu|int|name|asia)$/i.test(str);
+    },
+    //国号+手机
+    phoneRich: function (str) {
+        return /(^(([+]{0,1}\d{2,4}|\d{2,4})-?)?1[34578]\d{9}$)/.test(str);
+    },
+    //国号+电话/传真
+    telephoneRich: function (str) {
+        return /(^(([+]{0,1}\d{2,4}|\d{2,4})-?)?((\d{3,4})-?)?(\d{6,8})(-?(\d{1,6}))?$)/.test(str);
+    },
+    //手机
+    phone: function (str) {
+        return /^1[34578][0-9]{9}$/.test(str);
+    },
+    //电话/传真
+    telephone: function (str) {
+        return /^((\(\d{2,3}\))|(\d{3}\-))?(\(0\d{2,3}\)|0\d{2,3}-)?(\(0\d{2,3}\)|0\d{2,3})?(\(0\d{2,3}\)|0\d{2,3})?[1-9]\d{6,7}(\-\d{1,5})?$/.test(str);
+    },
+    //qq号
+    qq: function (str) {
+        return /[1-9][0-9]{4,}$/.test(str);
+    },
+    //微信号（中英文下划线数字）
+    weixin: function (str) {
+        return /^([0-9a-zA-Z]+[_0-9a-zA-Z]*)$/.test(str);
+    },
+    //超链接
+    url: function (str) {
+        return /^http[s]?:\/\/([\w-]+\.)+[\w-]+([\w-./?%&=]*)?$/.test(str);
+    },
+    //判断是否有大写字母
+    hasCapital: function (str) {
+        return /^.*[A-Z]+.*$/.test(str);
+    },
+    //判断是否有小写字母
+    hasLowercase: function (str) {
+        return /^.*[a-z]+.*$/.test(str);
+    },
+    //判断是否有数字
+    hasNumber: function (str) {
+        return /^.*[0-9]+.*$/.test(str);
+    },
+    //判断是否含有其它字符
+    hasOther: function (str) {
+        return /^.*[^0-9A-Za-z]+.*$/.test(str);
+    },
+    //验证登录用户名
+    loginUserName: function (str) {
+        return /^([0-9a-zA-Z]+[_0-9a-zA-Z@.-]*)$/.test(str);
+    },
+    //判断是否为数字
+    isNumber: function (str) {
+        return /^[0-9]+$/.test(str);
+    },
+    //判断是否是数字或字母
+    isCharOrNum: function (char) {
+        return /^([0-9]+|\w+)$/.test(char);
+    },
+    //中文姓名验证
+    isName: function(str){
+    	
+    	return  /^[\u4e00-\u9fff\w]{2,8}$/.test(str);
+    },
+    //车牌号吗验证
+    isCarNum:function(carNum){
+    	return /^[京津沪渝冀豫云辽黑湘皖鲁新苏浙赣鄂桂甘晋蒙陕吉闽贵粤青藏川宁琼使领A-Z]{1}[A-Z]{1}[A-Z0-9]{4}[A-Z0-9挂学警港澳]{1}$/.test(carNum);
+    },
+    checkMoney:function(money){
+    	return  /^([1-9][\d]{0,7}|0)(\.[\d]{1,2})?$/.test(money);
+    }
+};
+
+/*************************ztree控件封装Start************************************/
+/*****
+ * tree控件初始化
+ * param id ul元素的id
+ */
+/****wade.libs.tree Start*********/
+wade.libs.tree=function(ztreeConf){
+	
+//按钮
+	
+	var buttonhtml="";
+	$.each(ztreeConf.btns,function(index,value){
+		if(value=="add"){
+			buttonhtml+='<a id="zadd'+ztreeConf.id+'" class="btn btntreewidth" href=":javascript" title="新增节点"><i class="fa fa-plus"></i></a>'
+		}else
+		if(value=="delete"){
+			buttonhtml+='<a id="zdelete'+ztreeConf.id+'" class="btn btntreewidth" href=":javascript" title="删除节点"><i class="fa fa-minus"></i></a>'
+		}else
+		if(value=="edit"){
+			buttonhtml+='<a id="zedit'+ztreeConf.id+'" class="btn btntreewidth" href=":javascript" title="编辑节点"><i class="fa fa-edit"></i></a>'
+		}else
+		if(value=="expandAll"){
+			buttonhtml+='<a id="zexpandAll'+ztreeConf.id+'" class="btn btntreewidth" href=":javascript" title="展开所有节点"><i class="fa fa-folder-open-o"></i></a>'
+		}else
+		if(value=="collapseAll"){
+				
+			buttonhtml+='<a id="zcollapseAll'+ztreeConf.id+'" class="btn btntreewidth" href=":javascript" title="合并所有节点"><i class="fa fa-folder-o"></i></a>'
+		}else if(value="cancel"){
+			buttonhtml+='<a id="cancel'+ztreeConf.id+'" class="btn btntreewidth" href=":javascript" title="取消已选中的节点"><i class="fa fa-ban"></i></a>'
+		}
+		
+		
+	});
+	if(ztreeConf.btns.length!=0){
+		var controlhtml='<div id="controlbar'+ztreeConf.id+'" class="btn-group btn-group-line yy-btn-width">'+buttonhtml+'</div>';}
+	else
+		controlhtml='';
+	
+	
+	
+	//获取节点数据
+	var zNodes;
+	$.ajax({
+		url:ztreeConf.url,
+		async:false,
+		type:'get',
+		success:function(data){
+			result=JSON.parse(data);
+			zNodes=result;
+		}
+		
+	});
+	//树控件初始化
+	if($("#"+ztreeConf.id).length==0){
+		return;
+	}
+	
+		$("#"+ztreeConf.id).wrap("<div style='overflow:auto;'></div>").parent().before(controlhtml);
+		if(window.permission){
+			permission();
+		}
+		$.fn.zTree.init($("#"+ztreeConf.id),ztreeConf.setting, zNodes);
+		if(ztreeConf.expand===true){
+		$.fn.zTree.getZTreeObj(ztreeConf.id).expandAll(true);
+		}
+		
+	//取消选中绑定点击事件
+	$("#cancel"+ztreeConf.id).on('click',function(){
+		wade.tree.cancelchoose(ztreeConf.id);
+		if(ztreeConf.oncancel){
+			ztreeConf.oncancel();
+		}
+		return false;
+		
+	});
+	
+	$.each(ztreeConf.btns,function(index,value){
+		if(value=="add"){
+			$("#zadd"+ztreeConf.id).on("click",function(){
+
+					//跳出模态框，添加
+					var devClone = $("#" +ztreeConf.adddiv).clone(true);
+					var title  ='添加'+ devClone.find('.modal-title').text();
+					devClone.find('.modal-title').text(title);
+					devClone.modal({backdrop: 'static', keyboard: false}).on('shown.bs.modal',function(){
+					})
+					devClone.on('hidden.bs.modal',function(event){
+						$(this).remove();
+					});
+					if(ztreeConf.add_shown) {
+						ztreeConf.add_shown(devClone,ztreeConf.id,0);
+							
+						
+					}
+					
+					devClone.find(".btn-primary").click(function() { // 保存按钮添加事件
+				        var jsoninfo = devClone.find("form:first").serializeObject();
+				       
+						var formdata = "condition=" + JSON.stringify(jsoninfo);	
+						$(this).attr("disabled","disabled");
+						// 提交表单
+						$.ajax({
+							url : ztreeConf.addurl,
+							type:'post',
+							data : formdata+"&flag=0", // 默认获取div下第一个from数据
+							success : function(data) {
+								result = JSON.parse(data);
+								if (result.success) {
+									
+							   		wade.libs.alert('添加成功');
+							   		devClone.modal('hide');
+							   		wade.tree.addNode(ztreeConf.id,result.object);
+									
+														
+								} else {
+									wade.libs.alert(result.msg,0 ,devClone.find('div:first'));	
+								}
+								$(this).removeAttr("disabled");
+							
+						}});
+					});
+
+				
+				
+				
+				return false;
+			});
+		}else if(value=="delete"){
+			$("#zdelete"+ztreeConf.id).on("click",function(){
+				var node=wade.tree.selectNode(ztreeConf.id);
+				if(node==undefined){
+					//wade.libs.dialog("请选择需要删除的节点")
+					wade.libs.alert("请选择需要删除的节点",2);
+					return false;
+				}
+				if(ztreeConf.delnode){
+					if(!ztreeConf.delnode(node)){
+						return false;
+					}
+				}
+				
+				if(node.children==undefined||node.children.length==0){
+					
+					wade.libs.dialog("您确定要删除选中的节点吗",deleteNode);
+					
+				}else{
+					wade.libs.dialog("该节点有子节点，不能删除");
+				}
+			
+				
+				return false;
+			});
+			
+		}else if(value=="edit"){
+			$("#zedit"+ztreeConf.id).on("click",function(){
+				var node = wade.tree.selectNode(ztreeConf.id);
+				//跳出模态框，修改
+				var devClone = $("#" +ztreeConf.adddiv).clone(true);
+				var title  ='修改'+ devClone.find('.modal-title').text();
+				devClone.find('.modal-title').text(title);
+				devClone.on('shown.bs.modal',function(){
+				})
+				devClone.modal({backdrop: 'static', keyboard: false}).on('hidden.bs.modal',function(event){
+					$(this).remove();
+				});
+				if(ztreeConf.add_shown) {
+					ztreeConf.add_shown(devClone,ztreeConf.id,1); //模态框弹出后执行的函数
+				}
+				
+				devClone.find(".btn-primary").click(function() { // 保存按钮添加事件
+			        var jsoninfo = devClone.find("form:first").serializeObject();
+			       
+					var formdata = "condition=" + JSON.stringify(jsoninfo);	
+					$(this).attr("disabled","disabled");
+
+					// 提交表单
+					$.ajax({
+						url : ztreeConf.addurl,
+						type:'post',
+						data : formdata+"&nodeid="+node.id+"&flag=1", // 默认获取div下第一个from数据
+						success : function(data) {
+							result = JSON.parse(data);
+							if (result.success) {
+								
+								devClone.modal('hide');
+						   		wade.libs.alert('修改成功');
+						   		//$("#controlbar"+ztreeConf.id).remove();
+						   		//wade.libs.tree(ztreeConf);
+						   		var newnode = result.object;
+						   		var treeObj = $.fn.zTree.getZTreeObj(ztreeConf.id);
+						   		$.each(newnode,function(key,value){
+						   		
+						   			node[key]=newnode[key]
+						   			
+						   		});
+						  
+						   		treeObj.updateNode(node);
+								
+													
+							} else {
+								wade.libs.alert(result.msg,0 ,devClone.find('div:first'));	
+							}
+							$(this).removeAttr("disabled");
+						}
+					});
+				
+				
+			});
+				return false;
+			});
+			
+		}else if(value=="expandAll") {
+			$("#zexpandAll"+ztreeConf.id).on("click",function(){
+			var treeObj = $.fn.zTree.getZTreeObj(ztreeConf.id);
+			treeObj.expandAll(true);
+			return false;
+			});
+			
+		}else if(value=="collapseAll"){
+			$("#zcollapseAll"+ztreeConf.id).on("click",function(){
+			var treeObj = $.fn.zTree.getZTreeObj(ztreeConf.id);
+			treeObj.expandAll(false);
+			return false;
+			});
+			
+		}else{
+			////扩展
+			
+			
+		}
+		
+		
+	});
+	
+	function deleteNode(){
+		var result1;//删除结果
+		var node = wade.tree.selectNode(ztreeConf.id);
+		if(node!=undefined){	
+				
+				 
+				$.ajax({
+					url:ztreeConf.deleteurl,
+					type:'post',
+					data:"node="+node.id,
+					async:false,
+					success:function(data){
+						var result =  JSON.parse(data);
+						if(result.success){
+							//$("#controlbar"+ztreeConf.id).remove();
+					   		//wade.libs.tree(ztreeConf);
+							wade.tree.deleteNodes(ztreeConf.id);
+							wade.libs.alert(result.msg,2);
+							if(ztreeConf.afterdelete){
+								ztreeConf.afterdelete();
+							}
+							result1=true;
+							
+						}
+						else{
+							wade.libs.alert(result.msg,2);
+							result1=false;
+						}
+					},
+					error:function(){
+						wade.libs.dialog('哥们，服务器异常！');
+						
+						result1=false;
+					}
+				});				
+			}
+				return result1;
+		
+	}
+	
+}
+/****wade.libs.tree END*********/
+
+wade.tree.json=function(){
+	
+	
+}
+
+//取消所有选中的节点
+wade.tree.cancelchoose = function(treeid){
+	
+	
+	var treeObj = $.fn.zTree.getZTreeObj(treeid);
+	treeObj.cancelSelectedNode();
+	
+	
+	
+}
+
+wade.tree.defaultNode = function (treeId,param,paramValue){
+	var zTree = $.fn.zTree.getZTreeObj(treeId);
+	var treeNode = zTree.getNodeByParam(param,paramValue);
+	zTree.selectNode(treeNode);
+}
+
+wade.tree.parentNode = function(treeId){
+	var treeObj = $.fn.zTree.getZTreeObj(treeId);
+	return treeObj.getNodeByParam("id",treeObj.getSelectedNodes()[0].pId);
+}
+
+wade.tree.selectNode = function(treeId){
+	var treeObj = $.fn.zTree.getZTreeObj(treeId);
+	if(treeObj==null){
+		return undefined;
+	}
+	return treeObj.getSelectedNodes()[0];
+}
+
+/**
+* 添加新节点，如果指定节点，则在节点下添加，没有指定
+* 节点，则添加在当前选择的节点下
+*/
+
+
+wade.tree.addNode = function(treeId,data,node){
+	var treeObj = $.fn.zTree.getZTreeObj(treeId);
+	var selectNode = (node)? node:treeObj.getSelectedNodes()[0];
+	treeObj.addNodes(selectNode, data);
+}
+
+wade.tree.updateNodeName = function(treeId,value,node){
+	var treeObj = $.fn.zTree.getZTreeObj(treeId);
+	var updateNode = node? node:treeObj.getSelectedNodes()[0];
+	updateNode.name = value;
+	treeObj.updateNode(updateNode);
+}
+
+/**
+* 删除节点的子节点
+*/
+
+wade.tree.deleteChildrenNodes = function(treeId,node){
+	var treeObj = $.fn.zTree.getZTreeObj(treeId);
+	var deleteNode = (node)? node:treeObj.getSelectedNodes()[0];
+	treeObj.removeChildNodes(deleteNode.id);
+}
+
+/**
+* 删除节点以及该节点下的子节点
+*/
+
+wade.tree.deleteNode = function (treeId,node){
+	var treeObj = $.fn.zTree.getZTreeObj(treeId);
+	var deleteNode = (node)? node:treeObj.getSelectedNodes()[0];
+	if(deleteNode.isParent) treeObj.removeChildNodes(deleteNode.id);
+	var parentNode = deleteNode.getParentNode();
+	if(parentNode){
+		treeObj.selectNode(parentNode);
+		treeClick(null,hik.tree.TREE_CONTROLUNIT_ID,parentNode);
+	}
+	treeObj.removeNode(deleteNode);
+	
+}
+
+/**
+* 删除所有选择的节点/删除多个节点
+*/
+wade.tree.deleteNodes = function(treeId,node){
+	var treeObj = $.fn.zTree.getZTreeObj(treeId);
+	var deleteNodes = (node)? node:treeObj.getSelectedNodes();
+	for(var i =0,l=deleteNodes.length;i<l;i++){
+		treeObj.removeNode(deleteNodes[i]);
+	}
+}
+
+/*获取不带前缀类型的ID值，例如:"CU0",返回 "0"*/
+wade.tree.idValue = function(node){
+	return (node)? node.id.match(/\d+/ig)[0]:"";;
+}
+/*****************zTree END**********************/
+/*********************方法扩展*************/
+Date.prototype.Format = function (fmt) { //author: meizz 
+    var o = {
+        "M+": this.getMonth() + 1, //月份 
+        "d+": this.getDate(), //日 
+        "h+": this.getHours(), //小时 
+        "m+": this.getMinutes(), //分 
+        "s+": this.getSeconds(), //秒 
+        "q+": Math.floor((this.getMonth() + 3) / 3), //季度 
+        "S": this.getMilliseconds() //毫秒 
+    };
+    if (/(y+)/.test(fmt)) fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+    for (var k in o)
+    if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+    return fmt;
+}
+
+//数组添加函数，可根据值删除元素；
+Array.prototype.indexOf = function(val) {
+	for (var i = 0; i < this.length; i++) {
+	if (this[i] == val) return i;
+	}
+	return -1;
+	};
+Array.prototype.remove = function(val) {
+		var index = this.indexOf(val);
+		if (index > -1) {
+		this.splice(index, 1);
+		}
+		};
+
+/***************** bootstrap控件 start**********************/
+$(".timepicker").timepicker({
+    showInputs: false,
+    showMeridian:false, //24小时
+    showSeconds:true //显示秒
+  });
+/***************** bootstrap控件 end  **********************/
+
+
+/***************** 对话框控件 start**********************/
+/**
+ * 提醒信息的显示
+ * @param  {[type]} info [显示的信息]
+ * @param  {[type]} type [信息类型 0:错误 1:基本 2:警告 3:成功]
+ * @param  {[type]} html [信息显示位置容器]
+ * @param  {[type]} tick [延期关闭时间]
+ * @return {[type]}      [无]
+ */
+wade.libs.alert = function(info,type,html,tick){	
+	var cal = null;
+	var icon  = null;
+	switch(type)
+	{
+		case 0:
+			icon = 'fa-ban';
+			cal = 'danger';
+			break;
+		case 1:
+			icon = 'fa-info';
+			cal = 'info';
+			break;
+		case 2:
+			icon = 'fa-warning';
+			cal = 'warning';
+			break;
+		default:
+			icon = 'fa-check';
+			cal = 'success';
+	}
+	var id = new Date().getTime();
+	var div  = '<div style="position: absolute; width:100%; padding-top: 5px; height: 24px; top: 43px; text-align: center;"'+
+					'class="alert alert-'+cal+' alert-dismissible" id ="'+ id+ '"> '+
+    				'<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>'+
+    				'<h4><i class="icon fa '+icon+'"></i>'+info+'</h4>'+
+    		   '</div>';	
+	$('.alert').alert('close'); 	//关闭未关掉的警告 
+	if(html){ //弹出框界面显示
+		html.append($(div));
+	} else {
+		$('body').append($(div));
+	}
+	window.setTimeout(function(){	//延迟自动关闭
+		$('#'+id+'').alert('close');
+	},tick ? tick :2000);	
+}
+
+/**
+ * [dialog 对话框]
+ * @param  {[type]} info [对话框显示信息]
+ * @param  {[type]} call [回调函数]
+ * @return {[type]}      [无]
+ */
+wade.libs.dialog = function(info,call){
+	var id = new Date().getTime();
+	var btnId = id +'btn';
+	var html = '<div class="modal modal-warning" id  ="'+id+'"> <div class="modal-dialog"><div class="modal-content">'+
+        '<div class="modal-header">'+
+         ' <button type="button" class="close" data-dismiss="modal" aria-label="Close">'+
+          '  <span aria-hidden="true">×</span></button>'+
+       ' </div>'+
+       ' <div class="modal-body">'+
+         ' <p>'+info+'</p>'+
+       ' </div>'+
+        '<div class="modal-footer">'+
+          '<button type="button" class="btn btn-outline" data-dismiss="modal">取消</button>'+
+          '<button type="button" class="btn btn-outline" id ="'+btnId+'">确定</button>'+
+        '</div>'+
+      '</div>'+
+      '<!-- /.modal-content -->'+
+    '</div>'+
+    '<!-- /.modal-dialog -->'+
+  '</div>';
+	$('body').append($(html));
+	$('#'+id+'').modal('show').on('hidden.bs.modal',function(event){
+		$(this).remove();
+	});		
+	$('#'+btnId+'').click(function(){
+		$('#'+id+'').modal('hide')
+		if(call)
+		{
+		call();
+		}
+	});
+}
+/***************** 对话框控件end**********************/
+
+

@@ -1,0 +1,24 @@
+.modal-body .control-group{
+	margin-left:30px;
+	margin-bottom:10px;
+}
+.modal-body [class*=label]{
+	margin-left:50px;
+}
+.modal-body .label2{
+	width:65px;
+}
+.modal-body .label1{
+	width:195px;
+}
+.control-group>div{
+	display:inline-block;
+}
+.control-group .span1{
+	margin-right:20px;
+	display:inline-block;
+	
+}
+.divider{
+	
+}

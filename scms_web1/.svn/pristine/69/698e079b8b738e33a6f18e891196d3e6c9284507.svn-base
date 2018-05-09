@@ -1,0 +1,108 @@
+package com.wadejerry.scms.modules.auth.realm;
+
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import org.apache.shiro.authc.AuthenticationException;
+import org.apache.shiro.authc.AuthenticationInfo;
+import org.apache.shiro.authc.AuthenticationToken;
+import org.apache.shiro.authc.DisabledAccountException;
+import org.apache.shiro.authc.LockedAccountException;
+import org.apache.shiro.authc.SimpleAuthenticationInfo;
+import org.apache.shiro.authc.UnknownAccountException;
+import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.authz.AuthorizationInfo;
+import org.apache.shiro.authz.SimpleAuthorizationInfo;
+import org.apache.shiro.cache.Cache;
+import org.apache.shiro.realm.AuthorizingRealm;
+import org.apache.shiro.subject.PrincipalCollection;
+import org.apache.shiro.subject.SimplePrincipalCollection;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.wadejerry.scms.frame.constant.user.ConstUser;
+import com.wadejerry.scms.frame.entity.LoginInfo;
+import com.wadejerry.scms.modules.auth.model.BimUser;
+import com.wadejerry.scms.modules.auth.service.BimUserRoleRelService;
+import com.wadejerry.scms.modules.auth.service.BimUserService;
+
+public class ShiroDbRealm extends AuthorizingRealm {
+
+	@Autowired
+	private BimUserService bimUserService;
+	@Autowired
+	private BimUserRoleRelService userRoleService;
+
+	public ShiroDbRealm() {
+		super();
+	}
+
+	/***
+	 * 验证
+	 */
+	@Override
+	protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken authcToken)
+			throws AuthenticationException {
+		UsernamePasswordToken token = (UsernamePasswordToken) authcToken;
+		BimUser user = bimUserService.findUserByLoginName(token.getUsername(), ConstUser.CONST_USER_TYPE);
+		{
+			if (user == null) {
+				throw new UnknownAccountException();
+			} else {
+				if (user.getsLevel() == ConstUser.GENERAL_MANAGER) {
+					if(user.getDisableTime() != null) {
+						Calendar disableTime = Calendar.getInstance();
+						disableTime.setTime(user.getDisableTime());
+						disableTime.add(Calendar.DATE, 1);
+						if (disableTime.before(Calendar.getInstance())) {
+							throw new DisabledAccountException();
+						}
+						if (user.getStatus() == 1) {
+							throw new LockedAccountException();
+						}
+					}
+				}
+			}
+			return new SimpleAuthenticationInfo(user.getUserName(), user.getPassword(), getName());
+		}
+	}
+
+	/**
+	 * 授权
+	 */
+	@Override
+	protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection arg0) {
+		// BimUser user =
+		// bimUserService.findUserByLoginName((String)arg0.getPrimaryPrincipal(),ConstUser.CONST_USER_TYPE);\
+		SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
+		if (!LoginInfo.isCompanyManager()) {
+			List<String> roleNames = userRoleService.selectPermissionByid(LoginInfo.getLoginId());
+			List<String> permissions = userRoleService.selectPermissionByid(LoginInfo.getLoginId());
+
+			for (String temp : roleNames) {
+				info.addRole(temp);
+			}
+			for (String temp : permissions) {
+				info.addStringPermission(temp);
+			}
+		} else {
+			for (String temp : userRoleService.AllAuthorizationsManager()) {
+				info.addStringPermission(temp);
+			}
+		}
+		return info;
+	}
+
+	public void clearCachedAuthorizationInfo(String principal) {
+		SimplePrincipalCollection principals = new SimplePrincipalCollection(principal, getName());
+		clearCachedAuthorizationInfo(principals);
+	}
+
+	public void clearAllCachedAuthorizationInfo() {
+		Cache<Object, AuthorizationInfo> cache = getAuthorizationCache();
+		if (cache != null) {
+			for (Object key : cache.keys()) {
+				cache.remove(key);
+			}
+		}
+	}
+}

@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper  namespace="com.wadejerry.scms.modules.onecard.dao.PersonManagerMapper">
+ <resultMap id="BaseResultMap" type="com.wadejerry.scms.modules.onecard.model.PersonManager" >
+    <id column="person_id" property="personId" jdbcType="INTEGER" />
+    <result column="bim_dept_id" property="bimDeptId" jdbcType="INTEGER" />
+    <result column="bim_company_id" property="bimCompanyId" jdbcType="INTEGER" />
+    <result column="person_code" property="personCode" jdbcType="VARCHAR" />
+    <result column="person_name" property="personName" jdbcType="VARCHAR" />
+    <result column="pinyin" property="pinyin" jdbcType="VARCHAR" />
+    <result column="sex" property="sex" jdbcType="SMALLINT" />
+    <result column="cert_id" property="certId" jdbcType="VARCHAR" />
+    <result column="certtype" property="certtype" jdbcType="VARCHAR" />
+    <result column="enabledate" property="enabledate" jdbcType="TIMESTAMP"/>
+    <result column="disabledate" property="disabledate" jdbcType="TIMESTAMP" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="phone" property="phone" jdbcType="VARCHAR" />
+    <result column="address" property="address" jdbcType="VARCHAR" />
+    <result column="mail" property="mail" jdbcType="VARCHAR" />
+    <result column="order" property="order" jdbcType="INTEGER" />
+    <result column="password" property="password" jdbcType="VARCHAR" />
+    <result column="login_password" property="loginPassword" jdbcType="VARCHAR" />
+    <result column="use_system" property="useSystem" jdbcType="VARCHAR" />
+    <result column="note" property="note" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+    <result column="custom1" property="custom1" jdbcType="INTEGER" />
+    <result column="custom2" property="custom2" jdbcType="INTEGER" />
+    <result column="custom3" property="custom3" jdbcType="VARCHAR" />
+    <result column="custom4" property="custom4" jdbcType="VARCHAR" />
+    <result column="isdel" property="isdel" jdbcType="INTEGER" />
+  </resultMap>
+   <resultMap type="com.wadejerry.scms.modules.onecard.dto.PersonManagerDto" id="DtoResultMap">
+    <id column="person_id" property="personId" jdbcType="INTEGER" />
+    <result column="bim_dept_id" property="bimDeptId" jdbcType="INTEGER" />
+    <result column="bim_company_id" property="bimCompanyId" jdbcType="INTEGER" />
+    <result column="person_name" property="personName" jdbcType="VARCHAR" />
+    <result column="sex" property="sex" jdbcType="VARCHAR" />
+    <result column="cert_id" property="certId" jdbcType="VARCHAR" />
+    <result column="certtype" property="certtype" jdbcType="VARCHAR" />
+    <result column="pinyin" property="pinyin" jdbcType="VARCHAR" />
+    <result column="phone" property="phone" jdbcType="VARCHAR" />
+    <result column="person_code" property="personCode" jdbcType="VARCHAR" />
+    <result column="dept_level" property="deptLevel" jdbcType="INTEGER" />
+   </resultMap>
+   <resultMap type="com.wadejerry.scms.modules.onecard.dto.DeptTreeDto" id="DeptTreeDto">
+     <id column="bim_dept_id" property="id" jdbcType="INTEGER" />  
+    <result column="dept_code" property="deptCode" jdbcType="INTEGER" />
+    <result column="dept_name" property="name" jdbcType="VARCHAR" />
+    <result column="in_code" property="SpId" jdbcType="INTEGER" />
+    <!--  <result column="custom2" property="pId" jdbcType="INTEGER" /> -->
+   <!--  <result column="custom3" property="id" jdbcType="VARCHAR" />  -->
+    <result column="custom4" property="pId" jdbcType="VARCHAR" />
+   
+   </resultMap>
+  <resultMap type="com.wadejerry.scms.modules.onecard.dto.BimPersonDto" id="BimPersonDto">
+  <id column="person_id" property="personId" jdbcType="INTEGER" />
+  <result column="person_code" property="personCode" jdbcType="VARCHAR" />
+   <result column="bim_company_id" property="bimCompanyId" jdbcType="INTEGER" />
+  <result column="person_name" property="personName" jdbcType="VARCHAR" />
+  <result column="bim_dept_id" property="bimDeptId" jdbcType="INTEGER" />
+  <result column="sex" property="sex" jdbcType="SMALLINT" />
+  <result column="certtype" property="certtype" jdbcType="VARCHAR" />
+  <result column="cert_id" property="certId" jdbcType="VARCHAR" />
+  <result column="custom1" property="custom1" jdbcType="INTEGER" />
+  <result column="custom3" property="custom3" jdbcType="VARCHAR" />
+  <result column="custom4" property="custom4" jdbcType="VARCHAR" />
+  <result column="phone" property="phone" jdbcType="VARCHAR" />
+  <result column="address" property="address" jdbcType="VARCHAR" />
+  <result column="photo1" property="photo1" jdbcType="VARCHAR" />
+  <!-- <result column="birthday" property="birthday" jdbcType="TIMESTAMP" /> -->
+  </resultMap>
+   <select id="getRecordTotal" parameterType="com.wadejerry.scms.frame.entity.PageParamsDto"  resultType="java.lang.Integer" >
+  select count(person_id) from bim_person where
+  <!-- 如果不是企业操作员，就只有当前用户创建的操作员权限  -->
+  (#{loginUserLevel,jdbcType=INTEGER}=1) and 
+  <!--用户或角色名称模糊查询-->
+  	(#{searchValue0,jdbcType=VARCHAR}=''  or custom3 =#{searchValue0,jdbcType=VARCHAR})
+  	<!-- 过滤企业 -->
+  	and bim_company_id = #{companyId,jdbcType=INTEGER}
+  </select>
+  <!-- 分页获取操作员信息 -->
+  <select id="getpersonListByPage" parameterType="com.wadejerry.scms.frame.entity.PageParamsDto" resultMap="DtoResultMap" >
+   select person_id,person_code,bim_dept_id,person_name,sex,cert_id,certtype,pinyin,phone from bim_person where
+		<!-- 如果不是企业操
+		作员，就只有当前用户创建的操作员权限  -->
+	  	(#{loginUserLevel,jdbcType=INTEGER} = 1) and
+	  	<!--用户或角色名称模糊查询-->
+	  	(#{searchValue0,jdbcType=VARCHAR}='' or  custom3=#{searchValue0,jdbcType=VARCHAR} ) 
+	  	
+	  	<!-- 过滤企业 -->
+	  	and (bim_company_id = #{companyId,jdbcType=INTEGER}) ${order} 
+	  	LIMIT  #{length,jdbcType=INTEGER} OFFSET  #{start,jdbcType=INTEGER} 
+  </select>
+  
+   <select id="selectPTree" parameterType="int" resultMap="DeptTreeDto">
+  select bim_dept_id,dept_code,dept_name,in_code,custom4 from bim_dept where bim_company_id=#{0}
+  </select> 
+  
+  <select id="getRecordTotalByNode" parameterType="int">
+  select count(bim_dept_id) from  bim_person where bim_company_id=1 and bim_dept_id=#{0}
+  </select>
+  
+  <!-- <select id="updateInfoByNode" parameterType="com.wadejerry.scms.frame.entity.PageParamsDto" resultMap="DtoResultMap">
+  select person_id,person_code, person_name,sex,cert_id,certtype,pinyin,phone from bim_person  where
+		如果不是企业操
+		作员，就只有当前用户创建的操作员权限 
+	  	(#{loginUserLevel,jdbcType=INTEGER} = 1) and
+	  	用户或角色名称模糊查询
+	  	( bim_dept_id=#{IntValue2,jdbcType=INTEGER}) 
+	  	
+	  	过滤企业
+	  	and (bim_company_id = #{companyId,jdbcType=INTEGER})   ${order} 
+	  	LIMIT  #{length,jdbcType=INTEGER} OFFSET  #{start,jdbcType=INTEGER} 
+  </select> -->
+  <!-- 查询人员编号和姓名都存在 -->
+  <select id="selectByCodeAndName" resultMap="BimPersonDto">
+  select * from bim_person where person_code=#{0} and person_name=#{1}
+  </select>
+   <!-- 根据人员编号查询id -->
+  <select id="findByPersonCode" resultMap="BimPersonDto">
+  select * from bim_person where person_code=#{0} and bim_company_id=#{1}
+  </select>
+  <!-- 根据人员编号查询id -->
+  <select id="findPersonId" parameterType="int">
+  select person_id from bim_person where person_code=#{0} and bim_company_id=#{1}
+  </select>
+  
+  <insert id="SavePersonInfo" parameterType="com.wadejerry.scms.modules.onecard.dto.BimPersonDto">
+  insert into bim_person(bim_company_id,person_code,person_name,bim_dept_id,sex,custom3,certtype,cert_id,pinyin,phone,custom1,address,mail) values(#{bimCompanyId,jdbcType=INTEGER},#{personCode,jdbcType=VARCHAR},#{personName,jdbcType=VARCHAR},#{bimDeptId,jdbcType=INTEGER},#{sex,jdbcType=VARCHAR},#{custom3,jdbcType=VARCHAR},#{certtype,jdbcType=VARCHAR},#{certId,jdbcType=INTEGER},#{pinyin,jdbcType=VARCHAR},#{phone,jdbcType=VARCHAR},#{custom1,jdbcType=INTEGER},#{address,jdbcType=VARCHAR},#{mail,jdbcType=VARCHAR}) 
+  </insert>
+  
+  <insert id="SaveBirthday" parameterType="com.wadejerry.scms.modules.onecard.dto.BimPersonDto">
+  insert into bim_person_ext (person_id,birthday,english_name,job_date,resignation_date,educational,ethnic) values (#{personId,jdbcType=INTEGER},#{birthday,jdbcType=TIMESTAMP},#{englishName,jdbcType=VARCHAR},#{jobDate,jdbcType=TIMESTAMP},#{resignationDate,jdbcType=TIMESTAMP},#{educational,jdbcType=VARCHAR},#{ethnic,jdbcType=VARCHAR})
+  </insert>
+  <!-- 根据personid查询信息 -->
+  <select id="getInfoById" parameterType="com.wadejerry.scms.modules.onecard.dto.BimPersonDto">
+  select person_id,bim_company_id,person_code,person_name,bim_dept_id,sex,custom3,certtype,cert_id,custom4,phone,custom1,address from bim_person where person_id=#{0}
+  </select>
+  <!-- 根据部门id查询信息 -->
+  <select id="selectInfoByDeptId" parameterType="int" resultMap="BimPersonDto">
+  select * from bim_person where bim_dept_id=#{0}
+  </select>
+  <!-- 查询人员编号是否存在-->
+  <select id="selectCountByPersonCode"   resultType="int">
+  select count(*) from bim_person where person_name=#{0} and bim_company_id=#{1}
+  </select>
+  <!-- 查询部门编号是否存在-->
+  <select id="selectCountByDeptId"   resultType="int">
+  select count(*) from bim_dept where dept_code=#{0} and bim_company_id=#{1}
+  </select>
+  <!-- 查询证件类型是否存在-->
+  <select id="selectCountByCertType"  resultType="int">
+  select count(*) from bim_person where certtype=#{0} and bim_company_id=#{1}
+  </select>
+  <update id="updatePersonInfo" parameterType="com.wadejerry.scms.modules.onecard.dto.BimPersonDto">
+  update bim_person set person_name=#{personCode,jdbcType=VARCHAR},person_name=#{personName,jdbcType=VARCHAR},bim_dept_id=#{bimDeptId,jdbcType=INTEGER},sex=#{sex,jdbcType=VARCHAR},custom3=#{custom3,jdbcType=VARCHAR},certtype=#{certtype,jdbcType=VARCHAR},cert_id=#{certId,jdbcType=INTEGER},custom4=#{custom4,jdbcType=VARCHAR},phone=#{phone,jdbcType=VARCHAR},custom1=#{custom1,jdbcType=INTEGER},address=#{address,jdbcType=VARCHAR} where person_id=#{personId,jdbcType=INTEGER}
+  </update>
+  <!-- 更改生日信息 -->
+  <update id="updateBirthday" parameterType="com.wadejerry.scms.modules.onecard.dto.BimPersonDto">
+  update bim_person_ext set birthday=#{birthday,jdbcType=TIMESTAMP} where person_id=#{personId,jdbcType=INTEGER}
+  </update>
+   <!-- 更改Email信息 -->
+  <update id="updateEmail" parameterType="com.wadejerry.scms.modules.onecard.dto.BimPersonExtDto">
+  update bim_person set mail=#{mail,jdbcType=VARCHAR} where person_id=#{personId,jdbcType=INTEGER}
+  </update>
+  <!-- 移至部门 -->
+  <update id="updateDeptInfo" >
+  update bim_person set bim_dept_id=#{1} where person_code=#{0}
+  </update> 
+  <!-- 删除人员信息 -->
+  <delete id="deletePersonById" parameterType="int">
+  delete from bim_person where person_id=#{0}
+  </delete>
+  <!-- 导出员工 -->
+  <select id="download" resultType="java.util.HashMap" parameterType="int">
+  select p.person_code,p.person_name,p.bim_dept_id,case p.sex when '0' then '男' when '1' then '女' end sex,p.certtype,p.cert_id,e.birthday,p.phone,p.pinyin,p.address,e.english_name,p.mail,e.job_date,e.resignation_date,e.educational,e.ethnic from bim_person as p,bim_person_ext as e where e.person_id=p.person_id and p.bim_company_id=#{0}
+  </select> 
+</mapper>

@@ -1,0 +1,132 @@
+package com.wadejerry.scms.modules.pfm.controller;
+
+import java.text.ParseException;
+import java.util.Date;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.codehaus.jettison.json.JSONException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.wadejerry.scms.frame.Authority.AuthorityGetter;
+import com.wadejerry.scms.frame.entity.DataTableDto;
+import com.wadejerry.scms.frame.entity.LoginInfo;
+import com.wadejerry.scms.frame.entity.PageParamsDto;
+import com.wadejerry.scms.frame.entity.ReportPageParamsDto;
+import com.wadejerry.scms.modules.pfm.dto.CarInfoDto;
+import com.wadejerry.scms.modules.pfm.dto.PfmFeeRecDto;
+import com.wadejerry.scms.modules.pfm.model.PfmChargeRecord;
+import com.wadejerry.scms.modules.pfm.model.PfmFeeRec;
+import com.wadejerry.scms.modules.pfm.service.PfmFeeRecService;
+import com.wadejerry.scms.utils.AjaxUtil;
+import com.wadejerry.scms.utils.date.DateUtil;
+@Controller
+public class PfmFeeRecController {
+	@Autowired
+	private HttpServletRequest request;
+	@Autowired
+	private HttpServletResponse response;
+	@Autowired
+	private PfmFeeRecService pfmfeerecService;
+	@Autowired
+	private AuthorityGetter authorityGetter;
+	//查询账户消费记录，用来显示前10条记录
+	@RequestMapping("/account/selectrecording.do")
+	@ResponseBody
+	public void SelectRecord(){
+		String cardid=request.getParameter("cardid");
+		String Fee=null;
+		List<PfmFeeRecDto> listDto=pfmfeerecService.selectRecording(Integer.valueOf(cardid),LoginInfo.getCompanyId());
+		for(PfmFeeRecDto tempDto:listDto){
+			//String date=DateUtil.YMDHMdf.format(tempDto.getTime());
+			String date=DateUtil.YMDHMdf.format(tempDto.getInsertTime());
+			tempDto.setStrTime(date);
+		}
+		AjaxUtil.ajaxWriteObject(listDto,response);
+	}
+
+	@RequestMapping("/report/selectFeeRec.do")
+	@ResponseBody
+	public void selectFeeRec(HttpServletRequest request) throws ParseException, JSONException{
+		List<Integer> listtype=authorityGetter.carTypeAuth();
+		ReportPageParamsDto paramsDto=ReportPageParamsDto.GetParamsDtoByRequest(request);
+		if(paramsDto==null){
+			int draw = Integer.parseInt(request.getParameter("draw"));
+			DataTableDto data = new DataTableDto(); // 返回数据封装
+			data.setDataList(null);
+			data.setDraw(draw);
+			data.setRecordsFiltered(0);
+			data.setRecordsTotal(0);
+			AjaxUtil.ajaxWriteDataTable(data, response);
+			return;
+		}else{
+			
+			int iTotal=0;
+			Date startTime=null;
+			Date endTime=null;
+			String carNumber=null;
+		    List<Integer> listtypeId=null;
+		    Integer typeId=null;
+		    String size=null;
+		    Integer accountType=null;
+			if(paramsDto.getSearchValue0()!=null){
+				//开始时间
+				startTime=paramsDto.getSearchValue0();
+			}
+			if(paramsDto.getSearchValue1()!=null){
+				//结束时间
+				endTime=paramsDto.getSearchValue1();
+			}
+			if(paramsDto.getSearchValue2()!=null&&!paramsDto.getSearchValue2().equals("")){
+				carNumber=paramsDto.getSearchValue2();
+			}
+			if(paramsDto.getIntValue5()!=-1){
+				typeId=paramsDto.getIntValue5();
+			}
+			if(paramsDto.getIntValue6()!=-1){
+				accountType=paramsDto.getIntValue6();
+			}
+			if(listtype!=null){//不是企业管理员，需要权限
+				if(listtype.size()>0){
+					listtypeId=listtype;
+					paramsDto.setListType(listtype);
+				}else{
+					size="1";
+					paramsDto.setSize("1");
+				}
+			}
+			List<PfmChargeRecord> dtolist=null;
+			iTotal=pfmfeerecService.getFeeReportCount(startTime,endTime,carNumber,listtypeId,size,typeId,accountType);
+			if(iTotal>0){
+				if(paramsDto.getLength()==-1){
+					paramsDto.setLength(iTotal);  //查询所有记录
+				}
+				
+				dtolist=pfmfeerecService.getFeeReportListByPage(paramsDto);
+				
+			}
+			DataTableDto data = new DataTableDto(); // 返回数据封装
+			data.setDataList(dtolist);
+			data.setDraw(paramsDto.getDraw());
+			data.setRecordsFiltered(iTotal);
+			data.setRecordsTotal(iTotal);
+			AjaxUtil.ajaxWriteDataTable(data, response);
+			
+			
+			
+		}
+		
+		
+		}
+	   
+		
+	}
+	
+	
+	
+

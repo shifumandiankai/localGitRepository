@@ -1,0 +1,28 @@
+package com.wadejerry.scms.modules.sysconfig.serviceImpl;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.wadejerry.scms.modules.sysconfig.dao.BimsysParamMapper;
+import com.wadejerry.scms.modules.sysconfig.service.BimsysParamService;
+
+
+@Service("bimsysParamService")
+public class BimsysParamServiceImpl implements BimsysParamService {
+@Autowired
+private BimsysParamMapper bimsysParamMapper;
+@Transactional(rollbackFor=Exception.class)
+	public void SaveParams(int alarm, int config, int common, int work, int monitor, int validate,String AutoSetTime) {
+		//bimsysParamMapper.SaveParams(alarm,config,common,work,monitor,validate,AutoSetTimeTime);
+	bimsysParamMapper.updateTimeStyle(AutoSetTime);
+	bimsysParamMapper.updateTimeWeek(validate);
+	bimsysParamMapper.updateAlarm(alarm);
+	bimsysParamMapper.updateConfig(config);
+	bimsysParamMapper.updateCommon(common);
+	bimsysParamMapper.updateWork(work);
+	bimsysParamMapper.updateMonitor(monitor);
+		
+	}
+
+}
